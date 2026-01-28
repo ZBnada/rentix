@@ -1,0 +1,55 @@
+<!-- Overlay -->
+@if (isOpen()) {
+    <div
+            class="fixed inset-0 z-40"
+            [ngClass]="'bg-black/50'"
+            (click)="onClose()">
+    </div>
+}
+
+<!-- Sidebar -->
+<div
+        [ngClass]="{
+    'translate-x-0': isOpen(),
+    '-translate-x-full': !isOpen()
+  }"
+        class="fixed top-0 left-0 h-full w-80 bg-white z-50 transform transition-transform duration-300 ease-in-out">
+
+    <!-- Sidebar Header -->
+    <div class="flex items-center justify-between p-6 border-b">
+        <div class="flex items-center gap-2">
+      <span class="text-2xl font-black tracking-tight text-black">
+        Rent<span class="text-orange-500">I</span>X
+      </span>
+        </div>
+        <button
+                (click)="onClose()"
+                class="p-2 hover:bg-gray-100 rounded-lg transition-colors">
+            <!-- X Icon -->
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+        </button>
+    </div>
+
+    <!-- Sidebar Menu -->
+    <nav class="p-6 space-y-6">
+        @for (item of menuItems; track item.label) {
+            <div>
+                <a
+                        href="#"
+                        [ngClass]="{
+            'text-orange-500': item.active,
+            'text-black hover:text-orange-500': !item.active
+          }"
+                        class="flex items-center gap-4 text-lg font-semibold transition-colors">
+                    <span [innerHTML]="getIcon(item.icon)"></span>
+                    {{ item.label }}
+                </a>
+                @if (item.subtitle) {
+                    <p class="ml-10 text-sm text-gray-500 mt-1">{{ item.subtitle }}</p>
+                }
+            </div>
+        }
+    </nav>
+</div>

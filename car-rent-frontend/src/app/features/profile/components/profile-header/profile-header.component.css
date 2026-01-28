@@ -1,0 +1,43 @@
+/* src/app/features/profile/components/profile-header/profile-header.component.css */
+
+/* Background pattern animation */
+@keyframes patternMove {
+    0% {
+        background-position: 0 0;
+    }
+    100% {
+        background-position: 40px 40px;
+    }
+}
+
+/* Glow effect animation */
+@keyframes glow {
+    0%, 100% {
+        opacity: 0.1;
+    }
+    50% {
+        opacity: 0.15;
+    }
+}
+
+/* Profile image border glow on hover */
+.group:hover .border-orange-500\/30 {
+    border-color: rgba(249, 115, 22, 0.6);
+}
+
+/* Status indicator pulse */
+@keyframes statusPulse {
+    0%, 100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+    50% {
+        transform: scale(1.1);
+        opacity: 0.8;
+    }
+}
+
+/* Stats card hover effect */
+.group:hover .group-hover\:bg-orange-500\/20 {
+    background-color: rgba(249, 115, 22, 0.2);
+}

@@ -1,0 +1,388 @@
+/* ===== IMPORTS (doivent être en premier) ===== */
+@import url("https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap");
+@import "swiper/css/bundle";
+
+/* ===== TAILWIND ===== */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ===== BASE STYLES ===== */
+@layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: theme('colors.gray.200');
+  }
+
+  button:not(:disabled),
+  [role="button"]:not(:disabled) {
+    cursor: pointer;
+  }
+
+  body {
+    @apply relative font-normal font-outfit bg-gray-50 text-gray-900;
+  }
+}
+
+/* ===== UTILITIES ===== */
+@layer utilities {
+  /* Menu Items */
+  .menu-item {
+    @apply relative flex items-center w-full gap-3 px-3 py-2 font-medium rounded-lg text-sm;
+  }
+
+  .menu-item-active {
+    @apply bg-orange-50 text-orange-500;
+  }
+
+  .menu-item-inactive {
+    @apply text-gray-700 hover:bg-gray-100 group-hover:text-gray-700;
+  }
+
+  .menu-item-icon {
+    @apply text-gray-500 group-hover:text-gray-700;
+  }
+
+  .menu-item-icon-active {
+    @apply text-orange-500;
+  }
+
+  .menu-item-icon-size svg {
+    @apply !w-6 !h-6;
+  }
+
+  /* Scrollbar */
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar {
+    @apply w-1.5 h-1.5;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-track {
+    @apply rounded-full;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    @apply bg-gray-200 rounded-full hover:bg-gray-300;
+  }
+
+  /* Date Input */
+  input[type="date"]::-webkit-inner-spin-button,
+  input[type="time"]::-webkit-inner-spin-button,
+  input[type="date"]::-webkit-calendar-picker-indicator,
+  input[type="time"]::-webkit-calendar-picker-indicator {
+    display: none;
+    -webkit-appearance: none;
+  }
+}
+
+/* ===== CUSTOM COMPONENTS ===== */
+@layer components {
+  .btn-primary {
+    @apply bg-orange-500 hover:bg-orange-600 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200;
+  }
+
+  .btn-secondary {
+    @apply bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-2 px-4 rounded-lg transition-colors duration-200;
+  }
+
+  .input-primary {
+    @apply w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent;
+  }
+
+  .card {
+    @apply bg-white rounded-lg shadow-md p-6;
+  }
+}
+
+/* ===== CHECKBOX STYLES ===== */
+.tableCheckbox:checked ~ span span {
+  @apply opacity-100;
+}
+
+.tableCheckbox:checked ~ span {
+  @apply border-orange-500 bg-orange-500;
+}
+
+.form-check-input:checked ~ span {
+  @apply border-[6px] border-orange-500 bg-orange-500;
+}
+
+.taskCheckbox:checked ~ .box span {
+  @apply opacity-100 bg-orange-500;
+}
+
+.taskCheckbox:checked ~ p {
+  @apply text-gray-400 line-through;
+}
+
+.taskCheckbox:checked ~ .box {
+  @apply border-orange-500 bg-orange-500;
+}
+
+/* ===== THIRD-PARTY LIBRARIES ===== */
+
+/* ApexCharts */
+.apexcharts-legend-text {
+  @apply !text-gray-700;
+}
+
+.apexcharts-text {
+  @apply !fill-gray-700;
+}
+
+.apexcharts-tooltip.apexcharts-theme-light {
+  @apply gap-1 !rounded-lg !border-gray-200 p-3 !shadow-md;
+}
+
+.apexcharts-gridline {
+  @apply !stroke-gray-100;
+}
+
+/* Flatpickr Calendar */
+.flatpickr-wrapper {
+  @apply w-full;
+}
+
+.flatpickr-calendar {
+  @apply mt-2 !bg-white !rounded-xl !p-5 !border !border-gray-200 !text-gray-500;
+}
+
+.flatpickr-months .flatpickr-prev-month:hover svg,
+.flatpickr-months .flatpickr-next-month:hover svg {
+  @apply stroke-orange-500;
+}
+
+.flatpickr-day.selected,
+.flatpickr-day.startRange,
+.flatpickr-day.endRange {
+  @apply !text-white !border-orange-500 !bg-orange-500 hover:!border-orange-600 hover:!bg-orange-600;
+}
+
+/* FullCalendar */
+.fc .fc-toolbar.fc-header-toolbar {
+  @apply flex-col gap-4 px-6 pt-6 sm:flex-row;
+}
+
+.fc-button-group .fc-button {
+  @apply flex h-10 w-10 items-center justify-center !rounded-lg border border-gray-200 bg-transparent hover:border-gray-300 hover:bg-gray-50 capitalize;
+}
+
+.fc-addEventButton-button {
+  @apply !rounded-lg !border-0 !bg-orange-500 !px-4 !py-2.5 !text-sm !font-medium hover:!bg-orange-600;
+}
+
+/* Swiper */
+.swiper-button-prev svg,
+.swiper-button-next svg {
+  @apply !h-auto !w-auto;
+}
+
+.stocks-slider-outer .swiper-button-next,
+.stocks-slider-outer .swiper-button-prev {
+  @apply !static mt-0 h-8 w-9 rounded-full border border-gray-200 !text-gray-700 transition hover:bg-gray-100;
+}
+
+
+/* Popup principal */
+.rentix-popup {
+  border-radius: 1rem !important;
+  padding: 2rem !important;
+  font-family: inherit !important;
+}
+
+/* Titre */
+.rentix-title {
+  font-size: 1.5rem !important;
+  font-weight: 700 !important;
+  color: #1f2937 !important;
+  margin-bottom: 1rem !important;
+}
+
+/* Icônes */
+.swal2-icon {
+  border-width: 3px !important;
+  width: 5rem !important;
+  height: 5rem !important;
+  margin: 1.5rem auto !important;
+}
+
+.swal2-icon.swal2-success {
+  border-color: #10b981 !important;
+  color: #10b981 !important;
+}
+
+.swal2-icon.swal2-success [class^='swal2-success-line'] {
+  background-color: #10b981 !important;
+}
+
+.swal2-icon.swal2-success .swal2-success-ring {
+  border-color: rgba(16, 185, 129, 0.3) !important;
+}
+
+.swal2-icon.swal2-error {
+  border-color: #ef4444 !important;
+  color: #ef4444 !important;
+}
+
+.swal2-icon.swal2-error [class^='swal2-x-mark-line'] {
+  background-color: #ef4444 !important;
+}
+
+.swal2-icon.swal2-warning {
+  border-color: #f59e0b !important;
+  color: #f59e0b !important;
+}
+
+.swal2-icon.swal2-info {
+  border-color: #3b82f6 !important;
+  color: #3b82f6 !important;
+}
+
+.swal2-icon.swal2-question {
+  border-color: #8b5cf6 !important;
+  color: #8b5cf6 !important;
+}
+
+/* Contenu */
+.swal2-html-container {
+  font-size: 1rem !important;
+  color: #4b5563 !important;
+  line-height: 1.6 !important;
+  margin: 1rem 0 !important;
+}
+
+/* Bouton de confirmation - Style RentIX Orange */
+.rentix-confirm-btn {
+  background-color: #f97316 !important;
+  border: none !important;
+  border-radius: 0.5rem !important;
+  padding: 0.75rem 2rem !important;
+  font-size: 1rem !important;
+  font-weight: 600 !important;
+  color: #ffffff !important;
+  box-shadow: 0 4px 6px -1px rgba(249, 115, 22, 0.3) !important;
+  transition: all 0.2s ease !important;
+}
+
+.rentix-confirm-btn:hover {
+  background-color: #ea580c !important;
+  box-shadow: 0 10px 15px -3px rgba(249, 115, 22, 0.4) !important;
+  transform: translateY(-1px) !important;
+}
+
+.rentix-confirm-btn:active {
+  transform: translateY(0) !important;
+}
+
+.rentix-confirm-btn:focus {
+  box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.5) !important;
+}
+
+/* Bouton d'annulation */
+.rentix-cancel-btn {
+  background-color: #6b7280 !important;
+  border: none !important;
+  border-radius: 0.5rem !important;
+  padding: 0.75rem 2rem !important;
+  font-size: 1rem !important;
+  font-weight: 600 !important;
+  color: #ffffff !important;
+  transition: all 0.2s ease !important;
+}
+
+.rentix-cancel-btn:hover {
+  background-color: #4b5563 !important;
+  transform: translateY(-1px) !important;
+}
+
+.rentix-cancel-btn:active {
+  transform: translateY(0) !important;
+}
+
+/* Barre de progression (timer) */
+.swal2-timer-progress-bar {
+  background-color: #f97316 !important;
+  height: 4px !important;
+}
+
+/* Loading spinner - Couleur Orange */
+.swal2-loader {
+  border-color: #f97316 transparent #f97316 transparent !important;
+}
+
+/* Actions footer */
+.swal2-actions {
+  gap: 1rem !important;
+  margin: 1.5rem 0 0 0 !important;
+}
+
+/* Animation d'apparition personnalisée */
+@keyframes swal2-show {
+  0% {
+    transform: scale(0.7);
+    opacity: 0;
+  }
+  45% {
+    transform: scale(1.05);
+    opacity: 1;
+  }
+  80% {
+    transform: scale(0.95);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.swal2-show {
+  animation: swal2-show 0.3s ease-out !important;
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .rentix-popup {
+    background-color: #1f2937 !important;
+  }
+
+  .rentix-title {
+    color: #f9fafb !important;
+  }
+
+  .swal2-html-container {
+    color: #d1d5db !important;
+  }
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+  .rentix-popup {
+    padding: 1.5rem !important;
+    margin: 1rem !important;
+  }
+
+  .rentix-title {
+    font-size: 1.25rem !important;
+  }
+
+  .swal2-icon {
+    width: 4rem !important;
+    height: 4rem !important;
+  }
+
+  .rentix-confirm-btn,
+  .rentix-cancel-btn {
+    padding: 0.625rem 1.5rem !important;
+    font-size: 0.875rem !important;
+  }
+}

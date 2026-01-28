@@ -1,0 +1,396 @@
+﻿/* ==========================================
+   HEADER COMPONENT - RENTIX
+   Theme: Orange (#FF5F00) & Professional
+   ========================================== */
+
+/* ==========================================
+   TRANSITIONS & ANIMATIONS
+   ========================================== */
+
+/* Smooth transitions for all interactive elements */
+header button,
+header a {
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Menu toggle button hover effect */
+header button:hover {
+    transform: translateY(-1px);
+}
+
+header button:active {
+    transform: translateY(0);
+}
+
+/* ==========================================
+   USER DROPDOWN ANIMATION
+   ========================================== */
+
+.animate-in {
+    animation: slideInDown 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes slideInDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px) scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+/* Fade in animation */
+.fade-in {
+    animation: fadeIn 0.15s ease-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+/* Slide in from top */
+.slide-in-from-top-2 {
+    animation: slideFromTop 0.2s ease-out;
+}
+
+@keyframes slideFromTop {
+    from {
+        opacity: 0;
+        transform: translateY(-8px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ==========================================
+   CHEVRON ROTATION
+   ========================================== */
+
+.rotate-180 {
+    transform: rotate(180deg);
+    transition: transform 0.2s ease-in-out;
+}
+
+/* ==========================================
+   SEARCH INPUT
+   ========================================== */
+
+/* Custom width for search */
+.xl\:w-125 {
+    width: 31.25rem; /* 500px */
+}
+
+/* Search input focus effect */
+input[type="text"]:focus {
+    box-shadow: 0 0 0 3px rgba(255, 95, 0, 0.1);
+}
+
+/* ==========================================
+   NOTIFICATION PING ANIMATION
+   ========================================== */
+
+@keyframes ping {
+    75%, 100% {
+        transform: scale(2);
+        opacity: 0;
+    }
+}
+
+.animate-ping {
+    animation: ping 1s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+/* ==========================================
+   CUSTOM Z-INDEX LAYERS
+   ========================================== */
+
+.z-1 {
+    z-index: 1;
+}
+
+.-z-1 {
+    z-index: -1;
+}
+
+.z-40 {
+    z-index: 40;
+}
+
+.z-50 {
+    z-index: 50;
+}
+
+.z-999 {
+    z-index: 999;
+}
+
+/* ==========================================
+   CUSTOM SIZES
+   ========================================== */
+
+.h-8\.5 {
+    height: 2.125rem; /* 34px */
+}
+
+.w-8\.5 {
+    width: 2.125rem; /* 34px */
+}
+
+.h-5\.5 {
+    height: 1.375rem;
+}
+
+.w-5\.5 {
+    width: 1.375rem;
+}
+
+.w-62\.5 {
+    width: 15.625rem; /* 250px */
+}
+
+/* ==========================================
+   USER AVATAR
+   ========================================== */
+
+/* Avatar gradient */
+span[class*="bg-gradient-to-br"] {
+    box-shadow: 0 2px 8px rgba(255, 95, 0, 0.2);
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+button:hover span[class*="bg-gradient-to-br"] {
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(255, 95, 0, 0.3);
+}
+
+/* ==========================================
+   DROPDOWN MENU ITEMS
+   ========================================== */
+
+/* Menu item hover effects */
+ul button {
+    position: relative;
+    overflow: hidden;
+}
+
+ul button::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100%;
+    width: 3px;
+    background-color: #FF5F00;
+    transform: scaleY(0);
+    transition: transform 0.2s ease-in-out;
+}
+
+ul button:hover::before {
+    transform: scaleY(1);
+}
+
+/* Logout button special styling */
+button[class*="text-red-600"]::before {
+    background-color: #dc2626;
+}
+
+/* ==========================================
+   BACKDROP
+   ========================================== */
+
+/* Dropdown backdrop */
+div[class*="fixed inset-0"] {
+    animation: fadeIn 0.15s ease-out;
+}
+
+/* ==========================================
+   DARK MODE ICON TRANSITION
+   ========================================== */
+
+/* Smooth icon swap */
+button svg {
+    transition: all 0.2s ease-in-out;
+}
+
+button:hover svg {
+    transform: scale(1.1);
+}
+
+/* ==========================================
+   RESPONSIVE ADJUSTMENTS
+   ========================================== */
+
+/* Mobile: Hide search bar */
+@media (max-width: 640px) {
+    form {
+        display: none;
+    }
+}
+
+/* Tablet: Show search */
+@media (min-width: 640px) {
+    form {
+        display: block;
+    }
+}
+
+/* Desktop: Show user info */
+@media (min-width: 1024px) {
+    .lg\:block {
+        display: block;
+    }
+}
+
+/* Extra large: Show keyboard shortcut */
+@media (min-width: 1280px) {
+    .xl\:inline-flex {
+        display: inline-flex;
+    }
+}
+
+/* ==========================================
+   ACCESSIBILITY
+   ========================================== */
+
+/* Focus visible states */
+button:focus-visible,
+a:focus-visible {
+    outline: 2px solid #FF5F00;
+    outline-offset: 2px;
+    border-radius: 0.5rem;
+}
+
+/* Reduce motion for accessibility */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* ==========================================
+   HOVER EFFECTS
+   ========================================== */
+
+/* Button hover lift effect */
+button {
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+button:hover {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+:host-context(.dark) button:hover {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+/* ==========================================
+   STICKY HEADER SHADOW
+   ========================================== */
+
+/* Add shadow when scrolled */
+header.scrolled {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+:host-context(.dark) header.scrolled {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+/* ==========================================
+   PRINT STYLES
+   ========================================== */
+
+@media print {
+    header {
+        position: static;
+        box-shadow: none;
+        border-bottom: 1px solid #000;
+    }
+
+    /* Hide interactive elements when printing */
+    button,
+    form {
+        display: none;
+    }
+}
+/* src/app/core/components/header/header.component.css */
+
+/* Assurer que le header reste fixe en haut */
+:host {
+    display: block;
+    position: sticky;
+    top: 0;
+    z-index: 999;
+    background-color: white;
+}
+
+:host-context(.dark) {
+    background-color: #1a202c; /* dark:bg-gray-dark */
+}
+
+/* Ombre subtile au scroll */
+.header-shadow {
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+}
+
+/* Animation smooth pour le dropdown */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.animate-in {
+    animation: fadeIn 0.2s ease-out;
+}
+
+/* Assurer que le backdrop du dropdown ne bloque pas le scroll */
+.dropdown-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 40;
+}
+
+/* Transitions smooth */
+button {
+    transition: all 0.2s ease-in-out;
+}
+
+/* Focus states pour l'accessibilité */
+button:focus-visible {
+    outline: 2px solid #f97316;
+    outline-offset: 2px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 640px) {
+    /* Ajustements pour mobile si nécessaire */
+}
+
+/* Assurer que le header ne se chevauche pas avec le contenu en dessous */
+header {
+    border-bottom: 1px solid #e5e7eb;
+}
+
+:host-context(.dark) header {
+    border-bottom-color: #374151;
+}

@@ -1,0 +1,139 @@
+
+/* Card entrance animation */
+.card {
+    animation: cardFadeIn 0.4s ease-out;
+}
+
+@keyframes cardFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Stagger animation for multiple cards */
+.card:nth-child(1) { animation-delay: 0s; }
+.card:nth-child(2) { animation-delay: 0.1s; }
+.card:nth-child(3) { animation-delay: 0.2s; }
+.card:nth-child(4) { animation-delay: 0.3s; }
+.card:nth-child(5) { animation-delay: 0.4s; }
+
+/* Progress bar animation */
+@keyframes progressFill {
+    from {
+        width: 0;
+    }
+}
+
+.bg-gradient-to-r {
+    animation: progressFill 1s ease-out;
+}
+
+/* Badge hover effects */
+span[class*="inline-flex"]:hover {
+    transform: translateY(-1px);
+    transition: transform 0.2s ease;
+}
+
+/* Icon animations */
+svg {
+    transition: transform 0.2s ease;
+}
+
+.group:hover svg {
+    transform: scale(1.1);
+}
+
+/* Verified badge pulse */
+@keyframes verifiedPulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.7;
+    }
+}
+
+.text-green-700 svg {
+    animation: verifiedPulse 2s ease-in-out infinite;
+}
+
+/* Card section headers */
+h3 {
+    transition: color 0.2s ease;
+}
+
+/* Grid items hover effect */
+.grid > div:hover {
+    background-color: rgba(249, 115, 22, 0.02);
+    transition: background-color 0.2s ease;
+}
+
+/* Label icon color transition */
+label svg {
+    transition: color 0.2s ease;
+}
+
+label:hover svg {
+    color: #f97316;
+}
+
+/* Status indicator animations */
+.bg-green-500,
+.bg-red-500 {
+    animation: statusBlink 2s ease-in-out infinite;
+}
+
+@keyframes statusBlink {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.6;
+    }
+}
+
+/* Completion card gradient animation */
+@keyframes gradientShift {
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+.bg-gradient-to-br {
+    background-size: 200% 200%;
+    animation: gradientShift 3s ease infinite;
+}
+
+/* Responsive improvements */
+@media (max-width: 768px) {
+    .card {
+        animation: none; /* Disable animations on mobile for better performance */
+    }
+
+    .grid {
+        gap: 1rem;
+    }
+}
+
+/* Print styles */
+@media print {
+    .card {
+        page-break-inside: avoid;
+        box-shadow: none !important;
+    }
+
+    svg {
+        display: none;
+    }
+}

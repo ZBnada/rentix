@@ -1,0 +1,180 @@
+<div class="mx-auto max-w-6xl space-y-6">
+    <!-- Back Button -->
+    <button
+            (click)="onCancel()"
+            type="button"
+            class="flex items-center gap-2 text-gray-600 transition-colors hover:text-gray-900 dark:text-gray-400 dark:hover:text-white">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd" />
+        </svg>
+        Back to list
+    </button>
+
+    <!-- Page Header -->
+    <div>
+        <h1 class="text-3xl font-bold text-gray-900 dark:text-white">
+            {{ isEditMode() ? 'Edit Vehicle' : 'New Vehicle' }}
+        </h1>
+        <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">
+            {{ isEditMode() ? 'Update vehicle information' : 'Add a new vehicle to your fleet' }}
+        </p>
+    </div>
+
+    <!-- Global Error Message -->
+    @if (errorMessage()) {
+        <div class="rounded-lg border border-error-200 bg-error-50 p-4 dark:border-error-900 dark:bg-error-900/20">
+            <div class="flex items-center gap-2">
+                <svg class="h-5 w-5 text-error-600 dark:text-error-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <p class="text-sm font-medium text-error-800 dark:text-error-200">
+                    {{ errorMessage() }}
+                </p>
+            </div>
+        </div>
+    }
+
+    <!-- Loading State -->
+    @if (isLoading()) {
+        <div class="flex items-center justify-center py-12">
+            <div class="h-12 w-12 animate-spin rounded-full border-b-2 border-orange-500"></div>
+        </div>
+    }
+
+    <!-- Form -->
+    @if (!isLoading()) {
+        <form [formGroup]="formGroup" (ngSubmit)="onSubmit()" class="space-y-6">
+            <!-- Form Sections -->
+            @for (section of formSections; track section.id) {
+                <div class="card">
+                    <!-- Section Header -->
+                    <div class="mb-6 border-b border-gray-200 pb-4 dark:border-gray-800">
+                        <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
+                            {{ section.title }}
+                        </h2>
+                    </div>
+
+                    <!-- Section Fields -->
+                    <div class="grid grid-cols-12 gap-6">
+                        @for (field of getFieldsBySection(section.id); track field.name) {
+                            <div [ngClass]="field.cssClasses || 'col-span-12'">
+                                <!-- Label -->
+                                <label
+                                        [for]="field.name"
+                                        class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
+                                    {{ field.label }}
+                                    @if (isFieldRequired(field.name)) {
+                                        <span class="text-error-500">*</span>
+                                    }
+                                </label>
+
+                                <!-- Text/Number/Date Input -->
+                                @if (field.type === 'text' || field.type === 'number' || field.type === 'date' || field.type === 'url') {
+                                    <input
+                                            [id]="field.name"
+                                            [type]="field.type"
+                                            [formControlName]="field.name"
+                                            [placeholder]="field.placeholder || ''"
+                                            [ngClass]="{
+                      'border-error-300 focus:border-error-500 focus:ring-error-500 dark:border-error-700': hasError(field.name),
+                      'border-gray-300 focus:border-orange-500 focus:ring-orange-500 dark:border-gray-700': !hasError(field.name)
+                    }"
+                                            class="input-primary">
+                                }
+
+                                <!-- Textarea -->
+                                @if (field.type === 'textarea') {
+                                    <textarea
+                                            [id]="field.name"
+                                            [formControlName]="field.name"
+                                            [placeholder]="field.placeholder || ''"
+                                            [rows]="field.rows || 3"
+                                            [ngClass]="{
+                      'border-error-300 focus:border-error-500 focus:ring-error-500 dark:border-error-700': hasError(field.name),
+                      'border-gray-300 focus:border-orange-500 focus:ring-orange-500 dark:border-gray-700': !hasError(field.name)
+                    }"
+                                            class="input-primary resize-vertical"></textarea>
+                                }
+
+                                <!-- Select -->
+                                @if (field.type === 'select') {
+                                    <select
+                                            [id]="field.name"
+                                            [formControlName]="field.name"
+                                            [ngClass]="{
+                      'border-error-300 focus:border-error-500 focus:ring-error-500 dark:border-error-700': hasError(field.name),
+                      'border-gray-300 focus:border-orange-500 focus:ring-orange-500 dark:border-gray-700': !hasError(field.name)
+                    }"
+                                            class="input-primary">
+                                        <option value="">{{ field.placeholder || 'Select an option' }}</option>
+                                        @for (option of field.options; track option.value) {
+                                            <option [value]="option.value">{{ option.label }}</option>
+                                        }
+                                    </select>
+                                }
+
+                                <!-- Checkbox -->
+                                @if (field.type === 'checkbox') {
+                                    <div class="flex items-center">
+                                        <input
+                                                [id]="field.name"
+                                                type="checkbox"
+                                                [formControlName]="field.name"
+                                                class="h-4 w-4 rounded border-gray-300 text-orange-600 focus:ring-orange-500 dark:border-gray-700">
+                                        <label
+                                                [for]="field.name"
+                                                class="ml-2 block text-sm text-gray-700 dark:text-gray-300">
+                                            {{ field.label }}
+                                        </label>
+                                    </div>
+                                }
+
+                                <!-- Error Message -->
+                                @if (hasError(field.name)) {
+                                    <p class="mt-1 text-sm text-error-600 dark:text-error-500">
+                                        {{ getErrorMessage(field) }}
+                                    </p>
+                                }
+                            </div>
+                        }
+                    </div>
+                </div>
+            }
+
+            <!-- Form Actions -->
+            <div class="card">
+                <div class="flex gap-4">
+                    <button
+                            type="button"
+                            (click)="onCancel()"
+                            [disabled]="isSubmitting()"
+                            class="btn-secondary">
+                        Cancel
+                    </button>
+
+                    <button
+                            type="submit"
+                            [disabled]="isSubmitting() || formGroup.invalid"
+                            class="btn-primary flex flex-1 items-center justify-center gap-2">
+                        @if (isSubmitting()) {
+                            <svg
+                                    class="h-5 w-5 animate-spin"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    fill="none"
+                                    viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                            Processing...
+                        } @else {
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                            </svg>
+                            {{ isEditMode() ? 'Update Vehicle' : 'Create Vehicle' }}
+                        }
+                    </button>
+                </div>
+            </div>
+        </form>
+    }
+</div>

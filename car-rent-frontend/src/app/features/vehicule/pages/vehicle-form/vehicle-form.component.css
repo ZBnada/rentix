@@ -1,0 +1,52 @@
+/* Textarea resize vertical only */
+.resize-vertical {
+    resize: vertical;
+    min-height: 100px;
+}
+
+/* Disabled state styling */
+input:disabled,
+textarea:disabled,
+select:disabled,
+button:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+/* Error animation */
+.error-message {
+    animation: slideDown 0.2s ease-out;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-4px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Checkbox custom styling */
+input[type="checkbox"]:checked {
+    background-color: #f97316;
+    border-color: #f97316;
+}
+
+/* Form section transitions */
+.card {
+    transition: all 0.3s ease;
+}
+
+/* Number input - hide spinners */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+input[type="number"] {
+    -moz-appearance: textfield;
+}

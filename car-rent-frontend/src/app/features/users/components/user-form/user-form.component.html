@@ -1,0 +1,376 @@
+<form [formGroup]="userForm" (ngSubmit)="onSubmit()" class="space-y-6">
+    <!-- Profile Picture Section -->
+    <div class="bg-white dark:bg-gray-dark rounded-lg shadow-sm border border-gray-200 dark:border-gray-800 p-6">
+        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+            Profile Picture
+        </h3>
+
+        <div class="flex items-center gap-6">
+            <!-- Photo Preview -->
+            <div class="flex-shrink-0">
+                @if (profilePicturePreview()) {
+                    <div class="relative">
+                        <img
+                                [src]="profilePicturePreview()!.url"
+                                alt="Profile picture preview"
+                                class="w-32 h-32 rounded-full object-cover border-4 border-orange-500">
+                        <button
+                                type="button"
+                                (click)="removeProfilePicture()"
+                                class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-2 hover:bg-red-600 transition-colors shadow-lg">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                            </svg>
+                        </button>
+                    </div>
+                } @else {
+                    <div class="w-32 h-32 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
+                        <svg class="w-16 h-16 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                        </svg>
+                    </div>
+                }
+            </div>
+
+            <!-- Upload Zone -->
+            <div class="flex-1">
+                <input
+                        type="file"
+                        id="profilePictureInput"
+                        accept="image/jpeg,image/jpg,image/png,image/webp"
+                        (change)="onFileSelected($event)"
+                        class="hidden">
+
+                <div
+                        (click)="triggerFileInput()"
+                        (dragover)="onDragOver($event)"
+                        (dragleave)="onDragLeave($event)"
+                        (drop)="onDrop($event)"
+                        [ngClass]="{
+                        'border-orange-500 bg-orange-50 dark:bg-orange-900/10': isDragging(),
+                        'border-gray-300 dark:border-gray-700': !isDragging()
+                    }"
+                        class="border-2 border-dashed rounded-lg p-6 text-center cursor-pointer hover:border-orange-500 hover:bg-orange-50 dark:hover:bg-orange-900/10 transition-all">
+
+                    <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
+                    </svg>
+
+                    <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">
+                        <span class="font-semibold text-orange-500">Click to upload</span>
+                        or drag and drop
+                    </p>
+                    <p class="mt-1 text-xs text-gray-500 dark:text-gray-500">
+                        JPG, PNG or WEBP (max. 5 MB)
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Personal Information Section -->
+    <div class="bg-white dark:bg-gray-dark rounded-lg shadow-sm border border-gray-200 dark:border-gray-800 p-6">
+        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+            Personal Information
+        </h3>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- First Name -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    First Name <span class="text-red-500">*</span>
+                </label>
+                <input
+                        type="text"
+                        formControlName="firstName"
+                        [class.border-red-500]="isFieldInvalid('firstName')"
+                        class="w-full px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-orange-500 dark:bg-gray-800 dark:text-white"
+                        placeholder="John">
+                @if (isFieldInvalid('firstName')) {
+                    <p class="mt-1 text-sm text-red-500">{{ getFieldError('firstName') }}</p>
+                }
+            </div>
+
+            <!-- Last Name -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Last Name <span class="text-red-500">*</span>
+                </label>
+                <input
+                        type="text"
+                        formControlName="lastName"
+                        [class.border-red-500]="isFieldInvalid('lastName')"
+                        class="w-full px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-orange-500 dark:bg-gray-800 dark:text-white"
+                        placeholder="Doe">
+                @if (isFieldInvalid('lastName')) {
+                    <p class="mt-1 text-sm text-red-500">{{ getFieldError('lastName') }}</p>
+                }
+            </div>
+
+            <!-- Email -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Email <span class="text-red-500">*</span>
+                </label>
+                <input
+                        type="email"
+                        formControlName="email"
+                        [class.border-red-500]="isFieldInvalid('email')"
+                        class="w-full px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-orange-500 dark:bg-gray-800 dark:text-white"
+                        placeholder="john.doe@example.com">
+                @if (isFieldInvalid('email')) {
+                    <p class="mt-1 text-sm text-red-500">{{ getFieldError('email') }}</p>
+                }
+            </div>
+
+            <!-- Password -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Password
+                    @if (!isEditMode) {
+                        <span class="text-red-500">*</span>
+                    }
+                    @if (isEditMode) {
+                        <span class="text-sm text-gray-500">(leave blank to keep unchanged)</span>
+                    }
+                </label>
+                <input
+                        type="password"
+                        formControlName="password"
+                        [class.border-red-500]="isFieldInvalid('password')"
+                        class="w-full px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-orange-500 dark:bg-gray-800 dark:text-white"
+                        placeholder="••••••••">
+                @if (isFieldInvalid('password')) {
+                    <p class="mt-1 text-sm text-red-500">{{ getFieldError('password') }}</p>
+                }
+            </div>
+
+            <!-- Country Code -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Country Code <span class="text-red-500">*</span>
+                </label>
+                <input
+                        type="text"
+                        formControlName="countryCodePhone"
+                        [class.border-red-500]="isFieldInvalid('countryCodePhone')"
+                        class="w-full px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-orange-500 dark:bg-gray-800 dark:text-white"
+                        placeholder="+216">
+                @if (isFieldInvalid('countryCodePhone')) {
+                    <p class="mt-1 text-sm text-red-500">{{ getFieldError('countryCodePhone') }}</p>
+                }
+            </div>
+
+            <!-- Phone Number -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Phone Number <span class="text-red-500">*</span>
+                </label>
+                <input
+                        type="tel"
+                        formControlName="phoneNumber"
+                        [class.border-red-500]="isFieldInvalid('phoneNumber')"
+                        class="w-full px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-orange-500 dark:bg-gray-800 dark:text-white"
+                        placeholder="12345678">
+                @if (isFieldInvalid('phoneNumber')) {
+                    <p class="mt-1 text-sm text-red-500">{{ getFieldError('phoneNumber') }}</p>
+                }
+            </div>
+        </div>
+    </div>
+
+    <!-- User Type & Role Section -->
+    <div class="bg-white dark:bg-gray-dark rounded-lg shadow-sm border border-gray-200 dark:border-gray-800 p-6">
+        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+            User Type & Role
+        </h3>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- User Type -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    User Type <span class="text-red-500">*</span>
+                </label>
+                <select
+                        formControlName="userType"
+                        [class.border-red-500]="isFieldInvalid('userType')"
+                        class="w-full px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-orange-500 dark:bg-gray-800 dark:text-white">
+                    <option [value]="UserType.INDIVIDUAL">Individual</option>
+                    <option [value]="UserType.COMPANY">Company</option>
+                </select>
+                @if (isFieldInvalid('userType')) {
+                    <p class="mt-1 text-sm text-red-500">{{ getFieldError('userType') }}</p>
+                }
+            </div>
+
+            <!-- Role -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Role <span class="text-red-500">*</span>
+                </label>
+                <select
+                        formControlName="roleName"
+                        [class.border-red-500]="isFieldInvalid('roleName')"
+                        class="w-full px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-orange-500 dark:bg-gray-800 dark:text-white">
+                    <option value="">Select a role</option>
+                    @for (role of roles(); track role.id) {
+                        <option [value]="role.name">{{ role.name }}</option>
+                    }
+                </select>
+                @if (isFieldInvalid('roleName')) {
+                    <p class="mt-1 text-sm text-red-500">{{ getFieldError('roleName') }}</p>
+                }
+            </div>
+        </div>
+    </div>
+
+    <!-- Company Information (shown only for COMPANY type) -->
+    @if (selectedUserType() === UserType.COMPANY) {
+        <div class="bg-white dark:bg-gray-dark rounded-lg shadow-sm border border-gray-200 dark:border-gray-800 p-6">
+            <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+                Company Information
+            </h3>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        Legal Company Name <span class="text-red-500">*</span>
+                    </label>
+                    <input
+                            type="text"
+                            formControlName="legalCompanyName"
+                            [class.border-red-500]="isFieldInvalid('legalCompanyName')"
+                            class="w-full px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-orange-500 dark:bg-gray-800 dark:text-white"
+                            placeholder="ABC Company LLC">
+                    @if (isFieldInvalid('legalCompanyName')) {
+                        <p class="mt-1 text-sm text-red-500">{{ getFieldError('legalCompanyName') }}</p>
+                    }
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        Country of Registration <span class="text-red-500">*</span>
+                    </label>
+                    <input
+                            type="text"
+                            formControlName="countryOfRegistration"
+                            [class.border-red-500]="isFieldInvalid('countryOfRegistration')"
+                            class="w-full px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-orange-500 dark:bg-gray-800 dark:text-white"
+                            placeholder="Tunisia">
+                    @if (isFieldInvalid('countryOfRegistration')) {
+                        <p class="mt-1 text-sm text-red-500">{{ getFieldError('countryOfRegistration') }}</p>
+                    }
+                </div>
+            </div>
+        </div>
+    }
+
+    <!-- Address Section -->
+    <div class="bg-white dark:bg-gray-dark rounded-lg shadow-sm border border-gray-200 dark:border-gray-800 p-6">
+        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+            Address
+        </h3>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="md:col-span-2">
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Street
+                </label>
+                <input
+                        type="text"
+                        formControlName="streetAddress"
+                        class="w-full px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-orange-500 dark:bg-gray-800 dark:text-white"
+                        placeholder="Habib Bourguiba Avenue">
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    House Number
+                </label>
+                <input
+                        type="text"
+                        formControlName="houseNumber"
+                        class="w-full px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-orange-500 dark:bg-gray-800 dark:text-white"
+                        placeholder="123">
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Postal Code
+                </label>
+                <input
+                        type="text"
+                        formControlName="zipCode"
+                        class="w-full px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-orange-500 dark:bg-gray-800 dark:text-white"
+                        placeholder="1000">
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    City
+                </label>
+                <input
+                        type="text"
+                        formControlName="city"
+                        class="w-full px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-orange-500 dark:bg-gray-800 dark:text-white"
+                        placeholder="Tunis">
+            </div>
+        </div>
+    </div>
+
+    <!-- Status Section -->
+    <div class="bg-white dark:bg-gray-dark rounded-lg shadow-sm border border-gray-200 dark:border-gray-800 p-6">
+        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+            Status
+        </h3>
+
+        <div class="space-y-4">
+            <div class="flex items-center">
+                <input
+                        type="checkbox"
+                        formControlName="isActive"
+                        id="isActive"
+                        class="h-4 w-4 text-orange-500 focus:ring-orange-500 border-gray-300 rounded">
+                <label for="isActive" class="ml-2 block text-sm text-gray-700 dark:text-gray-300">
+                    Active account
+                </label>
+            </div>
+
+            @if (!isEditMode) {
+                <div class="flex items-center">
+                    <input
+                            type="checkbox"
+                            formControlName="isEmailVerified"
+                            id="isEmailVerified"
+                            class="h-4 w-4 text-orange-500 focus:ring-orange-500 border-gray-300 rounded">
+                    <label for="isEmailVerified" class="ml-2 block text-sm text-gray-700 dark:text-gray-300">
+                        Email verified
+                    </label>
+                </div>
+            }
+        </div>
+    </div>
+
+    <!-- Form Actions -->
+    <div class="flex items-center justify-end gap-4">
+        <button
+                type="button"
+                (click)="onCancel()"
+                [disabled]="isSubmitting()"
+                class="px-6 py-2 border border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 font-medium rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+            Cancel
+        </button>
+        <button
+                type="submit"
+                [disabled]="isSubmitting() || userForm.invalid"
+                class="px-6 py-2 bg-orange-500 text-white font-medium rounded-lg hover:bg-orange-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2">
+            @if (isSubmitting()) {
+                <svg class="animate-spin h-5 w-5" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+            }
+            {{ isEditMode ? 'Update' : 'Create User' }}
+        </button>
+    </div>
+</form>

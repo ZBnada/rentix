@@ -1,0 +1,73 @@
+<div class="container mx-auto px-4 py-8">
+    <!-- Loading State -->
+    @if (isLoading()) {
+        <div class="flex justify-center items-center py-12">
+            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500"></div>
+        </div>
+    }
+
+    <!-- Error State -->
+    @if (errorMessage()) {
+        <div class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4 mb-6">
+            <div class="flex items-center gap-3">
+                <svg class="w-5 h-5 text-red-600 dark:text-red-400" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+                </svg>
+                <p class="text-red-600 dark:text-red-400 font-medium">{{ errorMessage() }}</p>
+            </div>
+        </div>
+    }
+
+    <!-- Edit Form -->
+    @if (user() && !isLoading()) {
+        <div>
+            <!-- Header with Breadcrumb -->
+            <div class="mb-6">
+                <!-- Breadcrumb Navigation -->
+                <div class="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400 mb-4">
+                    <!-- "Users" text is in English -->
+                    <a routerLink="/dashboard/users" class="hover:text-orange-500 transition-colors">Users</a>
+                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"/>
+                    </svg>
+                    <a [routerLink]="['/dashboard/users', user()!.id]" class="hover:text-orange-500 transition-colors">{{ user()!.firstName }} {{ user()!.lastName }}</a>
+                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"/>
+                    </svg>
+                    <!-- "Edit" text is in English -->
+                    <span class="text-gray-900 dark:text-white font-medium">Edit</span>
+                </div>
+
+                <!-- Page Header -->
+                <div class="flex items-center gap-4">
+                    <!-- Back Button -->
+                    <a
+                            [routerLink]="['/dashboard/users', user()!.id]"
+                            class="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors">
+                        <svg class="w-6 h-6 text-gray-600 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                        </svg>
+                    </a>
+                    <div>
+                        <!-- "Edit User" heading is in English -->
+                        <h1 class="text-3xl font-bold text-gray-900 dark:text-white">
+                            Edit User
+                        </h1>
+                        <!-- "Update information for" text is in English -->
+                        <p class="mt-1 text-gray-600 dark:text-gray-400">
+                            Update information for {{ user()!.firstName }} {{ user()!.lastName }}
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- User Form Component -->
+            <app-user-form
+                    [user]="user()!"
+                    [isEditMode]="true"
+                    (formSubmit)="onFormSubmit($event)"
+                    (formCancel)="onFormCancel()">
+            </app-user-form>
+        </div>
+    }
+</div>

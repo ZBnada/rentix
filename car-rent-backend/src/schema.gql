@@ -1,0 +1,485 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+type AuthResponse {
+  accessToken: String!
+  refreshToken: String!
+  user: UserResource!
+}
+
+input ChangeEmailInput {
+  newEmail: String!
+  password: String!
+}
+
+input ChangePasswordInput {
+  currentPassword: String!
+  newPassword: String!
+}
+
+input ChangeRoleInput {
+  roleId: ID!
+  userId: ID!
+}
+
+"""Classes de véhicules disponibles"""
+enum ClasseVehicule {
+  """Véhicule haute gamme"""
+  HAUTE_GAMME
+
+  """Véhicule touristique"""
+  TOURISTIQUE
+
+  """Véhicule utilitaire"""
+  UTILITAIRE
+}
+
+input CreateMarqueVehiculeInput {
+  description: String
+  id: String
+  libelle: String!
+  logoUrl: String
+}
+
+input CreateRoleInput {
+  description: String
+  name: String!
+  weight: Int! = 60
+}
+
+input CreateUserInput {
+  city: String
+  countryCodePhone: String = "+216"
+  countryOfRegistration: String
+  email: String!
+  firstName: String!
+  googleId: String
+  houseNumber: String
+  isActive: Boolean
+  isEmailVerified: Boolean
+  lastName: String!
+  legalCompanyName: String
+  password: String
+  phoneNumber: String!
+
+  """URL or path to profile image"""
+  profileImage: String
+  roleName: String!
+  streetAddress: String
+  userType: String! = "INDIVIDUAL"
+  zipCode: String
+}
+
+input CreateVehiculeInput {
+  classeVehicule: ClasseVehicule! = TOURISTIQUE
+  compteur: Int! = 0
+  couleur: String
+  cricManivelle: Boolean! = false
+  datePremiereMiseEnCirculation: DateTime!
+  energie: EnergieType! = ESSENCE
+  imageUrl: String
+  jeuEnjoliveurs: Boolean! = false
+  jeuHousse: Boolean! = false
+  jeuTapis: Boolean! = false
+  marqueId: String!
+  matricule: String!
+  observations: String
+  posteRadio: Boolean! = false
+  prixAchat: Float! = 0
+  prixHeureRetard: Float! = 0
+  prixLocationJournee: Float! = 0
+  puissance: Int! = 0
+  roueSecours: Boolean! = false
+  saisiPar: String
+  siegeBebe: Boolean! = false
+  type: String!
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
+"""Types d'énergie disponibles pour les véhicules"""
+enum EnergieType {
+  """Véhicule diesel"""
+  DIESEL
+
+  """Véhicule électrique"""
+  ELECTRIQUE
+
+  """Véhicule essence"""
+  ESSENCE
+
+  """Véhicule GPL"""
+  GPL
+
+  """Véhicule hybride"""
+  HYBRIDE
+}
+
+input ForgotPasswordInput {
+  email: String!
+}
+
+input LoginInput {
+  email: String!
+  password: String!
+}
+
+type MarqueVehicule {
+  createdAt: DateTime!
+  description: String
+  estActif: Boolean!
+  id: ID!
+  libelle: String!
+  logoUrl: String
+  updatedAt: DateTime!
+}
+
+type MessageResponse {
+  message: String!
+  success: Boolean!
+}
+
+type Mutation {
+  """Changer l'email de l'utilisateur connecté"""
+  changeEmail(changeEmailInput: ChangeEmailInput!): String!
+
+  """Changer le mot de passe de l'utilisateur connecté"""
+  changePassword(changePasswordInput: ChangePasswordInput!): Boolean!
+
+  """Changer le rôle d'un utilisateur (Admin)"""
+  changeUserRole(changeRoleInput: ChangeRoleInput!): UserResource!
+
+  """Créer une nouvelle marque de véhicule"""
+  createMarqueVehicule(input: CreateMarqueVehiculeInput!): MarqueVehicule!
+
+  """Créer un nouveau rôle - Réservé au SUPERADMIN"""
+  createRole(createRoleInput: CreateRoleInput!): Role!
+  createUser(createUserInput: CreateUserInput!): UserResource!
+
+  """Créer un nouveau véhicule dans le système"""
+  createVehicule(input: CreateVehiculeInput!): Vehicule!
+
+  """Supprimer une marque de véhicule (désactivation)"""
+  deleteMarqueVehicule(id: String!): Boolean!
+
+  """Supprimer un véhicule (désactivation)"""
+  deleteVehicule(id: String!): Boolean!
+
+  """Demander un code de réinitialisation de mot de passe"""
+  forgotPassword(forgotPasswordInput: ForgotPasswordInput!): MessageResponse!
+
+  """Connexion avec email et mot de passe"""
+  login(loginInput: LoginInput!): AuthResponse!
+
+  """Renouveler le token d'accès avec un refresh token"""
+  refreshToken(refreshToken: String!): AuthResponse!
+
+  """Inscription d'un nouvel utilisateur avec envoi du code de vérification"""
+  register(registerInput: RegisterInput!): MessageResponse!
+
+  """Supprimer un rôle - Réservé au SUPERADMIN"""
+  removeRole(id: ID!): Boolean!
+  removeUser(id: ID!): Boolean!
+
+  """Renvoyer un nouveau code de vérification par email"""
+  resendVerificationCode(email: String!): ResendCodeResponse!
+
+  """Réinitialiser le mot de passe avec le code reçu"""
+  resetPassword(resetPasswordInput: ResetPasswordInput!): MessageResponse!
+
+  """Activer ou désactiver un compte utilisateur"""
+  toggleUserStatus(userId: ID!): UserResource!
+
+  """Mettre à jour une marque de véhicule"""
+  updateMarqueVehicule(input: UpdateMarqueVehiculeInput!): MarqueVehicule!
+
+  """Mettre à jour un rôle - Réservé au SUPERADMIN"""
+  updateRole(updateRoleInput: UpdateRoleInput!): Role!
+  updateUser(updateUserInput: UpdateUserInput!): UserResource!
+
+  """Mettre à jour les informations d'un véhicule"""
+  updateVehicule(input: UpdateVehiculeInput!): Vehicule!
+
+  """Vérifier l'email avec le code à 6 chiffres"""
+  verifyEmail(verifyEmailInput: VerifyEmailInput!): MessageResponse!
+}
+
+type Query {
+  """Vérifier que le module d'authentification fonctionne"""
+  authStatus: String!
+
+  """Vérifier si un email peut recevoir un nouveau code"""
+  canRequestVerificationCode(email: String!, type: VerificationCodeType!): Boolean!
+
+  """Vérifier si un rôle a le niveau de privilège requis"""
+  hasRequiredPrivilegeLevel(requiredWeight: Int!, roleId: ID!): Boolean!
+
+  """Récupérer le dernier code créé (DEV ONLY)"""
+  latestVerificationCode(email: String!, type: VerificationCodeType!): VerificationCode
+
+  """Récupérer une marque de véhicule par son ID"""
+  marqueVehicule(id: String!): MarqueVehicule
+
+  """Récupérer toutes les marques de véhicules actives"""
+  marquesVehicule: [MarqueVehicule!]!
+  me: UserResource!
+
+  """Récupérer un rôle par son ID"""
+  role(id: ID!): Role!
+
+  """Récupérer un rôle par son nom"""
+  roleByName(name: String!): Role
+
+  """Vérifier si roleId1 a plus de privilèges que roleId2"""
+  roleHasMorePrivileges(roleId1: ID!, roleId2: ID!): Boolean!
+
+  """Récupérer tous les rôles triés par poids"""
+  roles: [Role!]!
+
+  """Récupérer rôles avec poids <= maxWeight"""
+  rolesByMaxWeight(maxWeight: Int!): [Role!]!
+
+  """Rechercher des marques de véhicules par libellé (autocomplete)"""
+  searchMarquesVehicule(searchTerm: String!): [MarqueVehicule!]!
+  user(id: ID!): UserResource!
+  userStats: UserStatsResponse!
+
+  """Liste des utilisateurs avec filtrage, recherche et pagination"""
+  users(filter: UserFilterInput): UserPaginatedResponse!
+
+  """Récupérer un véhicule par son ID"""
+  vehicule(id: String!): Vehicule
+
+  """Récupérer un véhicule par son matricule"""
+  vehiculeByMatricule(matricule: String!): Vehicule
+
+  """Récupérer tous les véhicules actifs"""
+  vehicules: [Vehicule!]!
+
+  """Récupérer tous les véhicules d'une marque spécifique"""
+  vehiculesByMarque(marqueId: String!): [Vehicule!]!
+
+  """Récupérer les véhicules disponibles (selon seuil de compteur)"""
+  vehiculesDisponibles(seuilCompteur: Float): [Vehicule!]!
+}
+
+input RegisterInput {
+  city: String
+  countryCodePhone: String! = "+216"
+  countryOfRegistration: String
+  email: String!
+  firstName: String!
+  houseNumber: String
+  lastName: String!
+  legalCompanyName: String
+  password: String!
+  phoneNumber: String!
+  streetAddress: String
+  userType: UserType! = INDIVIDUAL
+  zipCode: String
+}
+
+type ResendCodeResponse {
+  expiresAt: DateTime!
+  message: String!
+  success: Boolean!
+}
+
+input ResetPasswordInput {
+  code: String!
+  email: String!
+  newPassword: String!
+}
+
+type Role {
+  createdAt: DateTime!
+  description: String!
+  id: ID!
+  name: String!
+  updatedAt: DateTime!
+  weight: Int!
+}
+
+input UpdateMarqueVehiculeInput {
+  description: String
+  id: String!
+  libelle: String
+  logoUrl: String
+}
+
+input UpdateRoleInput {
+  description: String
+  id: ID!
+  name: String
+  weight: Int
+}
+
+input UpdateUserInput {
+  city: String
+  countryCodePhone: String
+  countryOfRegistration: String
+  email: String
+  firstName: String
+  googleId: String
+  houseNumber: String
+  id: String!
+  isActive: Boolean
+  lastName: String
+  legalCompanyName: String
+  password: String
+  phoneNumber: String
+  profileImage: String
+  roleId: String
+  streetAddress: String
+  userType: String
+  zipCode: String
+}
+
+input UpdateVehiculeInput {
+  classeVehicule: ClasseVehicule = TOURISTIQUE
+  compteur: Int = 0
+  couleur: String
+  cricManivelle: Boolean = false
+  datePremiereMiseEnCirculation: DateTime
+  energie: EnergieType = ESSENCE
+  id: String!
+  imageUrl: String
+  jeuEnjoliveurs: Boolean = false
+  jeuHousse: Boolean = false
+  jeuTapis: Boolean = false
+  marqueId: String
+  matricule: String
+  modifiePar: String
+  observations: String
+  posteRadio: Boolean = false
+  prixAchat: Float = 0
+  prixHeureRetard: Float = 0
+  prixLocationJournee: Float = 0
+  puissance: Int = 0
+  roueSecours: Boolean = false
+  saisiPar: String
+  siegeBebe: Boolean = false
+  type: String
+}
+
+input UserFilterInput {
+  isActive: Boolean
+  isEmailVerified: Boolean
+  limit: Int = 10
+  page: Int = 1
+  roleId: String
+  search: String
+  sortField: String = "createdAt"
+  sortOrder: String = "DESC"
+  userType: UserType
+}
+
+type UserPaginatedResponse {
+  hasNextPage: Boolean!
+  hasPreviousPage: Boolean!
+  limit: Int!
+  page: Int!
+  total: Int!
+  totalPages: Int!
+  users: [UserResource!]!
+}
+
+type UserResource {
+  city: String
+  countryCodePhone: String!
+  countryOfRegistration: String
+  createdAt: DateTime!
+  email: String!
+  emailVerifiedAt: DateTime
+  firstName: String!
+  houseNumber: String
+  id: String!
+  initials: String!
+  isActive: Boolean!
+  isEmailVerified: Boolean!
+  lastLoginAt: DateTime
+  lastName: String!
+  legalCompanyName: String
+  phoneNumber: String!
+  profileImage: String
+  role: Role
+  streetAddress: String
+  updatedAt: DateTime!
+  userType: String!
+  zipCode: String
+}
+
+type UserStatsResponse {
+  activeUsers: Int!
+  companyUsers: Int!
+  inactiveUsers: Int!
+  individualUsers: Int!
+  totalUsers: Int!
+  unverifiedEmails: Int!
+  verifiedEmails: Int!
+}
+
+"""Type d'utilisateur : individuel ou entreprise"""
+enum UserType {
+  COMPANY
+  INDIVIDUAL
+}
+
+type Vehicule {
+  classeVehicule: ClasseVehicule!
+  compteur: Int!
+  couleur: String
+  cricManivelle: Boolean!
+  datePremiereMiseEnCirculation: DateTime!
+  energie: EnergieType!
+  estActif: Boolean!
+  id: ID!
+  imageUrl: String
+  jeuEnjoliveurs: Boolean!
+  jeuHousse: Boolean!
+  jeuTapis: Boolean!
+  marque: MarqueVehicule!
+  marqueId: String!
+  matricule: String!
+  modifieLe: DateTime!
+  modifiePar: String
+  observations: String
+  posteRadio: Boolean!
+  prixAchat: Float!
+  prixHeureRetard: Float!
+  prixLocationJournee: Float!
+  puissance: Int!
+  roueSecours: Boolean!
+  saisiLe: DateTime!
+  saisiPar: String
+  siegeBebe: Boolean!
+  type: String!
+}
+
+type VerificationCode {
+  code: String!
+  createdAt: DateTime!
+  email: String!
+  expiresAt: DateTime!
+  id: ID!
+  isUsed: Boolean!
+  type: VerificationCodeType!
+  updatedAt: DateTime!
+  usedAt: DateTime
+  userId: String
+}
+
+"""Type de code de vérification"""
+enum VerificationCodeType {
+  EMAIL_VERIFICATION
+  PASSWORD_RESET
+}
+
+input VerifyEmailInput {
+  code: String!
+  email: String!
+}

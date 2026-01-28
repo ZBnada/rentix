@@ -1,0 +1,94 @@
+import { Component, inject, signal, output } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Router } from '@angular/router';
+import { AuthService } from '../../services/auth.service';
+
+@Component({
+  selector: 'app-login-modal',
+  standalone: true,
+  imports: [CommonModule, ReactiveFormsModule],
+  templateUrl: './login-modal.component.html',
+  styleUrls: ['./login-modal.component.css']
+})
+export class LoginModalComponent {
+  private readonly fb = inject(FormBuilder);
+  private readonly authService = inject(AuthService);
+  private readonly router = inject(Router);
+
+  closeModal = output<void>();
+  switchToRegister = output<void>();
+
+  loginForm: FormGroup;
+  isLoading = signal(false);
+  errorMessage = signal<string | null>(null);
+  showPassword = signal(false);
+
+  constructor() {
+    this.loginForm = this.fb.group({
+      email: ['', [Validators.required, Validators.email]],
+      password: ['', [Validators.required, Validators.minLength(8)]]
+    });
+  }
+
+  togglePasswordVisibility(): void {
+    this.showPassword.set(!this.showPassword());
+  }
+
+  onSubmit(): void {
+    if (this.loginForm.invalid) {
+      this.loginForm.markAllAsTouched();
+      return;
+    }
+
+    this.isLoading.set(true);
+    this.errorMessage.set(null);
+
+    this.authService.login(this.loginForm.value).subscribe({
+      next: () => {
+        this.closeModal.emit();
+        this.router.navigate(['/dashboard']);
+      },
+      error: (error: Error) => {
+        this.errorMessage.set(error.message);
+        this.isLoading.set(false);
+      },
+      complete: () => {
+        this.isLoading.set(false);
+      }
+    });
+  }
+
+  navigateToRegister(): void {
+    this.switchToRegister.emit();
+  }
+
+  navigateToForgotPassword(): void {
+    this.closeModal.emit();
+    this.router.navigate(['/auth/forgot-password']);
+  }
+
+  handleGoogleLogin(): void {
+    window.location.href = 'http://localhost:3000/auth/google';
+  }
+
+  onBackdropClick(event: MouseEvent): void {
+    if (event.target === event.currentTarget) {
+      this.closeModal.emit();
+    }
+  }
+
+  getFieldError(fieldName: string): string {
+    const field = this.loginForm.get(fieldName);
+    if (field?.hasError('required')) {
+      return `${fieldName === 'email' ? 'Email' : 'Password'} is required`;
+    }
+    if (field?.hasError('email')) {
+      return 'Invalid email format';
+    }
+    if (field?.hasError('minlength')) {
+      return 'Password must be at least 8 characters';
+    }
+    return '';
+  }
+}

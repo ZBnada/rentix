@@ -1,0 +1,29 @@
+/* Textarea resize vertical only */
+.resize-vertical {
+    resize: vertical;
+    min-height: 100px;
+}
+
+/* Disabled state styling */
+input:disabled,
+textarea:disabled,
+button:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+/* Error animation */
+.error-message {
+    animation: slideDown 0.2s ease-out;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-4px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

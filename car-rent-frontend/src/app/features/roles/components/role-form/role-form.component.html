@@ -1,0 +1,176 @@
+<form [formGroup]="roleForm" (ngSubmit)="onSubmit()" class="space-y-6">
+    <!-- Role Templates (only for create mode) -->
+    @if (!isEditMode) {
+        <div class="bg-white dark:bg-gray-dark rounded-lg shadow-sm border border-gray-200 dark:border-gray-800 p-6">
+            <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+                Predefined Role Templates
+            </h3>
+            <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
+                Select a template to get started quickly
+            </p>
+
+            <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
+                @for (template of roleTemplates; track template.name) {
+                    <button
+                            type="button"
+                            (click)="applyTemplate(template)"
+                            class="p-4 border-2 border-gray-200 dark:border-gray-700 rounded-lg hover:border-orange-500 dark:hover:border-orange-500 transition-colors text-left">
+                        <div class="font-semibold text-gray-900 dark:text-white text-sm">
+                            {{ template.name }}
+                        </div>
+                        <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                            Weight: {{ template.weight }}
+                        </div>
+                    </button>
+                }
+            </div>
+        </div>
+    }
+
+    <!-- Basic Information -->
+    <div class="bg-white dark:bg-gray-dark rounded-lg shadow-sm border border-gray-200 dark:border-gray-800 p-6">
+        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+            Role Information
+        </h3>
+
+        <div class="space-y-6">
+            <!-- Role Name -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Role Name <span class="text-red-500">*</span>
+                </label>
+                <input
+                        type="text"
+                        formControlName="name"
+                        [class.border-red-500]="isFieldInvalid('name')"
+                        class="w-full px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-orange-500 dark:bg-gray-800 dark:text-white"
+                        placeholder="Ex: Manager, Admin, Client...">
+                @if (isFieldInvalid('name')) {
+                    <p class="mt-1 text-sm text-red-500">{{ getFieldError('name') }}</p>
+                }
+            </div>
+
+            <!-- Description -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Description
+                </label>
+                <textarea
+                        formControlName="description"
+                        rows="3"
+                        [class.border-red-500]="isFieldInvalid('description')"
+                        class="w-full px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-orange-500 dark:bg-gray-800 dark:text-white"
+                        placeholder="Describe the responsibilities and access rights for this role..."></textarea>
+                @if (isFieldInvalid('description')) {
+                    <p class="mt-1 text-sm text-red-500">{{ getFieldError('description') }}</p>
+                }
+            </div>
+        </div>
+    </div>
+
+    <!-- Weight Configuration -->
+    <div class="bg-white dark:bg-gray-dark rounded-lg shadow-sm border border-gray-200 dark:border-gray-800 p-6">
+        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+            Privilege Level (Weight)
+        </h3>
+
+        <div class="space-y-4">
+            <!-- Info Box -->
+            <div class="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
+                <div class="flex items-start">
+                    <svg class="w-5 h-5 text-blue-600 dark:text-blue-400 mr-2 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                    <div class="text-sm text-blue-700 dark:text-blue-400">
+                        <strong>Important:</strong> The lower the weight, the higher the privileges.
+                        <br>• <strong>0</strong> = Maximum privileges (Super Admin)
+                        <br>• <strong>100</strong> = Minimum privileges (Guest)
+                    </div>
+                </div>
+            </div>
+
+            <!-- Weight Slider -->
+            <div>
+                <div class="flex items-center justify-between mb-2">
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                        Weight <span class="text-red-500">*</span>
+                    </label>
+                    <div class="flex items-center gap-2">
+            <span class="text-2xl font-bold text-gray-900 dark:text-white">
+              {{ selectedWeight() }}
+            </span>
+                    </div>
+                </div>
+
+                <input
+                        type="range"
+                        formControlName="weight"
+                        min="0"
+                        max="100"
+                        step="1"
+                        class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700 accent-orange-500">
+
+                <div class="flex justify-between text-xs text-gray-500 dark:text-gray-400 mt-2">
+                    <span>0 (Max)</span>
+                    <span>25</span>
+                    <span>50</span>
+                    <span>75</span>
+                    <span>100 (Min)</span>
+                </div>
+            </div>
+
+            <!-- Weight Display -->
+            <div class="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                <div class="text-center">
+                    <div [ngClass]="getWeightColor()" class="text-lg font-bold">
+                        {{ getWeightLabel() }}
+                    </div>
+                    <div class="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                        Current privilege level
+                    </div>
+                </div>
+            </div>
+
+            <!-- Numeric Input -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Or enter an exact value
+                </label>
+                <input
+                        type="number"
+                        formControlName="weight"
+                        min="0"
+                        max="100"
+                        [class.border-red-500]="isFieldInvalid('weight')"
+                        class="w-full px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-orange-500 dark:bg-gray-800 dark:text-white"
+                        placeholder="0-100">
+                @if (isFieldInvalid('weight')) {
+                    <p class="mt-1 text-sm text-red-500">{{ getFieldError('weight') }}</p>
+                }
+            </div>
+        </div>
+    </div>
+
+    <!-- Form Actions -->
+    <div class="flex items-center justify-end gap-4">
+        <button
+                type="button"
+                (click)="onCancel()"
+                [disabled]="isSubmitting()"
+                class="px-6 py-2 border border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 font-medium rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+            Cancel
+        </button>
+        <button
+                type="submit"
+                [disabled]="isSubmitting() || roleForm.invalid"
+                class="px-6 py-2 bg-orange-500 text-white font-medium rounded-lg hover:bg-orange-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2">
+            @if (isSubmitting()) {
+                <svg class="animate-spin h-5 w-5" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+            }
+            {{ isEditMode ? 'Update' : 'Create Role' }}
+        </button>
+    </div>
+</form>

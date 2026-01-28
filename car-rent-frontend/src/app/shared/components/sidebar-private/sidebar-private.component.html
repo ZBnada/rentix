@@ -1,0 +1,166 @@
+<!-- Sidebar Overlay (Mobile) -->
+@if (isOpen()) {
+    <div
+            class="fixed inset-0 z-99999 block bg-black/20 lg:hidden"
+            (click)="handleCloseSidebar()">
+    </div>
+}
+
+<!-- Sidebar -->
+<aside
+        [class]="'absolute left-0 top-0 z-9999 flex h-screen w-72.5 flex-col overflow-y-hidden bg-white duration-300 ease-linear dark:bg-gray-dark lg:static lg:translate-x-0 border-r border-gray-200 dark:border-gray-800 ' + (isOpen() ? 'translate-x-0' : '-translate-x-full')">
+
+    <!-- Sidebar Header -->
+    <div class="flex items-center justify-between gap-2 px-6 py-5.5 lg:py-6.5">
+        <a href="/dashboard" class="flex items-center gap-2">
+            <!-- Logo RentIX - Plus grand et sans contour -->
+            <span class="text-3xl font-black tracking-tight text-gray-900 dark:text-white">
+        Rent<span class="text-orange-500">I</span>X
+      </span>
+        </a>
+
+        <button
+                (click)="handleCloseSidebar()"
+                class="block lg:hidden p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-900">
+            <svg class="w-6 h-6 text-gray-700 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+        </button>
+    </div>
+
+    <!-- Sidebar Menu -->
+    <div class="no-scrollbar flex flex-col overflow-y-auto duration-300 ease-linear">
+        <nav class="mt-5 px-4 py-4 lg:mt-9 lg:px-6">
+            <!-- Menu Group -->
+            <div>
+                <h3 class="mb-4 ml-4 text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase">
+                    MENU
+                </h3>
+
+                <ul class="mb-6 flex flex-col gap-1.5">
+                    @for (item of menuItems; track item.label) {
+                        <li>
+                            @if (!item.children) {
+                                <!-- Single Menu Item -->
+                                <a
+                                        [routerLink]="item.route"
+                                        routerLinkActive="menu-item-active"
+                                        #rla="routerLinkActive"
+                                        [routerLinkActiveOptions]="{exact: false}"
+                                        class="group relative flex items-center gap-2.5 rounded-lg px-4 py-2 font-medium duration-300 ease-in-out"
+                                        [class.menu-item-active]="rla.isActive"
+                                        [class.menu-item-inactive]="!rla.isActive">
+
+                                    <svg
+                                            class="w-5 h-5"
+                                            [class.menu-item-icon-active]="rla.isActive"
+                                            [class.menu-item-icon-inactive]="!rla.isActive"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            viewBox="0 0 24 24">
+                                        <path
+                                                stroke-linecap="round"
+                                                stroke-linejoin="round"
+                                                stroke-width="2"
+                                                [attr.d]="getIcon(item.icon)"/>
+                                    </svg>
+
+                                    {{ item.label }}
+                                </a>
+                            } @else {
+                                <!-- Menu Item with Submenu -->
+                                <button
+                                        (click)="toggleMenu(item.label)"
+                                        class="group relative flex w-full items-center justify-between gap-2.5 rounded-lg px-4 py-2 font-medium duration-300 ease-in-out menu-item-inactive">
+
+                                    <div class="flex items-center gap-2.5">
+                                        <svg
+                                                class="w-5 h-5 menu-item-icon-inactive"
+                                                fill="none"
+                                                stroke="currentColor"
+                                                viewBox="0 0 24 24">
+                                            <path
+                                                    stroke-linecap="round"
+                                                    stroke-linejoin="round"
+                                                    stroke-width="2"
+                                                    [attr.d]="getIcon(item.icon)"/>
+                                        </svg>
+
+                                        {{ item.label }}
+                                    </div>
+
+                                    <svg
+                                            class="w-4 h-4 transition-transform duration-200"
+                                            [class.rotate-180]="isMenuExpanded(item.label)"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                                    </svg>
+                                </button>
+
+                                <!-- Submenu -->
+                                @if (isMenuExpanded(item.label)) {
+                                    <div class="translate transform overflow-hidden duration-200 ease-in-out">
+                                        <ul class="mt-2 mb-4 flex flex-col gap-2.5 pl-6">
+                                            @for (child of item.children; track child.label) {
+                                                <li>
+                                                    <a
+                                                            [routerLink]="child.route"
+                                                            routerLinkActive="active-submenu-item"
+                                                            class="group relative flex items-center gap-2.5 rounded-md px-4 py-2 font-medium text-gray-600 dark:text-gray-400 duration-300 ease-in-out hover:text-gray-900 dark:hover:text-white">
+                                                        {{ child.label }}
+                                                    </a>
+                                                </li>
+                                            }
+                                        </ul>
+                                    </div>
+                                }
+                            }
+                        </li>
+                    }
+                </ul>
+            </div>
+
+            <!-- Others Group -->
+            <div>
+                <h3 class="mb-4 ml-4 text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase">
+                    OTHERS
+                </h3>
+
+                <ul class="mb-6 flex flex-col gap-1.5">
+                    <li>
+                        <a
+                                href="#"
+                                class="group relative flex items-center gap-2.5 rounded-lg px-4 py-2 font-medium text-gray-600 dark:text-gray-400 duration-300 ease-in-out hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-900">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                            </svg>
+                            Charts
+                        </a>
+                    </li>
+                    <li>
+                        <a
+                                href="#"
+                                class="group relative flex items-center gap-2.5 rounded-lg px-4 py-2 font-medium text-gray-600 dark:text-gray-400 duration-300 ease-in-out hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-900">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5a1 1 0 011-1h4a1 1 0 011 1v7a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM14 5a1 1 0 011-1h4a1 1 0 011 1v7a1 1 0 01-1 1h-4a1 1 0 01-1-1V5zM4 15a1 1 0 011-1h4a1 1 0 011 1v3a1 1 0 01-1 1H5a1 1 0 01-1-1v-3zM14 15a1 1 0 011-1h4a1 1 0 011 1v3a1 1 0 01-1 1h-4a1 1 0 01-1-1v-3z"/>
+                            </svg>
+                            UI Elements
+                        </a>
+                    </li>
+                    <li>
+                        <a
+                                href="#"
+                                class="group relative flex items-center gap-2.5 rounded-lg px-4 py-2 font-medium text-gray-600 dark:text-gray-400 duration-300 ease-in-out hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-900">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                            </svg>
+                            Authentication
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+    </div>
+</aside>

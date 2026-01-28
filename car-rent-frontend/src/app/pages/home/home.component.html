@@ -1,0 +1,32 @@
+<div class="min-h-screen">
+    <!-- Navbar -->
+    <app-navbar (toggleSidebar)="handleToggleSidebar()" />
+
+    <!-- Sidebar -->
+    <app-sidebar
+            [isOpen]="isSidebarOpen()"
+            (closeSidebar)="handleCloseSidebar()" />
+
+    <!-- Container pour Hero + Booking Form -->
+    <div class="relative">
+        <div class="absolute top-6 left-0 right-0 z-30 px-4">
+            <app-booking-form />
+        </div>
+        <app-hero-section />
+    </div>
+
+    <!-- Features Section -->
+    <app-features-section />
+
+    <!-- Rewards Section -->
+    <app-rewards-section />
+
+    <!-- Promotions Section -->
+    <app-promotions-section />
+
+    <!-- Cars Section -->
+    <app-cars-section />
+
+    <!-- Footer -->
+    <app-footer />
+</div>

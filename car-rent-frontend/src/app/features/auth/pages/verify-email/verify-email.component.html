@@ -1,0 +1,174 @@
+<div class="min-h-screen bg-gradient-to-br from-orange-50 to-white flex items-center justify-center px-4">
+
+    <div class="w-full max-w-6xl grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+
+        <!-- Left Side - Promotional Image -->
+        <div class="hidden lg:block">
+            <div class="bg-gradient-to-br from-gray-900 to-gray-700 rounded-3xl p-12 text-white shadow-2xl">
+                <h2 class="text-5xl font-bold mb-6">
+                    READY, SENT, GO!
+                </h2>
+
+                <p class="text-xl mb-8 text-gray-300">
+                    Check your mail for the confirmation code.
+                </p>
+
+                <div class="mt-12">
+                    <img
+                            src="https://images.unsplash.com/photo-1551836022-d5d88e9218df?w=600&h=400&fit=crop"
+                            alt="Email Verification"
+                            class="rounded-2xl shadow-xl w-full object-cover">
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Side - Verification Form -->
+        <div class="w-full">
+            <div class="bg-white rounded-2xl shadow-xl p-8">
+
+                <!-- Progress Steps -->
+                <div class="flex items-center justify-center mb-8 space-x-4">
+                    <div class="flex items-center">
+                        <div class="flex items-center justify-center w-10 h-10 rounded-full bg-green-600 text-white font-bold">
+                            ✓
+                        </div>
+                        <span class="ml-2 text-sm font-medium text-gray-400">Company Details</span>
+                    </div>
+
+                    <div class="w-16 h-1 bg-green-600"></div>
+
+                    <div class="flex items-center">
+                        <div class="flex items-center justify-center w-10 h-10 rounded-full bg-orange-600 text-white font-bold">
+                            2
+                        </div>
+                        <span class="ml-2 text-sm font-medium text-gray-900">Personal Details</span>
+                    </div>
+
+                    <div class="w-16 h-1 bg-gray-300"></div>
+
+                    <div class="flex items-center">
+                        <div class="flex items-center justify-center w-10 h-10 rounded-full bg-gray-300 text-gray-600 font-bold">
+                            3
+                        </div>
+                        <span class="ml-2 text-sm font-medium text-gray-400">Finalization</span>
+                    </div>
+                </div>
+
+                <!-- Header -->
+                <div class="text-center mb-8">
+                    <h1 class="text-3xl font-bold text-gray-900 mb-2">
+                        Confirm your email address
+                    </h1>
+                    <p class="text-gray-600">
+                        A code has been sent to <strong>{{ email() }}</strong>. Check your inbox and spam folder!
+                    </p>
+                </div>
+
+                <!-- Success Message -->
+                @if (successMessage()) {
+                    <div class="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg">
+                        <p class="text-sm text-green-600">{{ successMessage() }}</p>
+                    </div>
+                }
+
+                <!-- Error Message -->
+                @if (errorMessage()) {
+                    <div class="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+                        <p class="text-sm text-red-600">{{ errorMessage() }}</p>
+                    </div>
+                }
+
+                <!-- Verification Form -->
+                <form [formGroup]="codeForm" (ngSubmit)="onSubmit()" class="space-y-6">
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-3">
+                            Confirmation code
+                        </label>
+
+                        <!-- Code Inputs -->
+                        <div class="flex gap-3 justify-center">
+                            @for (digit of [1,2,3,4,5,6]; track digit) {
+                                <input
+                                        [id]="'digit' + digit"
+                                        type="text"
+                                        maxlength="1"
+                                        [formControlName]="'digit' + digit"
+                                        (input)="onDigitInput($event, digit)"
+                                        (keydown)="onDigitKeydown($event, digit)"
+                                        (paste)="digit === 1 ? onPaste($event) : null"
+                                        [class]="codeForm.get('digit' + digit)?.invalid && codeForm.get('digit' + digit)?.touched
+                    ? 'w-14 h-14 text-center text-2xl font-bold border-2 border-red-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500'
+                    : 'w-14 h-14 text-center text-2xl font-bold border-2 border-orange-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500'">
+                            }
+                        </div>
+                    </div>
+
+                    <!-- Timer -->
+                    <div class="flex items-center justify-center gap-2 text-gray-600">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        <span class="font-mono text-lg">{{ getFormattedTime() }}</span>
+                        <span class="text-sm">until code expires</span>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <button
+                            type="submit"
+                            [disabled]="isLoading() || codeForm.invalid"
+                            [class]="isLoading() || codeForm.invalid
+              ? 'w-full bg-gray-300 text-gray-500 cursor-not-allowed font-bold py-4 rounded-lg'
+              : 'w-full bg-orange-600 hover:bg-orange-700 text-white font-bold py-4 rounded-lg transition-colors'">
+                        @if (isLoading()) {
+                            <span class="flex items-center justify-center gap-2">
+                <svg class="animate-spin h-5 w-5" viewBox="0 0 24 24">
+                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"/>
+                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/>
+                </svg>
+                Verifying...
+              </span>
+                        } @else {
+                            <span>Confirm</span>
+                        }
+                    </button>
+
+                    <!-- Resend Code -->
+                    <div class="text-center">
+                        <p class="text-gray-600 mb-2">
+                            Didn't receive a confirmation code?
+                        </p>
+
+                        @if (canResend()) {
+                            <button
+                                    type="button"
+                                    (click)="resendCode()"
+                                    [disabled]="isLoading()"
+                                    class="text-orange-600 hover:text-orange-700 font-semibold underline disabled:opacity-50">
+                                Resend code
+                            </button>
+                        } @else {
+                            <span class="text-gray-400">
+                You can resend in {{ getFormattedTime() }}
+              </span>
+                        }
+                    </div>
+
+                    <!-- Change Email -->
+                    <div class="text-center pt-4 border-t border-gray-200">
+                        <button
+                                type="button"
+                                (click)="changeEmail()"
+                                class="text-orange-600 hover:text-orange-700 font-semibold underline">
+                            Change email address
+                        </button>
+                    </div>
+
+                </form>
+
+            </div>
+        </div>
+
+    </div>
+
+</div>

@@ -1,0 +1,114 @@
+<div class="min-h-screen bg-gradient-to-br from-orange-50 to-white flex items-center justify-center px-4 py-12">
+
+    <div class="w-full max-w-6xl grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+
+        <!-- Left Side - Promotional Image -->
+        <div class="hidden lg:block">
+            <div class="bg-gradient-to-br from-gray-900 to-gray-700 rounded-3xl p-12 text-white shadow-2xl">
+                <h2 class="text-5xl font-bold mb-6">
+                    @if (selectedUserType() === 'INDIVIDUAL') {
+                        ACCESS<br/>EXCLUSIVE<br/>BENEFITS
+                    } @else if (selectedUserType() === 'COMPANY') {
+                        EASY PEASY<br/>MOBILITY
+                    } @else {
+                        JOIN OUR<br/>COMMUNITY
+                    }
+                </h2>
+
+                <p class="text-xl mb-8 text-gray-300">
+                    @if (selectedUserType() === 'INDIVIDUAL') {
+                        Premium perks and custom offers - no strings attached!
+                    } @else if (selectedUserType() === 'COMPANY') {
+                        Your RentIX business account is just a few clicks away.
+                    } @else {
+                        Create your account to unlock exclusive benefits
+                    }
+                </p>
+
+                <div class="mt-12">
+                    <img
+                            src="https://images.unsplash.com/photo-1568605117036-5fe5e7bab0b7?w=600&h=400&fit=crop"
+                            alt="Premium Car"
+                            class="rounded-2xl shadow-xl w-full object-cover">
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Side - Registration Form -->
+        <div class="w-full">
+
+            <!-- Progress Steps -->
+            @if (selectedUserType()) {
+                <div class="flex items-center justify-center mb-8 space-x-4">
+                    <div class="flex items-center">
+                        <div class="flex items-center justify-center w-10 h-10 rounded-full bg-orange-600 text-white font-bold">
+                            1
+                        </div>
+                        <span class="ml-2 text-sm font-medium text-gray-400">Company Details</span>
+                    </div>
+
+                    <div class="w-16 h-1 bg-gray-300"></div>
+
+                    <div class="flex items-center">
+                        <div [class]="selectedUserType() === 'COMPANY'
+              ? 'flex items-center justify-center w-10 h-10 rounded-full bg-orange-600 text-white font-bold'
+              : 'flex items-center justify-center w-10 h-10 rounded-full bg-gray-300 text-gray-600 font-bold'">
+                            2
+                        </div>
+                        <span class="ml-2 text-sm font-medium text-gray-400">Personal Details</span>
+                    </div>
+
+                    <div class="w-16 h-1 bg-gray-300"></div>
+
+                    <div class="flex items-center">
+                        <div class="flex items-center justify-center w-10 h-10 rounded-full bg-gray-300 text-gray-600 font-bold">
+                            3
+                        </div>
+                        <span class="ml-2 text-sm font-medium text-gray-400">Finalization</span>
+                    </div>
+                </div>
+
+                <!-- Title -->
+                <div class="mb-6 text-center">
+                    <h1 class="text-3xl font-bold text-gray-900 mb-2">
+                        @if (selectedUserType() === 'INDIVIDUAL') {
+                            SET UP YOUR PERSONAL PROFILE
+                        } @else {
+                            SET UP YOUR COMPANY ACCOUNT
+                        }
+                    </h1>
+                    <p class="text-gray-600">
+                        @if (selectedUserType() === 'INDIVIDUAL') {
+                            Complete your profile to start enjoying exclusive benefits.
+                        } @else {
+                            Your company name is not listed? Just add it manually.
+                        }
+                    </p>
+                </div>
+
+                <!-- Register Form Component -->
+                <app-register-form [userType]="selectedUserType()!" />
+
+                <!-- Login Link -->
+                <div class="mt-6 text-center">
+                    <p class="text-gray-600">
+                        Already have a RentIX business account?
+                        <a routerLink="/" class="ml-1 text-orange-600 hover:text-orange-700 font-semibold underline">
+                            Log in now
+                        </a>
+                    </p>
+                </div>
+            }
+
+        </div>
+
+    </div>
+
+    <!-- Type Modal -->
+    @if (showTypeModal()) {
+        <app-register-type-modal
+                (selectUserType)="handleSelectUserType($event)"
+                (closeModal)="handleCloseModal()" />
+    }
+
+</div>

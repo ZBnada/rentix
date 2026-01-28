@@ -1,0 +1,88 @@
+<div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
+     (click)="onBackdropClick($event)">
+
+    <div class="relative w-full max-w-md bg-white rounded-2xl shadow-2xl p-8 mx-4 animate-in fade-in slide-in-from-bottom-4 duration-300">
+
+        <!-- Close Button -->
+        <button
+                type="button"
+                (click)="closeModal.emit()"
+                class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+        </button>
+
+        <!-- Header -->
+        <div class="text-center mb-8">
+            <h2 class="text-3xl font-bold text-gray-900 mb-2">PICK YOUR SIGN UP OPTION:</h2>
+        </div>
+
+        <!-- Options -->
+        <div class="space-y-4 mb-6">
+
+            <!-- Sign Up Now Option -->
+            <button
+                    type="button"
+                    (click)="selectType(UserType.INDIVIDUAL)"
+                    [class]="selectedType() === UserType.INDIVIDUAL
+          ? 'w-full border-2 border-orange-600 bg-orange-50 rounded-xl p-6 text-left transition-all duration-200 hover:shadow-lg'
+          : 'w-full border-2 border-gray-200 bg-white rounded-xl p-6 text-left transition-all duration-200 hover:border-gray-300 hover:shadow-md'">
+
+                <div class="flex items-start gap-4">
+                    <div [class]="selectedType() === UserType.INDIVIDUAL
+            ? 'flex-shrink-0 w-6 h-6 rounded-full border-2 border-orange-600 bg-orange-600 flex items-center justify-center mt-1'
+            : 'flex-shrink-0 w-6 h-6 rounded-full border-2 border-gray-300 bg-white flex items-center justify-center mt-1'">
+                        @if (selectedType() === UserType.INDIVIDUAL) {
+                            <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                            </svg>
+                        }
+                    </div>
+
+                    <div class="flex-1">
+                        <h3 class="text-xl font-bold text-gray-900 mb-2">SIGN UP NOW</h3>
+                        <p class="text-gray-600 text-sm">Quick access to all offers & exclusive rates.</p>
+                    </div>
+                </div>
+            </button>
+
+            <!-- Let's Talk First Option -->
+            <button
+                    type="button"
+                    (click)="selectType(UserType.COMPANY)"
+                    [class]="selectedType() === UserType.COMPANY
+          ? 'w-full border-2 border-orange-600 bg-orange-50 rounded-xl p-6 text-left transition-all duration-200 hover:shadow-lg'
+          : 'w-full border-2 border-gray-200 bg-white rounded-xl p-6 text-left transition-all duration-200 hover:border-gray-300 hover:shadow-md'">
+
+                <div class="flex items-start gap-4">
+                    <div [class]="selectedType() === UserType.COMPANY
+            ? 'flex-shrink-0 w-6 h-6 rounded-full border-2 border-orange-600 bg-orange-600 flex items-center justify-center mt-1'
+            : 'flex-shrink-0 w-6 h-6 rounded-full border-2 border-gray-300 bg-white flex items-center justify-center mt-1'">
+                        @if (selectedType() === UserType.COMPANY) {
+                            <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                            </svg>
+                        }
+                    </div>
+
+                    <div class="flex-1">
+                        <h3 class="text-xl font-bold text-gray-900 mb-2">LET'S TALK FIRST</h3>
+                        <p class="text-gray-600 text-sm">Book a call with a RentIX mobility consultant.</p>
+                    </div>
+                </div>
+            </button>
+
+        </div>
+
+        <!-- Continue Button -->
+        <button
+                type="button"
+                (click)="handleContinue()"
+                [disabled]="!selectedType()"
+                class="w-full bg-orange-600 hover:bg-orange-700 disabled:bg-gray-300 disabled:cursor-not-allowed text-white font-bold py-4 rounded-lg transition-colors duration-200 text-lg">
+            Continue
+        </button>
+
+    </div>
+</div>

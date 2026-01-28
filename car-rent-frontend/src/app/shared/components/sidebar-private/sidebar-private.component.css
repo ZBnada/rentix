@@ -1,0 +1,314 @@
+﻿/* ========================================
+   SIDEBAR PRIVATE - ADMIN DASHBOARD
+   RentIX Theme: Orange (#FF5F00) & Black
+   ======================================== */
+
+/* ==========================================
+   MENU ITEMS - ACTIVE/INACTIVE STATES
+   ========================================== */
+
+/* Menu Item Active State */
+.menu-item-active {
+    background-color: rgba(255, 95, 0, 0.1);
+    color: #FF5F00;
+    font-weight: 500;
+}
+
+/* Dark mode active state */
+:host-context(.dark) .menu-item-active {
+    background-color: rgba(255, 95, 0, 0.12);
+    color: #FF5F00;
+}
+
+/* Menu Item Inactive State */
+.menu-item-inactive {
+    color: #344054;
+    transition: all 0.2s ease-in-out;
+}
+
+.menu-item-inactive:hover {
+    background-color: #f2f4f7;
+    color: #344054;
+}
+
+/* Dark mode inactive state */
+:host-context(.dark) .menu-item-inactive {
+    color: #d0d5dd;
+}
+
+:host-context(.dark) .menu-item-inactive:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+    color: #d0d5dd;
+}
+
+/* ==========================================
+   MENU ICONS
+   ========================================== */
+
+/* Icon Active State */
+.menu-item-icon-active {
+    color: #FF5F00;
+}
+
+:host-context(.dark) .menu-item-icon-active {
+    color: #FF5F00;
+}
+
+/* Icon Inactive State */
+.menu-item-icon-inactive {
+    color: #98a2b3;
+    transition: color 0.2s ease-in-out;
+}
+
+.menu-item-icon-inactive:hover {
+    color: #344054;
+}
+
+:host-context(.dark) .menu-item-icon-inactive {
+    color: #667085;
+}
+
+:host-context(.dark) .menu-item-icon-inactive:hover {
+    color: #d0d5dd;
+}
+
+/* ==========================================
+   SUBMENU ITEMS
+   ========================================== */
+
+/* Submenu Active State */
+.active-submenu-item {
+    color: #FF5F00;
+    font-weight: 500;
+}
+
+:host-context(.dark) .active-submenu-item {
+    color: #FF5F00;
+}
+
+/* ==========================================
+   SCROLLBAR CUSTOMIZATION
+   ========================================== */
+
+/* Hide scrollbar for Chrome, Safari and Opera */
+.no-scrollbar::-webkit-scrollbar {
+    display: none;
+}
+
+/* Hide scrollbar for IE, Edge and Firefox */
+.no-scrollbar {
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+}
+
+/* ==========================================
+   CUSTOM DIMENSIONS
+   ========================================== */
+
+/* Sidebar Width */
+.w-72\.5 {
+    width: 18.125rem; /* 290px */
+}
+
+/* Custom Padding */
+.py-5\.5 {
+    padding-top: 1.375rem;
+    padding-bottom: 1.375rem;
+}
+
+.py-6\.5 {
+    padding-top: 1.625rem;
+    padding-bottom: 1.625rem;
+}
+
+/* ==========================================
+   Z-INDEX LAYERS
+   ========================================== */
+
+.z-9999 {
+    z-index: 9999;
+}
+
+.z-99999 {
+    z-index: 99999;
+}
+
+/* ==========================================
+   ANIMATIONS & TRANSITIONS
+   ========================================== */
+
+/* Sidebar Slide Animation */
+aside {
+    transition: transform 0.3s ease-linear;
+}
+
+/* Chevron Rotation */
+.rotate-180 {
+    transform: rotate(180deg);
+    transition: transform 0.2s ease-in-out;
+}
+
+/* Submenu Expand/Collapse Animation */
+.submenu-enter {
+    animation: submenuSlideDown 0.3s ease-out forwards;
+}
+
+@keyframes submenuSlideDown {
+    from {
+        opacity: 0;
+        max-height: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        max-height: 500px;
+        transform: translateY(0);
+    }
+}
+
+.submenu-leave {
+    animation: submenuSlideUp 0.2s ease-in forwards;
+}
+
+@keyframes submenuSlideUp {
+    from {
+        opacity: 1;
+        max-height: 500px;
+        transform: translateY(0);
+    }
+    to {
+        opacity: 0;
+        max-height: 0;
+        transform: translateY(-10px);
+    }
+}
+
+/* ==========================================
+   HOVER EFFECTS
+   ========================================== */
+
+/* Menu item hover with slight scale */
+.menu-item-inactive,
+.menu-item-active {
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.menu-item-inactive:hover {
+    transform: translateX(2px);
+}
+
+/* Icon hover effect */
+.menu-item-icon-inactive {
+    transition: all 0.2s ease-in-out;
+}
+
+.group:hover .menu-item-icon-inactive {
+    transform: scale(1.05);
+}
+
+/* ==========================================
+   BADGE STYLES (Optional)
+   ========================================== */
+
+.menu-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.125rem 0.5rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    border-radius: 9999px;
+    background-color: #FF5F00;
+    color: white;
+    margin-left: auto;
+}
+
+:host-context(.dark) .menu-badge {
+    background-color: #FF5F00;
+}
+
+/* ==========================================
+   RESPONSIVE ADJUSTMENTS
+   ========================================== */
+
+/* Mobile: Full width overlay */
+@media (max-width: 1024px) {
+    aside {
+        width: 18.125rem;
+    }
+}
+
+/* Tablet and up: Fixed sidebar */
+@media (min-width: 1024px) {
+    aside {
+        position: static;
+        transform: translateX(0) !important;
+    }
+}
+
+/* ==========================================
+   ACCESSIBILITY
+   ========================================== */
+
+/* Focus states */
+.menu-item-inactive:focus,
+.menu-item-active:focus {
+    outline: 2px solid #FF5F00;
+    outline-offset: 2px;
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+    aside,
+    .rotate-180,
+    .menu-item-inactive,
+    .menu-item-active {
+        transition: none;
+    }
+
+    .submenu-enter,
+    .submenu-leave {
+        animation: none;
+    }
+}
+
+/* ==========================================
+   CUSTOM UTILITIES
+   ========================================== */
+
+/* Divider */
+.menu-divider {
+    height: 1px;
+    background-color: #e4e7ec;
+    margin: 1rem 0;
+}
+
+:host-context(.dark) .menu-divider {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Group Header */
+.menu-group-header {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #98a2b3;
+    padding: 0.5rem 1rem;
+    margin-top: 1.5rem;
+    margin-bottom: 0.5rem;
+}
+
+:host-context(.dark) .menu-group-header {
+    color: #667085;
+}
+
+/* ==========================================
+   PRINT STYLES
+   ========================================== */
+
+@media print {
+    aside {
+        display: none;
+    }
+}

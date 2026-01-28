@@ -1,0 +1,32 @@
+<section class="relative w-full">
+    <!-- Image de la voiture avec Booking Form par-dessus -->
+    <div class="relative w-full h-[85vh] bg-gray-200 overflow-hidden">
+        <!-- Image Background -->
+        <img
+                src="assets/images/hero-car.png"
+                alt="BMW Car"
+                class="w-full h-full object-cover object-center"
+        />
+
+        <!-- Gradient Overlay -->
+        <div class="absolute inset-0 bg-gradient-to-b from-black/50 via-transparent to-black/60"></div>
+
+        <!-- Booking Form flottant -->
+        <div class="absolute top-6 left-0 right-0 z-20">
+            <app-booking-form />
+        </div>
+    </div>
+
+    <!-- Bande orange avec le texte (TRÈS RÉDUITE) -->
+    <div class="w-full bg-orange-500 py-6 md:py-7">
+        <div class="max-w-7xl mx-auto px-6 text-center">
+            <h1 class="text-2xl md:text-4xl lg:text-5xl font-black text-black leading-tight mb-2">
+                DON'T RENT A CAR.<br>
+                RENT THE CAR.
+            </h1>
+            <p class="text-sm md:text-base text-black font-medium">
+                Premium car rental at affordable rates. Worldwide.
+            </p>
+        </div>
+    </div>
+</section>

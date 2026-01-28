@@ -1,0 +1,30 @@
+/* Card hover animation */
+.card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+}
+
+/* Table styles */
+table {
+    border-collapse: collapse;
+}
+
+table tbody tr:last-child {
+    border-bottom: none;
+}
+
+/* Smooth transitions */
+button {
+    transition: all 0.2s ease;
+}
+
+button:hover {
+    transform: translateY(-1px);
+}
+
+button:active {
+    transform: translateY(0);
+}

@@ -1,0 +1,65 @@
+
+/* Avatar container hover effect */
+.group:hover {
+    transform: scale(1.02);
+}
+
+/* Camera badge hover effect */
+.group:hover > div:last-child {
+    transform: scale(1.1);
+}
+
+/* Upload overlay transition */
+.opacity-0 {
+    transition: opacity 0.3s ease-in-out;
+}
+
+.group-hover\:opacity-100 {
+    transition: opacity 0.3s ease-in-out;
+}
+
+/* Loading spinner */
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.animate-spin {
+    animation: spin 1s linear infinite;
+}
+
+/* Button hover effects */
+.btn-primary:hover {
+    transform: translateY(-1px);
+}
+
+.btn-primary:active {
+    transform: translateY(0);
+}
+
+/* Error message slide in */
+@keyframes slideInDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.animate-in {
+    animation: slideInDown 0.3s ease-out;
+}
+
+/* Drag and drop zone (pour future enhancement) */
+.dropzone {
+    transition: all 0.2s ease;
+}
+
+.dropzone.dragover {
+    background-color: rgba(249, 115, 22, 0.05);
+    border-color: #f97316;
+}
