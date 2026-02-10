@@ -1,0 +1,444 @@
+<div class="page-container">
+    <!-- Page Header -->
+    <div class="page-header">
+        <div class="page-title-section">
+            <div>
+                <h1 class="page-title">Maintenance Records</h1>
+                <p class="page-subtitle">
+                    Manage and track all vehicle maintenance operations
+                </p>
+            </div>
+        </div>
+        <div class="header-actions">
+            <button
+                    (click)="exportToPDF()"
+                    [disabled]="filteredEntretiens.length === 0"
+                    class="button-secondary"
+            >
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10"/>
+                </svg>
+                Export PDF
+            </button>
+            <button
+                    (click)="navigateToCreate()"
+                    class="button-primary"
+            >
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                </svg>
+                New Record
+            </button>
+        </div>
+    </div>
+
+    <!-- Filter Bar -->
+    <div class="filter-bar">
+        <div class="filter-grid">
+            <!-- Search Input -->
+            <div class="search-input-wrapper">
+                <svg class="search-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                </svg>
+                <input
+                        type="text"
+                        [(ngModel)]="searchTerm"
+                        (ngModelChange)="onSearchChange()"
+                        placeholder="Search by vehicle, type, or notes..."
+                        class="search-input"
+                />
+            </div>
+
+            <!-- Status Filter -->
+            <select
+                    [(ngModel)]="selectedStatus"
+                    (ngModelChange)="onStatusFilterChange()"
+                    class="filter-select"
+            >
+                <option *ngFor="let option of statusOptions" [value]="option.value">
+                    {{ option.label }}
+                </option>
+            </select>
+
+            <!-- Clear Filters Button -->
+            <button
+                    *ngIf="searchTerm || selectedStatus"
+                    (click)="searchTerm = ''; selectedStatus = ''; applyFilters()"
+                    class="button-secondary"
+            >
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+                Clear Filters
+            </button>
+        </div>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="stats-grid">
+        <!-- Total Records -->
+        <div class="stat-card">
+            <div class="stat-content">
+                <div>
+                    <p class="stat-text">Total Records</p>
+                    <p class="stat-value text-gray-900">{{ entretiens.length }}</p>
+                </div>
+                <div [ngClass]="'stat-icon-wrapper bg-blue-100'">
+                    <svg class="stat-icon text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                    </svg>
+                </div>
+            </div>
+        </div>
+
+        <!-- Completed -->
+        <div class="stat-card">
+            <div class="stat-content">
+                <div>
+                    <p class="stat-text">Completed</p>
+                    <p class="stat-value text-green-600">
+                        {{ getCountByStatus('TERMINE') }}
+                    </p>
+                </div>
+                <div [ngClass]="'stat-icon-wrapper bg-green-100'">
+                    <svg class="stat-icon text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                </div>
+            </div>
+        </div>
+
+        <!-- In Progress -->
+        <div class="stat-card">
+            <div class="stat-content">
+                <div>
+                    <p class="stat-text">In Progress</p>
+                    <p class="stat-value text-yellow-600">
+                        {{ getCountByStatus('EN_COURS') }}
+                    </p>
+                </div>
+                <div [ngClass]="'stat-icon-wrapper bg-yellow-100'">
+                    <svg class="stat-icon text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                </div>
+            </div>
+        </div>
+
+        <!-- Planned -->
+        <div class="stat-card">
+            <div class="stat-content">
+                <div>
+                    <p class="stat-text">Planned</p>
+                    <p class="stat-value text-purple-600">
+                        {{ getCountByStatus('PLANIFIE') }}
+                    </p>
+                </div>
+                <div [ngClass]="'stat-icon-wrapper bg-purple-100'">
+                    <svg class="stat-icon text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                    </svg>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading State -->
+    <div *ngIf="isLoading" class="loading-state">
+        <div class="loading-content">
+            <svg class="loading-spinner" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            <p class="loading-text">Loading maintenance records...</p>
+        </div>
+    </div>
+
+    <!-- Empty State -->
+    <div *ngIf="!isLoading && filteredEntretiens.length === 0" class="empty-state">
+        <svg class="empty-state-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+        </svg>
+        <h3 class="empty-state-title">No maintenance records found</h3>
+        <p class="empty-state-text">
+            {{ searchTerm || selectedStatus ? 'Try adjusting your filters' : 'Get started by creating your first maintenance record' }}
+        </p>
+        <button
+                *ngIf="!searchTerm && !selectedStatus"
+                (click)="navigateToCreate()"
+                class="button-primary"
+        >
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+            </svg>
+            Create First Record
+        </button>
+    </div>
+
+    <!-- Table -->
+    <div *ngIf="!isLoading && filteredEntretiens.length > 0" class="table-container">
+        <div class="table-wrapper">
+            <table class="data-table">
+                <thead class="table-header">
+                <tr>
+                    <th scope="col" class="table-header-cell">Vehicle</th>
+                    <th scope="col" class="table-header-cell">Maintenance Type</th>
+                    <th scope="col" class="table-header-cell">Date</th>
+                    <th scope="col" class="table-header-cell">Mileage</th>
+                    <th scope="col" class="table-header-cell">Cost</th>
+                    <th scope="col" class="table-header-cell">Status</th>
+                    <th scope="col" class="table-header-cell">Actions</th>
+                </tr>
+                </thead>
+                <tbody class="table-body">
+                <tr
+                        *ngFor="let entretien of paginatedEntretiens(); trackBy: trackByEntretienId"
+                        class="table-row"
+                        (click)="viewDetails(entretien)"
+                >
+                    <td class="table-cell">
+                        <div class="flex flex-col">
+              <span
+                      (click)="$event.stopPropagation(); navigateToVehicleHistory(entretien.vehiculeId)"
+                      class="vehicle-link"
+              >
+                {{ entretien.vehicule?.matricule || 'N/A' }}
+              </span>
+                            <span class="text-xs text-gray-500">
+                {{ entretien.vehicule?.marque?.libelle }} {{ entretien.vehicule?.type }}
+              </span>
+                        </div>
+                    </td>
+                    <td class="table-cell">
+                        <div class="flex flex-col">
+                            <span class="font-medium text-gray-900">
+                                {{ entretien.typeEntretien?.designation || 'N/A' }}
+                            </span>
+                            <span class="text-xs text-gray-500">
+                                {{ entretien.typeEntretien?.codeEntretien }}
+                            </span>
+                        </div>
+                    </td>
+                    <td class="table-cell text-gray-600">
+                        {{ formatDate(entretien.dateDebutOperation) }}
+                    </td>
+                    <td class="table-cell text-gray-900 font-medium">
+                        {{ entretien.kilometrageArret | number:'1.0-0' }} km
+                    </td>
+                    <td class="table-cell">
+            <span class="cost-display">
+              {{ entretien.coutTotal | number:'1.3-3' }} DT
+            </span>
+                    </td>
+                    <td class="table-cell">
+            <span
+                    [ngClass]="getStatusBadgeClass(entretien.etat)"
+                    class="status-badge"
+            >
+              {{ getStatusLabel(entretien.etat) }}
+            </span>
+                    </td>
+                    <td class="table-cell">
+                        <div class="flex items-center gap-3" (click)="$event.stopPropagation()">
+                            <button
+                                    (click)="viewDetails(entretien)"
+                                    class="action-button action-button-view"
+                            >
+                                View
+                            </button>
+                            <span class="action-divider">•</span>
+                            <button
+                                    (click)="navigateToEdit(entretien.id)"
+                                    class="action-button action-button-edit"
+                            >
+                                Edit
+                            </button>
+                            <span class="action-divider">•</span>
+                            <button
+                                    (click)="deleteEntretien(entretien)"
+                                    class="action-button action-button-delete"
+                            >
+                                Delete
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- 🎯 PAGINATION SECTION -->
+        <div *ngIf="totalPages() > 1" class="pagination-container">
+            <div class="pagination-info">
+                <p>Showing {{ (currentPage() - 1) * itemsPerPage() + 1 }} to {{ Math.min(currentPage() * itemsPerPage(), totalItems()) }} of {{ totalItems() }} results</p>
+            </div>
+            <div class="pagination-controls">
+                <!-- Previous Button -->
+                <button
+                        (click)="previousPage()"
+                        [disabled]="currentPage() === 1"
+                        class="pagination-button pagination-arrow"
+                        [class.pagination-button-disabled]="currentPage() === 1"
+                >
+                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                    </svg>
+                </button>
+
+                <!-- Current Page Number -->
+                <button class="pagination-button pagination-number pagination-button-active">
+                    {{ currentPage() }}
+                </button>
+
+                <!-- Next Button -->
+                <button
+                        (click)="nextPage()"
+                        [disabled]="currentPage() === totalPages()"
+                        class="pagination-button pagination-arrow"
+                        [class.pagination-button-disabled]="currentPage() === totalPages()"
+                >
+                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Details Modal -->
+<div *ngIf="selectedEntretien" class="modal-backdrop" (click)="closeDetails()">
+    <div class="modal-container">
+        <div class="modal-wrapper" (click)="$event.stopPropagation()">
+            <div class="modal-panel">
+                <!-- Modal Header -->
+                <div class="modal-header">
+                    <h3 class="modal-title">Maintenance Record Details</h3>
+                    <button
+                            (click)="closeDetails()"
+                            class="modal-close-button"
+                    >
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                        </svg>
+                    </button>
+                </div>
+
+                <!-- Modal Body -->
+                <div class="modal-body">
+                    <div class="space-y-6">
+                        <!-- Vehicle Information -->
+                        <div>
+                            <h4 class="text-sm font-semibold text-gray-900 mb-3">Vehicle Information</h4>
+                            <div class="detail-grid">
+                                <div class="detail-item">
+                                    <p class="detail-label">License Plate</p>
+                                    <p class="detail-value">{{ selectedEntretien.vehicule?.matricule }}</p>
+                                </div>
+                                <div class="detail-item">
+                                    <p class="detail-label">Brand & Type</p>
+                                    <p class="detail-value">
+                                        {{ selectedEntretien.vehicule?.marque?.libelle }}
+                                        {{ selectedEntretien.vehicule?.type }}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Maintenance Information -->
+                        <div>
+                            <h4 class="text-sm font-semibold text-gray-900 mb-3">Maintenance Information</h4>
+                            <div class="detail-grid">
+                                <div class="detail-item">
+                                    <p class="detail-label">Type</p>
+                                    <p class="detail-value">{{ selectedEntretien.typeEntretien?.designation }}</p>
+                                </div>
+                                <div class="detail-item">
+                                    <p class="detail-label">Code</p>
+                                    <p class="detail-value">{{ selectedEntretien.typeEntretien?.codeEntretien }}</p>
+                                </div>
+                                <div class="detail-item">
+                                    <p class="detail-label">Start Date</p>
+                                    <p class="detail-value">{{ selectedEntretien.dateDebutOperation | date: 'mediumDate' }}</p>
+                                </div>
+                                <div class="detail-item">
+                                    <p class="detail-label">End Date</p>
+                                    <p class="detail-value">{{ selectedEntretien.dateFinOperation | date: 'mediumDate' }}</p>
+                                </div>
+                                <div class="detail-item">
+                                    <p class="detail-label">Mileage</p>
+                                    <p class="detail-value">{{ selectedEntretien.kilometrageArret | number:'1.0-0' }} km</p>
+                                </div>
+                                <div class="detail-item">
+                                    <p class="detail-label">Cost</p>
+                                    <p class="cost-display">{{ selectedEntretien.coutTotal | number:'1.3-3' }} DT</p>
+                                </div>
+                                <div class="detail-item">
+                                    <p class="detail-label">Status</p>
+                                    <span
+                                            [ngClass]="getStatusBadgeClass(selectedEntretien.etat)"
+                                            class="status-badge"
+                                    >
+                    {{ getStatusLabel(selectedEntretien.etat) }}
+                  </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Personnel Information -->
+                        <div *ngIf="selectedEntretien.codePersonnel || selectedEntretien.nomPrenomPersonnel">
+                            <h4 class="text-sm font-semibold text-gray-900 mb-3">Personnel</h4>
+                            <div class="detail-grid">
+                                <div class="detail-item" *ngIf="selectedEntretien.codePersonnel">
+                                    <p class="detail-label">Personnel Code</p>
+                                    <p class="detail-value">{{ selectedEntretien.codePersonnel }}</p>
+                                </div>
+                                <div class="detail-item" *ngIf="selectedEntretien.nomPrenomPersonnel">
+                                    <p class="detail-label">Name</p>
+                                    <p class="detail-value">{{ selectedEntretien.nomPrenomPersonnel }}</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Next Maintenance -->
+                        <div *ngIf="selectedEntretien.kilometrageLimiteProchainEntretien || selectedEntretien.dateLimiteProchainEntretien" class="next-maintenance-info">
+                            <p class="next-maintenance-title">Next Maintenance Schedule</p>
+                            <div class="next-maintenance-details">
+                <span *ngIf="selectedEntretien.kilometrageLimiteProchainEntretien">
+                  📍 {{ selectedEntretien.kilometrageLimiteProchainEntretien | number:'1.0-0' }} km
+                </span>
+                                <span *ngIf="selectedEntretien.dateLimiteProchainEntretien">
+                  📅 {{ selectedEntretien.dateLimiteProchainEntretien | date: 'mediumDate' }}
+                </span>
+                            </div>
+                        </div>
+
+                        <!-- Observations -->
+                        <div *ngIf="selectedEntretien.observations">
+                            <h4 class="text-sm font-semibold text-gray-900 mb-2">Observations</h4>
+                            <p class="text-sm text-gray-700 bg-gray-50 p-3 rounded-lg">
+                                {{ selectedEntretien.observations }}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Modal Footer -->
+                <div class="modal-footer">
+                    <button
+                            (click)="closeDetails()"
+                            class="button-secondary"
+                    >
+                        Close
+                    </button>
+                    <button
+                            (click)="navigateToEdit(selectedEntretien.id)"
+                            class="button-primary"
+                    >
+                        Edit Record
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,4 +1,4 @@
-// Components
+// components
 export * from './components/login-modal/login-modal.component';
 export * from './components/register-type-modal/register-type-modal.component';
 export * from './components/register-form/register-form.component';

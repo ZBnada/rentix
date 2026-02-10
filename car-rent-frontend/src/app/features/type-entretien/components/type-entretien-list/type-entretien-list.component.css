@@ -1,0 +1,143 @@
+/* Custom styles for type-entretien-list component */
+
+/* Card hover effects */
+.hover\:shadow-md {
+    transition: box-shadow 0.3s ease-in-out;
+}
+
+/* Line clamp utilities */
+.line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+/* Modal backdrop animation */
+.fixed.inset-0 {
+    animation: fadeIn 0.2s ease-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+/* Modal content animation */
+.fixed.inset-0 > div {
+    animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px) scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+/* Loading spinner */
+.animate-spin {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Smooth transitions for interactive elements */
+button,
+input {
+    transition: all 0.2s ease-in-out;
+}
+
+/* Badge animations */
+.px-2.py-1 {
+    transition: all 0.2s ease-in-out;
+}
+
+/* Card grid responsive spacing */
+@media (max-width: 768px) {
+    .grid-cols-1 {
+        gap: 1rem;
+    }
+}
+
+/* Scrollbar styling for modal */
+.overflow-y-auto {
+    scrollbar-width: thin;
+    scrollbar-color: #cbd5e0 #f7fafc;
+}
+
+.overflow-y-auto::-webkit-scrollbar {
+    width: 6px;
+}
+
+.overflow-y-auto::-webkit-scrollbar-track {
+    background: #f7fafc;
+    border-radius: 3px;
+}
+
+.overflow-y-auto::-webkit-scrollbar-thumb {
+    background: #cbd5e0;
+    border-radius: 3px;
+}
+
+.overflow-y-auto::-webkit-scrollbar-thumb:hover {
+    background: #a0aec0;
+}
+
+/* Empty state animation */
+.flex.flex-col.items-center svg {
+    animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-10px);
+    }
+}
+
+/* Focus states for accessibility */
+button:focus-visible,
+input:focus-visible {
+    outline: 2px solid #f97316;
+    outline-offset: 2px;
+}
+
+/* Hover effects for action buttons */
+.p-2.hover\:bg-orange-50 {
+    position: relative;
+    overflow: hidden;
+}
+
+.p-2.hover\:bg-orange-50::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(249, 115, 22, 0.1);
+    transform: translate(-50%, -50%);
+    transition: width 0.3s, height 0.3s;
+}
+
+.p-2.hover\:bg-orange-50:hover::before {
+    width: 100%;
+    height: 100%;
+}

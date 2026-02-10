@@ -1,18 +1,27 @@
-import { Component, inject, signal, output, OnInit } from '@angular/core';
+// src/app/shared/components/header/header.component.ts
+// VERSION PRODUCTION - SANS LOGS
+
+import { Component, inject, signal, output, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
+import { Subject, takeUntil } from 'rxjs';
 import { AuthService } from '../../../features/auth/services/auth.service';
+import { NotificationBellComponent } from '@features/notifications/components/notification-bell/notification-bell.component';
+import { NotificationFacadeService } from '@features/notifications/services/notification-facade.service';
 
 @Component({
     selector: 'app-header',
     standalone: true,
-    imports: [CommonModule],
+    imports: [CommonModule, NotificationBellComponent],
     templateUrl: './header.component.html',
     styleUrls: ['./header.component.css']
 })
-export class HeaderComponent implements OnInit {
+export class HeaderComponent implements OnInit, OnDestroy {
     private readonly router = inject(Router);
     private readonly authService = inject(AuthService);
+    private readonly notificationFacade = inject(NotificationFacadeService);
+
+    private destroy$ = new Subject<void>();
 
     toggleSidebar = output<void>();
 
@@ -24,7 +33,7 @@ export class HeaderComponent implements OnInit {
     useDefaultAvatar = signal(false);
 
     ngOnInit(): void {
-        // Charger le thème depuis localStorage
+        // Charger le thème
         const savedTheme = localStorage.getItem('theme');
         const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
 
@@ -36,13 +45,34 @@ export class HeaderComponent implements OnInit {
             document.documentElement.classList.remove('dark');
         }
 
-        // Charger l'avatar de l'utilisateur
+        // Charger l'avatar
         this.loadUserAvatar();
+
+        // Initialiser les notifications
+        this.initializeNotifications();
+    }
+
+    ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
     }
 
     /**
-     * Charger l'avatar depuis le token JWT
-     * Le backend envoie déjà l'URL complète via le mapper
+     * Initialiser les notifications
+     */
+    private initializeNotifications(): void {
+        const user = this.authService.getCurrentUser();
+
+        if (!user || !user.id) {
+            return;
+        }
+
+        // Initialiser le système de notifications
+        this.notificationFacade.initialize(user.id);
+    }
+
+    /**
+     * Charger l'avatar
      */
     private loadUserAvatar(): void {
         const user = this.authService.getCurrentUser();
@@ -52,64 +82,41 @@ export class HeaderComponent implements OnInit {
             return;
         }
 
-        // Le backend envoie profileImage avec l'URL complète
-        // Vérifier si l'utilisateur a une image de profil
         if (user.profileImage) {
             this.userAvatarUrl.set(user.profileImage);
             this.useDefaultAvatar.set(false);
         } else {
-            // Pas d'image dans le token -> utiliser l'image par défaut
             this.userAvatarUrl.set('assets/images/default-avatar.png');
             this.useDefaultAvatar.set(true);
         }
     }
 
-    /**
-     * Gestion d'erreur de chargement d'image
-     * Si l'image ne charge pas, basculer vers l'image par défaut
-     */
     onAvatarError(): void {
-        console.warn('Failed to load user avatar, falling back to default');
         this.userAvatarUrl.set('assets/images/default-avatar.png');
         this.useDefaultAvatar.set(true);
     }
 
-    /**
-     * Récupérer le nom complet de l'utilisateur
-     */
     getUserName(): string {
         const user = this.authService.getCurrentUser();
         return user ? `${user.firstName} ${user.lastName}` : 'User';
     }
 
-    /**
-     * Récupérer l'email de l'utilisateur
-     */
     getUserEmail(): string {
         const user = this.authService.getCurrentUser();
         return user?.email || 'user@example.com';
     }
 
-    /**
-     * Récupérer les initiales de l'utilisateur
-     * Utilisé comme fallback si l'image par défaut ne charge pas
-     */
     getUserInitials(): string {
         const user = this.authService.getCurrentUser();
 
-        // Si le backend envoie déjà les initials dans le token
         if (user?.initials) {
             return user.initials;
         }
 
-        // Sinon, calculer les initiales
         if (!user) return 'U';
         return `${user.firstName.charAt(0)}${user.lastName.charAt(0)}`.toUpperCase();
     }
 
-    /**
-     * Vérifier si on doit afficher l'image ou les initiales
-     */
     shouldShowImage(): boolean {
         return this.userAvatarUrl() !== null && !this.useDefaultAvatar();
     }

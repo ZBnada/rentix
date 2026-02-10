@@ -1,0 +1,206 @@
+<div class="bg-white rounded-lg shadow-sm border border-gray-200">
+    <form [formGroup]="typeEntretienForm" (ngSubmit)="onSubmit()">
+        <!-- Header -->
+        <div class="px-6 py-4 border-b border-gray-200">
+            <h3 class="text-lg font-semibold text-gray-900">
+                {{ isEditMode ? 'Modifier le type d\'entretien' : 'Nouveau type d\'entretien' }}
+            </h3>
+        </div>
+
+        <!-- Form Body -->
+        <div class="px-6 py-6 space-y-6">
+            <!-- Row 1: Code and Designation -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Code Entretien -->
+                <div>
+                    <label for="codeEntretien" class="block text-sm font-medium text-gray-700 mb-2">
+                        Code <span class="text-red-500">*</span>
+                    </label>
+                    <input
+                            type="text"
+                            id="codeEntretien"
+                            formControlName="codeEntretien"
+                            placeholder="Ex: E01, E02..."
+                            [ngClass]="{
+              'border-red-300 focus:border-red-500 focus:ring-red-500': hasError('codeEntretien'),
+              'border-gray-300 focus:border-orange-500 focus:ring-orange-500': !hasError('codeEntretien')
+            }"
+                            class="w-full px-4 py-2.5 border rounded-lg focus:outline-none focus:ring-2 transition-colors"
+                    />
+                    <p *ngIf="hasError('codeEntretien')" class="mt-1 text-sm text-red-600">
+                        {{ getErrorMessage('codeEntretien') }}
+                    </p>
+                </div>
+
+                <!-- Designation -->
+                <div>
+                    <label for="designation" class="block text-sm font-medium text-gray-700 mb-2">
+                        Désignation <span class="text-red-500">*</span>
+                    </label>
+                    <input
+                            type="text"
+                            id="designation"
+                            formControlName="designation"
+                            placeholder="Ex: Vidange et changement filtre à huile"
+                            [ngClass]="{
+              'border-red-300 focus:border-red-500 focus:ring-red-500': hasError('designation'),
+              'border-gray-300 focus:border-orange-500 focus:ring-orange-500': !hasError('designation')
+            }"
+                            class="w-full px-4 py-2.5 border rounded-lg focus:outline-none focus:ring-2 transition-colors"
+                    />
+                    <p *ngIf="hasError('designation')" class="mt-1 text-sm text-red-600">
+                        {{ getErrorMessage('designation') }}
+                    </p>
+                </div>
+            </div>
+
+            <!-- Row 2: Description -->
+            <div>
+                <label for="description" class="block text-sm font-medium text-gray-700 mb-2">
+                    Description
+                </label>
+                <textarea
+                        id="description"
+                        formControlName="description"
+                        rows="3"
+                        placeholder="Description détaillée de l'entretien..."
+                        class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors resize-none"
+                ></textarea>
+            </div>
+
+            <!-- Row 3: Frequencies -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Frequence Jours -->
+                <div>
+                    <label for="frequenceJoursRecommandee" class="block text-sm font-medium text-gray-700 mb-2">
+                        Fréquence recommandée (jours)
+                    </label>
+                    <div class="relative">
+                        <input
+                                type="number"
+                                id="frequenceJoursRecommandee"
+                                formControlName="frequenceJoursRecommandee"
+                                placeholder="Ex: 180"
+                                min="1"
+                                [ngClass]="{
+                'border-red-300 focus:border-red-500 focus:ring-red-500': hasError('frequenceJoursRecommandee'),
+                'border-gray-300 focus:border-orange-500 focus:ring-orange-500': !hasError('frequenceJoursRecommandee')
+              }"
+                                class="w-full px-4 py-2.5 border rounded-lg focus:outline-none focus:ring-2 transition-colors"
+                        />
+                        <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                            <span class="text-gray-500 text-sm">jours</span>
+                        </div>
+                    </div>
+                    <p *ngIf="hasError('frequenceJoursRecommandee')" class="mt-1 text-sm text-red-600">
+                        {{ getErrorMessage('frequenceJoursRecommandee') }}
+                    </p>
+                </div>
+
+                <!-- Frequence KM -->
+                <div>
+                    <label for="frequenceKmRecommandee" class="block text-sm font-medium text-gray-700 mb-2">
+                        Fréquence recommandée (km)
+                    </label>
+                    <div class="relative">
+                        <input
+                                type="number"
+                                id="frequenceKmRecommandee"
+                                formControlName="frequenceKmRecommandee"
+                                placeholder="Ex: 5000"
+                                min="1"
+                                [ngClass]="{
+                'border-red-300 focus:border-red-500 focus:ring-red-500': hasError('frequenceKmRecommandee'),
+                'border-gray-300 focus:border-orange-500 focus:ring-orange-500': !hasError('frequenceKmRecommandee')
+              }"
+                                class="w-full px-4 py-2.5 border rounded-lg focus:outline-none focus:ring-2 transition-colors"
+                        />
+                        <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                            <span class="text-gray-500 text-sm">km</span>
+                        </div>
+                    </div>
+                    <p *ngIf="hasError('frequenceKmRecommandee')" class="mt-1 text-sm text-red-600">
+                        {{ getErrorMessage('frequenceKmRecommandee') }}
+                    </p>
+                </div>
+            </div>
+
+            <!-- Row 4: Cost and Mandatory -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Cout Moyen -->
+                <div>
+                    <label for="coutMoyenEstime" class="block text-sm font-medium text-gray-700 mb-2">
+                        Coût moyen estimé <span class="text-red-500">*</span>
+                    </label>
+                    <div class="relative">
+                        <input
+                                type="number"
+                                id="coutMoyenEstime"
+                                formControlName="coutMoyenEstime"
+                                placeholder="Ex: 150"
+                                min="0"
+                                step="0.001"
+                                [ngClass]="{
+                'border-red-300 focus:border-red-500 focus:ring-red-500': hasError('coutMoyenEstime'),
+                'border-gray-300 focus:border-orange-500 focus:ring-orange-500': !hasError('coutMoyenEstime')
+              }"
+                                class="w-full px-4 py-2.5 border rounded-lg focus:outline-none focus:ring-2 transition-colors"
+                        />
+                        <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                            <span class="text-gray-500 text-sm">DT</span>
+                        </div>
+                    </div>
+                    <p *ngIf="hasError('coutMoyenEstime')" class="mt-1 text-sm text-red-600">
+                        {{ getErrorMessage('coutMoyenEstime') }}
+                    </p>
+                </div>
+
+                <!-- Est Obligatoire -->
+                <div class="flex items-end pb-2">
+                    <label class="flex items-center cursor-pointer">
+                        <input
+                                type="checkbox"
+                                formControlName="estObligatoire"
+                                class="w-5 h-5 text-orange-500 border-gray-300 rounded focus:ring-orange-500 focus:ring-2 cursor-pointer"
+                        />
+                        <span class="ml-3 text-sm font-medium text-gray-700">
+              Entretien obligatoire
+            </span>
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer Actions -->
+        <div class="px-6 py-4 bg-gray-50 border-t border-gray-200 flex items-center justify-end gap-3 rounded-b-lg">
+            <button
+                    type="button"
+                    (click)="onCancel()"
+                    [disabled]="isSubmitting"
+                    class="px-5 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-300 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+                Annuler
+            </button>
+            <button
+                    type="submit"
+                    [disabled]="typeEntretienForm.invalid || isSubmitting"
+                    [ngClass]="{
+          'opacity-50 cursor-not-allowed': typeEntretienForm.invalid || isSubmitting,
+          'hover:bg-orange-600 hover:shadow-lg': !typeEntretienForm.invalid && !isSubmitting
+        }"
+                    class="px-5 py-2.5 text-sm font-medium text-white bg-orange-500 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 transition-all"
+            >
+        <span *ngIf="!isSubmitting">
+          {{ isEditMode ? 'Modifier' : 'Créer' }}
+        </span>
+                <span *ngIf="isSubmitting" class="flex items-center gap-2">
+          <svg class="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
+          Traitement...
+        </span>
+            </button>
+        </div>
+    </form>
+</div>

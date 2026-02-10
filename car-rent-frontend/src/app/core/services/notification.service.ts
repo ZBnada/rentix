@@ -225,7 +225,7 @@ export class NotificationService {
         return result.isConfirmed;
     }
 
-    async confirm(message: string, title: string = 'Confirmation'): Promise<boolean> {
+    async confirm(message: string, title: string = 'Confirmation', p0: string, p1: string): Promise<boolean> {
         const result = await Swal.fire({
             icon: 'question',
             title: title,
@@ -440,4 +440,218 @@ export class NotificationService {
 
         return result.isConfirmed;
     }
+    /**
+     * Success: Type entretien created
+     */
+    typeEntretienCreated(designation: string): void {
+        Swal.fire({
+            icon: 'success',
+            title: 'Type d\'entretien créé !',
+            html: `Le type d'entretien <strong>"${designation}"</strong> a été créé avec succès.`,
+            confirmButtonText: 'Super !',
+            timer: 3000,
+            timerProgressBar: true,
+            ...this.defaultConfig,
+        });
+    }
+
+    /**
+     * Success: Type entretien updated
+     */
+    typeEntretienUpdated(designation: string): void {
+        Swal.fire({
+            icon: 'success',
+            title: 'Type d\'entretien modifié !',
+            html: `Le type d'entretien <strong>"${designation}"</strong> a été mis à jour avec succès.`,
+            confirmButtonText: 'Parfait !',
+            timer: 3000,
+            timerProgressBar: true,
+            ...this.defaultConfig,
+        });
+    }
+
+    /**
+     * Success: Type entretien deleted
+     */
+    typeEntretienDeleted(designation: string): void {
+        Swal.fire({
+            icon: 'success',
+            title: 'Type d\'entretien supprimé !',
+            html: `Le type d'entretien <strong>"${designation}"</strong> a été supprimé définitivement.`,
+            confirmButtonText: 'OK',
+            timer: 3000,
+            timerProgressBar: true,
+            ...this.defaultConfig,
+        });
+    }
+
+    /**
+     * Error: Type entretien creation failed
+     */
+    typeEntretienCreateError(errorMessage?: string): void {
+        Swal.fire({
+            icon: 'error',
+            title: 'Erreur de création',
+            text:
+                errorMessage ||
+                'Une erreur est survenue lors de la création du type d\'entretien. Veuillez réessayer.',
+            confirmButtonText: 'Fermer',
+            ...this.defaultConfig,
+        });
+    }
+
+    /**
+     * Error: Type entretien update failed
+     */
+    typeEntretienUpdateError(errorMessage?: string): void {
+        Swal.fire({
+            icon: 'error',
+            title: 'Erreur de modification',
+            text:
+                errorMessage ||
+                'Une erreur est survenue lors de la mise à jour du type d\'entretien. Veuillez réessayer.',
+            confirmButtonText: 'Fermer',
+            ...this.defaultConfig,
+        });
+    }
+
+    /**
+     * Error: Type entretien deletion failed
+     */
+    typeEntretienDeleteError(message?: string): void {
+        Swal.fire({
+            icon: 'error',
+            title: 'Erreur de suppression',
+            text:
+                message ||
+                'Une erreur est survenue lors de la suppression du type d\'entretien. Veuillez réessayer.',
+            confirmButtonText: 'Fermer',
+            ...this.defaultConfig,
+        });
+    }
+
+    /**
+     * Error: Code already exists
+     */
+    codeAlreadyExists(code: string): void {
+        Swal.fire({
+            icon: 'error',
+            title: 'Code déjà utilisé',
+            html: `
+      <p>Le code <strong>"${code}"</strong> est déjà utilisé par un autre type d'entretien.</p>
+      <p class="mt-2 text-sm text-gray-600">Veuillez utiliser un code différent.</p>
+    `,
+            confirmButtonText: 'Compris',
+            ...this.defaultConfig,
+        });
+    }
+
+    /**
+     * Error: Type entretien in use
+     */
+    typeEntretienInUseError(): void {
+        Swal.fire({
+            icon: 'error',
+            title: 'Type d\'entretien en cours d\'utilisation',
+            html: `
+      <p>Impossible de supprimer ce type d'entretien car il est actuellement utilisé.</p>
+      <p class="mt-2 text-sm text-gray-600">Veuillez d'abord supprimer les entretiens associés.</p>
+    `,
+            confirmButtonText: 'Compris',
+            ...this.defaultConfig,
+        });
+    }
+
+    /**
+     * Confirmation: Delete type entretien
+     */
+    async confirmDeleteTypeEntretien(designation: string): Promise<boolean> {
+        const result = await Swal.fire({
+            icon: 'warning',
+            title: 'Supprimer le type d\'entretien ?',
+            html: `
+      <div class="text-left">
+        <p class="mb-3">Vous êtes sur le point de supprimer le type d'entretien :</p>
+        <p class="mb-3 font-semibold text-orange-600">"${designation}"</p>
+        <p class="mb-3">⚠️ Cette action est <strong>irréversible</strong> et ne peut pas être annulée.</p>
+        <p class="text-sm text-gray-600">Toutes les données associées à ce type d'entretien seront perdues définitivement.</p>
+      </div>
+    `,
+            showCancelButton: true,
+            confirmButtonText: 'Oui, supprimer',
+            cancelButtonText: 'Annuler',
+            reverseButtons: true,
+            focusCancel: true,
+            ...this.defaultConfig,
+        });
+
+        return result.isConfirmed;
+    }
+
+    /**
+     * Confirmation: Create type entretien
+     */
+    async confirmCreateTypeEntretien(): Promise<boolean> {
+        const result = await Swal.fire({
+            icon: 'question',
+            title: 'Créer ce type d\'entretien ?',
+            html: `
+      <div class="text-left">
+        <p class="mb-3">Êtes-vous sûr de vouloir créer ce nouveau type d'entretien ?</p>
+        <p class="text-sm text-gray-600">Vous pourrez le modifier ultérieurement si nécessaire.</p>
+      </div>
+    `,
+            showCancelButton: true,
+            confirmButtonText: 'Oui, créer',
+            cancelButtonText: 'Annuler',
+            reverseButtons: true,
+            ...this.defaultConfig,
+        });
+
+        return result.isConfirmed;
+    }
+
+    /**
+     * Confirmation: Update type entretien
+     */
+    async confirmUpdateTypeEntretien(designation: string): Promise<boolean> {
+        const result = await Swal.fire({
+            icon: 'question',
+            title: 'Modifier le type d\'entretien ?',
+            html: `
+      <div class="text-left">
+        <p class="mb-3">Voulez-vous enregistrer les modifications du type d'entretien :</p>
+        <p class="mb-3 font-semibold text-orange-600">"${designation}"</p>
+        <p class="text-sm text-gray-600">Les changements seront appliqués immédiatement.</p>
+      </div>
+    `,
+            showCancelButton: true,
+            confirmButtonText: 'Oui, modifier',
+            cancelButtonText: 'Annuler',
+            reverseButtons: true,
+            ...this.defaultConfig,
+        });
+
+        return result.isConfirmed;
+    }
+
+// ============================================
+// FIN DES MÉTHODES TYPE ENTRETIEN
+// ============================================
+
+    /**
+     * EXEMPLE D'UTILISATION DANS LE MODULE:
+     *
+     * constructor(
+     *   private notificationService: NotificationService  // ← Service du core
+     * ) {}
+     *
+     * async deleteType() {
+     *   const confirmed = await this.notificationService.confirmDeleteTypeEntretien('Vidange');
+     *   if (confirmed) {
+     *     // ...
+     *     this.notificationService.typeEntretienDeleted('Vidange');
+     *   }
+     * }
+     */
 }

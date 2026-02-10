@@ -4,7 +4,7 @@ export * from './models';
 // Services
 export * from './services';
 
-// Components
+// components
 export * from './components';
 
 // Pages

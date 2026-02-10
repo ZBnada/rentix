@@ -13,6 +13,10 @@ import { EmailModule } from './email/email.module';
 import { ApolloServerPluginLandingPageLocalDefault } from '@apollo/server/plugin/landingPage/default';
 import { VehiculeModule } from './vehicule/vehicule.module';
 import { MarqueVehiculeModule } from './marque-vehicule/marque-vehicule.module';
+import { EntretienModule } from './entretien/entretien.module';
+import { EntretienASuivreModule } from './entretien-asuivre/entretien-a-suivre.module';
+import { TypeEntretienModule } from './type-entretien/type-entretien.module';
+import { NotificationModule } from './notification/notification.module';
 
 @Module({
   imports: [
@@ -66,6 +70,10 @@ import { MarqueVehiculeModule } from './marque-vehicule/marque-vehicule.module';
     AuthModule,
     VehiculeModule,
     MarqueVehiculeModule,
+    EntretienModule,
+    EntretienASuivreModule,
+    TypeEntretienModule,
+    NotificationModule,
   ],
 })
 export class AppModule {}

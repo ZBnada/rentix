@@ -35,6 +35,44 @@ enum ClasseVehicule {
   UTILITAIRE
 }
 
+input CreateEntretienInput {
+  """Code du personnel"""
+  codePersonnel: String
+
+  """Coût total de l'entretien"""
+  coutTotal: Float! = 0
+
+  """Date de début de l'opération (YYYY-MM-DD)"""
+  dateDebutOperation: String!
+
+  """Date de fin de l'opération (YYYY-MM-DD)"""
+  dateFinOperation: String!
+
+  """Date limite pour le prochain entretien (YYYY-MM-DD)"""
+  dateLimiteProchainEntretien: String
+
+  """État de l'entretien"""
+  etat: String! = "TERMINE"
+
+  """Kilométrage à l'arrêt"""
+  kilometrageArret: Float!
+
+  """Kilométrage limite pour le prochain entretien"""
+  kilometrageLimiteProchainEntretien: Float
+
+  """Nom et prénom du personnel"""
+  nomPrenomPersonnel: String
+
+  """Observations"""
+  observations: String
+
+  """Identifiant du type d'entretien (E01, E02...)"""
+  typeEntretienId: ID!
+
+  """Identifiant du véhicule"""
+  vehiculeId: ID!
+}
+
 input CreateMarqueVehiculeInput {
   description: String
   id: String
@@ -42,10 +80,86 @@ input CreateMarqueVehiculeInput {
   logoUrl: String
 }
 
+input CreateNotificationInput {
+  """Label action"""
+  actionLabel: String
+
+  """URL d'action"""
+  actionUrl: String
+
+  """Couleur"""
+  couleur: String
+
+  """Créée par"""
+  creePar: String
+
+  """Destinataire"""
+  destinataire: String
+
+  """Date d'expiration"""
+  expireLe: DateTime
+
+  """Icône"""
+  icone: String
+
+  """Message"""
+  message: String!
+
+  """Metadata JSON string"""
+  metadata: String
+
+  """Module source"""
+  module: ModuleType!
+
+  """Priorité"""
+  priorite: PrioriteNotification! = NORMALE
+
+  """ID de la référence source"""
+  referenceId: ID!
+
+  """Type de référence"""
+  referenceType: String
+
+  """Rôle destinataire"""
+  roleDestinataire: String
+
+  """Titre"""
+  titre: String!
+
+  """Type de notification"""
+  type: TypeNotification!
+
+  """ID du véhicule"""
+  vehiculeId: ID
+}
+
 input CreateRoleInput {
   description: String
   name: String!
   weight: Int! = 60
+}
+
+input CreateTypeEntretienInput {
+  """Code du type d'entretien (E01, E02...)"""
+  codeEntretien: String!
+
+  """Coût moyen estimé"""
+  coutMoyenEstime: Float! = 0
+
+  """Description détaillée"""
+  description: String
+
+  """Désignation du type d'entretien"""
+  designation: String!
+
+  """Indique si l'entretien est obligatoire"""
+  estObligatoire: Boolean! = false
+
+  """Fréquence recommandée en jours"""
+  frequenceJoursRecommandee: Int
+
+  """Fréquence recommandée en kilomètres"""
+  frequenceKmRecommandee: Int
 }
 
 input CreateUserInput {
@@ -119,6 +233,82 @@ enum EnergieType {
   HYBRIDE
 }
 
+type Entretien {
+  """Code du personnel ayant effectué l'entretien"""
+  codePersonnel: String
+
+  """Coût total de l'entretien"""
+  coutTotal: Float!
+
+  """Date de début de l'opération (YYYY-MM-DD)"""
+  dateDebutOperation: String!
+
+  """Date de fin de l'opération (YYYY-MM-DD)"""
+  dateFinOperation: String!
+
+  """Date limite pour le prochain entretien (YYYY-MM-DD)"""
+  dateLimiteProchainEntretien: String
+
+  """Indique si l'entretien est actif"""
+  estActif: Boolean!
+
+  """État de l'entretien"""
+  etat: String!
+
+  """Identifiant unique de l'entretien"""
+  id: ID!
+
+  """Kilométrage à l'arrêt du véhicule"""
+  kilometrageArret: Float!
+
+  """Kilométrage limite pour le prochain entretien"""
+  kilometrageLimiteProchainEntretien: Float
+
+  """Date de modification (ISO 8601)"""
+  modifieLe: String!
+
+  """Utilisateur ayant modifié"""
+  modifiePar: String
+
+  """Nom et prénom du personnel"""
+  nomPrenomPersonnel: String
+
+  """Observations"""
+  observations: String
+
+  """Date de saisie (ISO 8601)"""
+  saisiLe: String!
+
+  """Utilisateur ayant saisi"""
+  saisiPar: String
+
+  """Type d'entretien (E01, E02...)"""
+  typeEntretien: TypeEntretien
+
+  """Identifiant du type d'entretien"""
+  typeEntretienId: ID!
+
+  """Véhicule concerné par cet entretien"""
+  vehicule: Vehicule
+
+  """Identifiant du véhicule concerné"""
+  vehiculeId: ID!
+}
+
+type EntretienConfiguration {
+  codeEntretien: String!
+  coutMoyenEstime: Float!
+  designation: String!
+  entretienASuivreId: ID
+
+  """Est-ce que cet entretien est coché pour ce véhicule"""
+  estActive: Boolean!
+  estObligatoire: Boolean!
+  frequenceJoursRecommandee: Int
+  frequenceKmRecommandee: Int
+  typeEntretienId: ID!
+}
+
 input ForgotPasswordInput {
   email: String!
 }
@@ -143,7 +333,31 @@ type MessageResponse {
   success: Boolean!
 }
 
+"""Type de module ayant généré la notification"""
+enum ModuleType {
+  """Notification liée à une assurance"""
+  ASSURANCE
+
+  """Notification liée au contrôle technique"""
+  CONTROLE_TECHNIQUE
+
+  """Notification liée à un entretien"""
+  ENTRETIEN
+
+  """Notification liée à une réparation"""
+  REPARATION
+
+  """Notification liée à une révision"""
+  REVISION
+
+  """Notification liée à une vignette"""
+  VIGNETTE
+}
+
 type Mutation {
+  """Archiver une notification"""
+  archiverNotification(id: String!): Boolean!
+
   """Changer l'email de l'utilisateur connecté"""
   changeEmail(changeEmailInput: ChangeEmailInput!): String!
 
@@ -153,18 +367,33 @@ type Mutation {
   """Changer le rôle d'un utilisateur (Admin)"""
   changeUserRole(changeRoleInput: ChangeRoleInput!): UserResource!
 
+  """Créer un nouvel entretien pour un véhicule"""
+  createEntretien(input: CreateEntretienInput!): Entretien!
+
   """Créer une nouvelle marque de véhicule"""
   createMarqueVehicule(input: CreateMarqueVehiculeInput!): MarqueVehicule!
 
   """Créer un nouveau rôle - Réservé au SUPERADMIN"""
   createRole(createRoleInput: CreateRoleInput!): Role!
+
+  """Créer un nouveau type d'entretien"""
+  createTypeEntretien(input: CreateTypeEntretienInput!): TypeEntretien!
   createUser(createUserInput: CreateUserInput!): UserResource!
 
   """Créer un nouveau véhicule dans le système"""
   createVehicule(input: CreateVehiculeInput!): Vehicule!
 
+  """Créer une nouvelle notification"""
+  creerNotification(input: CreateNotificationInput!): Notification!
+
+  """Supprimer un entretien (désactivation)"""
+  deleteEntretien(id: String!): Boolean!
+
   """Supprimer une marque de véhicule (désactivation)"""
   deleteMarqueVehicule(id: String!): Boolean!
+
+  """Supprimer un type d'entretien (désactivation)"""
+  deleteTypeEntretien(id: String!): Boolean!
 
   """Supprimer un véhicule (désactivation)"""
   deleteVehicule(id: String!): Boolean!
@@ -174,6 +403,12 @@ type Mutation {
 
   """Connexion avec email et mot de passe"""
   login(loginInput: LoginInput!): AuthResponse!
+
+  """Marquer une notification comme lue"""
+  marquerNotificationCommeLue(id: String!): Notification!
+
+  """Marquer toutes les notifications comme lues"""
+  marquerToutesNotificationsCommeLues(destinataire: String): Int!
 
   """Renouveler le token d'accès avec un refresh token"""
   refreshToken(refreshToken: String!): AuthResponse!
@@ -191,21 +426,162 @@ type Mutation {
   """Réinitialiser le mot de passe avec le code reçu"""
   resetPassword(resetPasswordInput: ResetPasswordInput!): MessageResponse!
 
+  """Supprimer une notification (soft delete)"""
+  supprimerNotification(id: String!): Boolean!
+
+  """Cocher ou décocher un type d'entretien pour un véhicule"""
+  toggleEntretienVehicule(estActive: Boolean!, typeEntretienId: String!, vehiculeId: String!): Boolean!
+
   """Activer ou désactiver un compte utilisateur"""
   toggleUserStatus(userId: ID!): UserResource!
+
+  """Mettre à jour les informations d'un entretien"""
+  updateEntretien(input: UpdateEntretienInput!): Entretien!
 
   """Mettre à jour une marque de véhicule"""
   updateMarqueVehicule(input: UpdateMarqueVehiculeInput!): MarqueVehicule!
 
   """Mettre à jour un rôle - Réservé au SUPERADMIN"""
   updateRole(updateRoleInput: UpdateRoleInput!): Role!
+
+  """Mettre à jour un type d'entretien"""
+  updateTypeEntretien(input: UpdateTypeEntretienInput!): TypeEntretien!
   updateUser(updateUserInput: UpdateUserInput!): UserResource!
 
   """Mettre à jour les informations d'un véhicule"""
   updateVehicule(input: UpdateVehiculeInput!): Vehicule!
 
+  """Valider la configuration des entretiens pour un véhicule"""
+  validerConfigurationVehicule(vehiculeId: String!): Boolean!
+
   """Vérifier l'email avec le code à 6 chiffres"""
   verifyEmail(verifyEmailInput: VerifyEmailInput!): MessageResponse!
+}
+
+type Notification {
+  """Label du bouton"""
+  actionLabel: String
+
+  """URL d'action"""
+  actionUrl: String
+
+  """Couleur"""
+  couleur: String
+
+  """Date de création"""
+  creeLe: DateTime!
+
+  """Créée par"""
+  creePar: String
+
+  """Date de lecture"""
+  dateLecture: DateTime
+
+  """Destinataire"""
+  destinataire: String
+
+  """Est active"""
+  estActive: Boolean!
+
+  """Est archivée"""
+  estArchivee: Boolean!
+
+  """Date d'expiration"""
+  expireLe: DateTime
+
+  """Icône"""
+  icone: String
+
+  """Identifiant unique de la notification"""
+  id: ID!
+
+  """Notification lue"""
+  lue: Boolean!
+
+  """Message détaillé"""
+  message: String!
+
+  """Metadata en JSON"""
+  metadata: String
+
+  """Date de modification"""
+  modifieLe: DateTime!
+
+  """Module source de la notification"""
+  module: ModuleType!
+
+  """Priorité de la notification"""
+  priorite: PrioriteNotification!
+
+  """ID de la référence source"""
+  referenceId: ID!
+
+  """Type de référence"""
+  referenceType: String
+
+  """Rôle du destinataire"""
+  roleDestinataire: String
+
+  """Titre de la notification"""
+  titre: String!
+
+  """Type de notification"""
+  type: TypeNotification!
+
+  """Véhicule concerné"""
+  vehicule: Vehicule
+
+  """ID du véhicule concerné"""
+  vehiculeId: ID
+}
+
+type NotificationStatistiques {
+  """Notifications archivées"""
+  archivees: Int!
+
+  """Notifications critiques"""
+  critiques: Int!
+
+  """Notifications lues"""
+  lues: Int!
+
+  """Notifications non lues"""
+  nonLues: Int!
+
+  """Total de notifications"""
+  total: Int!
+
+  """Notifications urgentes"""
+  urgentes: Int!
+}
+
+type NotificationStatistiquesParModule {
+  """Nombre de notifications"""
+  count: Int!
+
+  """Module"""
+  module: ModuleType!
+
+  """Non lues"""
+  nonLues: Int!
+}
+
+"""Niveau de priorité de la notification"""
+enum PrioriteNotification {
+  """Priorité basse - Information"""
+  BASSE
+
+  """Priorité critique - Action immédiate impérative"""
+  CRITIQUE
+
+  """Priorité haute - Nécessite attention"""
+  HAUTE
+
+  """Priorité normale - À traiter normalement"""
+  NORMALE
+
+  """Priorité urgente - Action rapide requise"""
+  URGENTE
 }
 
 type Query {
@@ -214,6 +590,40 @@ type Query {
 
   """Vérifier si un email peut recevoir un nouveau code"""
   canRequestVerificationCode(email: String!, type: VerificationCodeType!): Boolean!
+
+  """
+  Récupérer tous les types d'entretien avec leur état (coché/non coché) pour un véhicule
+  """
+  configurationEntretiensVehicule(vehiculeId: String!): [EntretienConfiguration!]!
+
+  """Compter les notifications non lues"""
+  countNotificationsNonLues(destinataire: String): Int!
+
+  """Calculer le coût total des entretiens pour un véhicule"""
+  coutTotalEntretiensVehicule(vehiculeId: String!): Float!
+
+  """Récupérer le dernier entretien d'un type donné pour un véhicule"""
+  dernierEntretienByTypeEtVehicule(typeEntretienId: String!, vehiculeId: String!): Entretien
+
+  """Récupérer un entretien par son ID"""
+  entretien(id: String!): Entretien
+
+  """Récupérer tous les entretiens actifs"""
+  entretiens: [Entretien!]!
+
+  """Récupérer uniquement les types d'entretien cochés pour un véhicule"""
+  entretiensActifsVehicule(vehiculeId: String!): [EntretienConfiguration!]!
+
+  """Récupérer les entretiens dans une période donnée"""
+  entretiensByPeriode(dateDebut: DateTime!, dateFin: DateTime!): [Entretien!]!
+
+  """Récupérer tous les entretiens d'un véhicule spécifique"""
+  entretiensByVehicule(vehiculeId: String!): [Entretien!]!
+
+  """
+  Récupérer les entretiens d'un véhicule filtrés par type (ex: toutes les vidanges)
+  """
+  entretiensByVehiculeAndType(typeEntretienId: String!, vehiculeId: String!): [Entretien!]!
 
   """Vérifier si un rôle a le niveau de privilège requis"""
   hasRequiredPrivilegeLevel(requiredWeight: Int!, roleId: ID!): Boolean!
@@ -227,6 +637,30 @@ type Query {
   """Récupérer toutes les marques de véhicules actives"""
   marquesVehicule: [MarqueVehicule!]!
   me: UserResource!
+
+  """Récupérer une notification par son ID"""
+  notification(id: String!): Notification
+
+  """Récupérer toutes les notifications"""
+  notifications(destinataire: String, limit: Int = 50): [Notification!]!
+
+  """Récupérer les notifications par module"""
+  notificationsByModule(destinataire: String, module: ModuleType!): [Notification!]!
+
+  """Récupérer les notifications par priorité"""
+  notificationsByPriorite(destinataire: String, priorite: PrioriteNotification!): [Notification!]!
+
+  """Récupérer les notifications par véhicule"""
+  notificationsByVehicule(vehiculeId: String!): [Notification!]!
+
+  """Récupérer toutes les notifications non lues"""
+  notificationsNonLues(destinataire: String): [Notification!]!
+
+  """Obtenir les statistiques des notifications"""
+  notificationsStatistiques(destinataire: String): NotificationStatistiques!
+
+  """Obtenir les statistiques par module"""
+  notificationsStatistiquesParModule(destinataire: String): [NotificationStatistiquesParModule!]!
 
   """Récupérer un rôle par son ID"""
   role(id: ID!): Role!
@@ -245,6 +679,21 @@ type Query {
 
   """Rechercher des marques de véhicules par libellé (autocomplete)"""
   searchMarquesVehicule(searchTerm: String!): [MarqueVehicule!]!
+
+  """Rechercher des types d'entretien par désignation"""
+  searchTypesEntretien(searchTerm: String!): [TypeEntretien!]!
+
+  """Récupérer un type d'entretien par son ID"""
+  typeEntretien(id: String!): TypeEntretien
+
+  """Récupérer un type d'entretien par son code (E01, E02...)"""
+  typeEntretienByCode(code: String!): TypeEntretien
+
+  """Récupérer tous les types d'entretien actifs"""
+  typesEntretien: [TypeEntretien!]!
+
+  """Récupérer les types d'entretien obligatoires"""
+  typesEntretienObligatoires: [TypeEntretien!]!
   user(id: ID!): UserResource!
   userStats: UserStatsResponse!
 
@@ -304,6 +753,112 @@ type Role {
   weight: Int!
 }
 
+type TypeEntretien {
+  """Code du type d'entretien (E01, E02...)"""
+  codeEntretien: String!
+
+  """Coût moyen estimé"""
+  coutMoyenEstime: Float!
+
+  """Description détaillée"""
+  description: String
+
+  """Désignation du type d'entretien"""
+  designation: String!
+
+  """Indique si le type est actif"""
+  estActif: Boolean!
+
+  """Indique si l'entretien est obligatoire"""
+  estObligatoire: Boolean!
+
+  """Fréquence recommandée en jours"""
+  frequenceJoursRecommandee: Int
+
+  """Fréquence recommandée en kilomètres"""
+  frequenceKmRecommandee: Int
+
+  """Identifiant unique du type d'entretien"""
+  id: ID!
+
+  """Date de modification"""
+  modifieLe: DateTime!
+
+  """Utilisateur ayant modifié"""
+  modifiePar: String
+
+  """Date de saisie"""
+  saisiLe: DateTime!
+
+  """Utilisateur ayant saisi"""
+  saisiPar: String
+}
+
+"""Type de notification selon l'urgence"""
+enum TypeNotification {
+  """Alerte importante"""
+  ALERTE
+
+  """Document expiré"""
+  EXPIRE
+
+  """Échéance imminente (1-2 jours avant)"""
+  IMMINENTE
+
+  """Information générale"""
+  INFO
+
+  """Échéance proche (7 jours avant)"""
+  PROCHE
+
+  """En retard (date dépassée)"""
+  RETARD
+
+  """Action urgente requise"""
+  URGENT
+}
+
+input UpdateEntretienInput {
+  """Code du personnel"""
+  codePersonnel: String
+
+  """Coût total de l'entretien"""
+  coutTotal: Float = 0
+
+  """Date de début de l'opération (YYYY-MM-DD)"""
+  dateDebutOperation: String
+
+  """Date de fin de l'opération (YYYY-MM-DD)"""
+  dateFinOperation: String
+
+  """Date limite pour le prochain entretien (YYYY-MM-DD)"""
+  dateLimiteProchainEntretien: String
+
+  """État de l'entretien"""
+  etat: String = "TERMINE"
+
+  """Identifiant de l'entretien à modifier"""
+  id: ID!
+
+  """Kilométrage à l'arrêt"""
+  kilometrageArret: Float
+
+  """Kilométrage limite pour le prochain entretien"""
+  kilometrageLimiteProchainEntretien: Float
+
+  """Nom et prénom du personnel"""
+  nomPrenomPersonnel: String
+
+  """Observations"""
+  observations: String
+
+  """Identifiant du type d'entretien (E01, E02...)"""
+  typeEntretienId: ID
+
+  """Identifiant du véhicule"""
+  vehiculeId: ID
+}
+
 input UpdateMarqueVehiculeInput {
   description: String
   id: String!
@@ -316,6 +871,32 @@ input UpdateRoleInput {
   id: ID!
   name: String
   weight: Int
+}
+
+input UpdateTypeEntretienInput {
+  """Code du type d'entretien (E01, E02...)"""
+  codeEntretien: String
+
+  """Coût moyen estimé"""
+  coutMoyenEstime: Float = 0
+
+  """Description détaillée"""
+  description: String
+
+  """Désignation du type d'entretien"""
+  designation: String
+
+  """Indique si l'entretien est obligatoire"""
+  estObligatoire: Boolean = false
+
+  """Fréquence recommandée en jours"""
+  frequenceJoursRecommandee: Int
+
+  """Fréquence recommandée en kilomètres"""
+  frequenceKmRecommandee: Int
+
+  """Identifiant du type d'entretien à modifier"""
+  id: ID!
 }
 
 input UpdateUserInput {

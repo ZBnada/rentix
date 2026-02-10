@@ -6,7 +6,7 @@ export * from './models/profile.interface';
 // Services
 export * from './services/profile.service';
 
-// Components
+// components
 export * from './components/profile-header/profile-header.component';
 export * from './components/profile-image-uploader/profile-image-uploader.component';
 export * from './components/profile-info/profile-info.component';

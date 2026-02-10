@@ -1,0 +1,76 @@
+/* Custom styles for type-entretien-form component */
+
+/* Input focus animations */
+input:focus,
+textarea:focus {
+    @apply shadow-sm;
+}
+
+/* Number input - hide spinner */
+input[type='number']::-webkit-inner-spin-button,
+input[type='number']::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+input[type='number'] {
+    -moz-appearance: textfield;
+}
+
+/* Checkbox custom styling */
+input[type='checkbox']:checked {
+    background-image: url("data:image/svg+xml,%3csvg viewBox='0 0 16 16' fill='white' xmlns='http://www.w3.org/2000/svg'%3e%3cpath d='M12.207 4.793a1 1 0 010 1.414l-5 5a1 1 0 01-1.414 0l-2-2a1 1 0 011.414-1.414L6.5 9.086l4.293-4.293a1 1 0 011.414 0z'/%3e%3c/svg%3e");
+}
+
+/* Form validation states */
+.border-red-300 {
+    animation: shake 0.3s ease-in-out;
+}
+
+@keyframes shake {
+    0%,
+    100% {
+        transform: translateX(0);
+    }
+    25% {
+        transform: translateX(-5px);
+    }
+    75% {
+        transform: translateX(5px);
+    }
+}
+
+/* Loading spinner animation */
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.animate-spin {
+    animation: spin 1s linear infinite;
+}
+
+/* Disabled state improvements */
+button:disabled {
+    @apply cursor-not-allowed;
+}
+
+/* Smooth transitions */
+input,
+textarea,
+button {
+    transition: all 0.2s ease-in-out;
+}
+
+/* Focus visible for accessibility */
+input:focus-visible,
+textarea:focus-visible,
+button:focus-visible {
+    @apply outline-none ring-2;
+}
+
+/* Placeholder styling */
+::placeholder {
+    @apply text-gray-400;
+}

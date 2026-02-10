@@ -1,4 +1,6 @@
-import { Component } from '@angular/core';
+// src/app/app.component.ts
+
+import { Component, OnInit, inject } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { ApolloModule } from 'apollo-angular';
 
@@ -7,8 +9,9 @@ import { ApolloModule } from 'apollo-angular';
   standalone: true,
   imports: [RouterOutlet, ApolloModule],
   template: `<router-outlet />`,
-  styles: []
+  styles: [],
 })
-export class AppComponent {
+export class AppComponent  {
   title = 'RentIX';
+
 }

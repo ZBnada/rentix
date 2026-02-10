@@ -1,0 +1,41 @@
+/* Custom styles for type-entretien-edit component */
+
+/* Breadcrumb hover effects */
+nav a:hover {
+    text-decoration: underline;
+}
+
+/* Page fade-in animation */
+:host {
+    display: block;
+    animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Loading spinner */
+.animate-spin {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .p-6 {
+        padding: 1rem;
+    }
+}

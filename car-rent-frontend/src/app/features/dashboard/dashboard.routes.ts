@@ -35,7 +35,7 @@ export const dashboardRoutes: Routes = [
                 title: 'Rôles'
             },
             {
-                path: 'vehicles',  // ✅ NEW: Vehicle Management
+                path: 'vehicles',
                 loadChildren: () =>
                     import('../vehicule/vehicleRoutes')
                         .then(m => m.vehicleRoutes),
@@ -47,6 +47,16 @@ export const dashboardRoutes: Routes = [
                     import('../marque/vehicle-brand.routes')
                         .then(m => m.vehicleBrandRoutes),
                 title: 'Vehicle Brands'
+            },
+            {
+                path: 'type-entretien',
+                loadChildren: () => import('../type-entretien/type-entretien.routes')
+                    .then(m => m.TYPE_ENTRETIEN_ROUTES),
+            },
+            {
+                path: 'entretien',
+                loadChildren: () => import('../entretien/entretien.routes')
+                    .then(m => m.ENTRETIEN_ROUTES),
             },
             {
                 path: 'profil',
