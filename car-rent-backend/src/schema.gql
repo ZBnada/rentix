@@ -2,10 +2,67 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
+type Assurance {
+  dateDebut: String!
+  dateFinValidite: String!
+  dateOperation: String!
+  documentUrl: String
+  estActif: Boolean!
+  id: ID!
+  modifieLe: String!
+  modifiePar: String
+  montantTotal: Float!
+  numeroPolice: String
+  observations: String
+  prestataire: String!
+  reglements: [AssuranceReglement!]!
+  saisiLe: String!
+  saisiPar: String
+  vehicule: Vehicule!
+  vehiculeId: String!
+}
+
+type AssuranceReglement {
+  assuranceId: String!
+  banque: String
+  createdAt: String!
+  dateOperation: String!
+  designation: String
+  echeance: String
+  estActif: Boolean!
+  id: ID!
+  modePaiement: ModePaiementType!
+  modePaiementId: String!
+  montant: Float!
+  porteur: String
+  referencePiece: String
+}
+
 type AuthResponse {
   accessToken: String!
   refreshToken: String!
   user: UserResource!
+}
+
+type CarnetEntretien {
+  codeEntretien: String!
+  coutEstime: Float!
+  coutReel: Float
+  dateDebut: DateTime!
+  dateFin: DateTime
+  designation: String!
+  id: ID!
+  kilometrageDebut: Int!
+  kilometrageFin: Int
+  modifieLe: DateTime!
+  modifiePar: String
+  notes: String
+  saisiLe: DateTime!
+  saisiPar: String
+  statut: String!
+  typeEntretienId: ID!
+  vehiculeId: ID!
+  vehiculeMatricule: String!
 }
 
 input ChangeEmailInput {
@@ -35,42 +92,29 @@ enum ClasseVehicule {
   UTILITAIRE
 }
 
-input CreateEntretienInput {
-  """Code du personnel"""
-  codePersonnel: String
-
-  """Coût total de l'entretien"""
-  coutTotal: Float! = 0
-
-  """Date de début de l'opération (YYYY-MM-DD)"""
-  dateDebutOperation: String!
-
-  """Date de fin de l'opération (YYYY-MM-DD)"""
-  dateFinOperation: String!
-
-  """Date limite pour le prochain entretien (YYYY-MM-DD)"""
-  dateLimiteProchainEntretien: String
-
-  """État de l'entretien"""
-  etat: String! = "TERMINE"
-
-  """Kilométrage à l'arrêt"""
-  kilometrageArret: Float!
-
-  """Kilométrage limite pour le prochain entretien"""
-  kilometrageLimiteProchainEntretien: Float
-
-  """Nom et prénom du personnel"""
-  nomPrenomPersonnel: String
-
-  """Observations"""
+input CreateAssuranceInput {
+  dateDebut: DateTime!
+  dateFinValidite: DateTime!
+  dateOperation: DateTime!
+  documentUrl: String
+  montantTotal: Float!
+  numeroPolice: String
   observations: String
+  prestataire: String!
+  reglements: [CreateAssuranceReglementInput!]!
+  saisiPar: String
+  vehiculeId: String!
+}
 
-  """Identifiant du type d'entretien (E01, E02...)"""
-  typeEntretienId: ID!
-
-  """Identifiant du véhicule"""
-  vehiculeId: ID!
+input CreateAssuranceReglementInput {
+  banque: String
+  dateOperation: DateTime!
+  designation: String
+  echeance: DateTime
+  modePaiementId: String!
+  montant: Float!
+  porteur: String
+  referencePiece: String
 }
 
 input CreateMarqueVehiculeInput {
@@ -78,6 +122,14 @@ input CreateMarqueVehiculeInput {
   id: String
   libelle: String!
   logoUrl: String
+}
+
+input CreateModePaiementInput {
+  description: String
+  icon: String
+  id: String
+  libelle: String!
+  type: ModePaiement!
 }
 
 input CreateNotificationInput {
@@ -233,68 +285,6 @@ enum EnergieType {
   HYBRIDE
 }
 
-type Entretien {
-  """Code du personnel ayant effectué l'entretien"""
-  codePersonnel: String
-
-  """Coût total de l'entretien"""
-  coutTotal: Float!
-
-  """Date de début de l'opération (YYYY-MM-DD)"""
-  dateDebutOperation: String!
-
-  """Date de fin de l'opération (YYYY-MM-DD)"""
-  dateFinOperation: String!
-
-  """Date limite pour le prochain entretien (YYYY-MM-DD)"""
-  dateLimiteProchainEntretien: String
-
-  """Indique si l'entretien est actif"""
-  estActif: Boolean!
-
-  """État de l'entretien"""
-  etat: String!
-
-  """Identifiant unique de l'entretien"""
-  id: ID!
-
-  """Kilométrage à l'arrêt du véhicule"""
-  kilometrageArret: Float!
-
-  """Kilométrage limite pour le prochain entretien"""
-  kilometrageLimiteProchainEntretien: Float
-
-  """Date de modification (ISO 8601)"""
-  modifieLe: String!
-
-  """Utilisateur ayant modifié"""
-  modifiePar: String
-
-  """Nom et prénom du personnel"""
-  nomPrenomPersonnel: String
-
-  """Observations"""
-  observations: String
-
-  """Date de saisie (ISO 8601)"""
-  saisiLe: String!
-
-  """Utilisateur ayant saisi"""
-  saisiPar: String
-
-  """Type d'entretien (E01, E02...)"""
-  typeEntretien: TypeEntretien
-
-  """Identifiant du type d'entretien"""
-  typeEntretienId: ID!
-
-  """Véhicule concerné par cet entretien"""
-  vehicule: Vehicule
-
-  """Identifiant du véhicule concerné"""
-  vehiculeId: ID!
-}
-
 type EntretienConfiguration {
   codeEntretien: String!
   coutMoyenEstime: Float!
@@ -333,6 +323,33 @@ type MessageResponse {
   success: Boolean!
 }
 
+"""Modes de paiement disponibles"""
+enum ModePaiement {
+  """Paiement par carte bancaire"""
+  CARTE_BANCAIRE
+
+  """Paiement par chèque"""
+  CHEQUE
+
+  """Paiement en espèces"""
+  ESPECE
+  KIMBIYALA
+
+  """Paiement par virement bancaire"""
+  VIREMENT
+}
+
+type ModePaiementType {
+  createdAt: DateTime!
+  description: String
+  estActif: Boolean!
+  icon: String
+  id: ID!
+  libelle: String!
+  type: ModePaiement!
+  updatedAt: DateTime!
+}
+
 """Type de module ayant généré la notification"""
 enum ModuleType {
   """Notification liée à une assurance"""
@@ -367,11 +384,14 @@ type Mutation {
   """Changer le rôle d'un utilisateur (Admin)"""
   changeUserRole(changeRoleInput: ChangeRoleInput!): UserResource!
 
-  """Créer un nouvel entretien pour un véhicule"""
-  createEntretien(input: CreateEntretienInput!): Entretien!
+  """Créer une nouvelle assurance avec ses règlements"""
+  createAssurance(input: CreateAssuranceInput!): Assurance!
 
   """Créer une nouvelle marque de véhicule"""
   createMarqueVehicule(input: CreateMarqueVehiculeInput!): MarqueVehicule!
+
+  """Créer un nouveau mode de paiement"""
+  createModePaiement(input: CreateModePaiementInput!): ModePaiementType!
 
   """Créer un nouveau rôle - Réservé au SUPERADMIN"""
   createRole(createRoleInput: CreateRoleInput!): Role!
@@ -386,11 +406,17 @@ type Mutation {
   """Créer une nouvelle notification"""
   creerNotification(input: CreateNotificationInput!): Notification!
 
-  """Supprimer un entretien (désactivation)"""
-  deleteEntretien(id: String!): Boolean!
+  """Supprimer une assurance (désactivation)"""
+  deleteAssurance(id: String!): Boolean!
+
+  """Supprimer un entretien du carnet (soft delete)"""
+  deleteCarnetEntretien(id: String!): Boolean!
 
   """Supprimer une marque de véhicule (désactivation)"""
   deleteMarqueVehicule(id: String!): Boolean!
+
+  """Supprimer un mode de paiement (désactivation)"""
+  deleteModePaiement(id: String!): Boolean!
 
   """Supprimer un type d'entretien (désactivation)"""
   deleteTypeEntretien(id: String!): Boolean!
@@ -435,11 +461,17 @@ type Mutation {
   """Activer ou désactiver un compte utilisateur"""
   toggleUserStatus(userId: ID!): UserResource!
 
-  """Mettre à jour les informations d'un entretien"""
-  updateEntretien(input: UpdateEntretienInput!): Entretien!
+  """Mettre à jour les informations d'une assurance"""
+  updateAssurance(input: UpdateAssuranceInput!): Assurance!
+
+  """Mettre à jour un entretien du carnet"""
+  updateCarnetEntretien(input: UpdateCarnetEntretienInput!): CarnetEntretien!
 
   """Mettre à jour une marque de véhicule"""
   updateMarqueVehicule(input: UpdateMarqueVehiculeInput!): MarqueVehicule!
+
+  """Mettre à jour un mode de paiement"""
+  updateModePaiement(input: UpdateModePaiementInput!): ModePaiementType!
 
   """Mettre à jour un rôle - Réservé au SUPERADMIN"""
   updateRole(updateRoleInput: UpdateRoleInput!): Role!
@@ -585,11 +617,26 @@ enum PrioriteNotification {
 }
 
 type Query {
+  """Récupérer une assurance par son ID"""
+  assurance(id: String!): Assurance
+
+  """Récupérer toutes les assurances actives"""
+  assurances: [Assurance!]!
+
+  """Récupérer toutes les assurances d'un véhicule spécifique"""
+  assurancesByVehicule(vehiculeId: String!): [Assurance!]!
+
+  """Récupérer les assurances qui expirent dans N jours"""
+  assurancesExpiringSoon(daysBeforeExpiry: Int! = 30): [Assurance!]!
+
   """Vérifier que le module d'authentification fonctionne"""
   authStatus: String!
 
   """Vérifier si un email peut recevoir un nouveau code"""
   canRequestVerificationCode(email: String!, type: VerificationCodeType!): Boolean!
+
+  """Récupérer tous les entretiens du carnet pour un véhicule"""
+  carnetEntretiensVehicule(vehiculeId: String!): [CarnetEntretien!]!
 
   """
   Récupérer tous les types d'entretien avec leur état (coché/non coché) pour un véhicule
@@ -599,31 +646,8 @@ type Query {
   """Compter les notifications non lues"""
   countNotificationsNonLues(destinataire: String): Int!
 
-  """Calculer le coût total des entretiens pour un véhicule"""
-  coutTotalEntretiensVehicule(vehiculeId: String!): Float!
-
-  """Récupérer le dernier entretien d'un type donné pour un véhicule"""
-  dernierEntretienByTypeEtVehicule(typeEntretienId: String!, vehiculeId: String!): Entretien
-
-  """Récupérer un entretien par son ID"""
-  entretien(id: String!): Entretien
-
-  """Récupérer tous les entretiens actifs"""
-  entretiens: [Entretien!]!
-
   """Récupérer uniquement les types d'entretien cochés pour un véhicule"""
   entretiensActifsVehicule(vehiculeId: String!): [EntretienConfiguration!]!
-
-  """Récupérer les entretiens dans une période donnée"""
-  entretiensByPeriode(dateDebut: DateTime!, dateFin: DateTime!): [Entretien!]!
-
-  """Récupérer tous les entretiens d'un véhicule spécifique"""
-  entretiensByVehicule(vehiculeId: String!): [Entretien!]!
-
-  """
-  Récupérer les entretiens d'un véhicule filtrés par type (ex: toutes les vidanges)
-  """
-  entretiensByVehiculeAndType(typeEntretienId: String!, vehiculeId: String!): [Entretien!]!
 
   """Vérifier si un rôle a le niveau de privilège requis"""
   hasRequiredPrivilegeLevel(requiredWeight: Int!, roleId: ID!): Boolean!
@@ -637,6 +661,12 @@ type Query {
   """Récupérer toutes les marques de véhicules actives"""
   marquesVehicule: [MarqueVehicule!]!
   me: UserResource!
+
+  """Récupérer un mode de paiement par son ID"""
+  modePaiement(id: String!): ModePaiementType
+
+  """Récupérer tous les modes de paiement actifs"""
+  modesPaiement: [ModePaiementType!]!
 
   """Récupérer une notification par son ID"""
   notification(id: String!): Notification
@@ -679,6 +709,9 @@ type Query {
 
   """Rechercher des marques de véhicules par libellé (autocomplete)"""
   searchMarquesVehicule(searchTerm: String!): [MarqueVehicule!]!
+
+  """Rechercher des modes de paiement par libellé"""
+  searchModesPaiement(searchTerm: String!): [ModePaiementType!]!
 
   """Rechercher des types d'entretien par désignation"""
   searchTypesEntretien(searchTerm: String!): [TypeEntretien!]!
@@ -818,45 +851,30 @@ enum TypeNotification {
   URGENT
 }
 
-input UpdateEntretienInput {
-  """Code du personnel"""
-  codePersonnel: String
-
-  """Coût total de l'entretien"""
-  coutTotal: Float = 0
-
-  """Date de début de l'opération (YYYY-MM-DD)"""
-  dateDebutOperation: String
-
-  """Date de fin de l'opération (YYYY-MM-DD)"""
-  dateFinOperation: String
-
-  """Date limite pour le prochain entretien (YYYY-MM-DD)"""
-  dateLimiteProchainEntretien: String
-
-  """État de l'entretien"""
-  etat: String = "TERMINE"
-
-  """Identifiant de l'entretien à modifier"""
-  id: ID!
-
-  """Kilométrage à l'arrêt"""
-  kilometrageArret: Float
-
-  """Kilométrage limite pour le prochain entretien"""
-  kilometrageLimiteProchainEntretien: Float
-
-  """Nom et prénom du personnel"""
-  nomPrenomPersonnel: String
-
-  """Observations"""
+input UpdateAssuranceInput {
+  dateDebut: DateTime
+  dateFinValidite: DateTime
+  dateOperation: DateTime
+  documentUrl: String
+  id: String!
+  modifiePar: String
+  montantTotal: Float
+  numeroPolice: String
   observations: String
+  prestataire: String
+  reglements: [CreateAssuranceReglementInput!]
+  saisiPar: String
+  vehiculeId: String
+}
 
-  """Identifiant du type d'entretien (E01, E02...)"""
-  typeEntretienId: ID
-
-  """Identifiant du véhicule"""
-  vehiculeId: ID
+input UpdateCarnetEntretienInput {
+  coutReel: Float
+  dateFin: DateTime
+  id: String!
+  kilometrageFin: Int
+  modifiePar: String
+  notes: String
+  statut: String
 }
 
 input UpdateMarqueVehiculeInput {
@@ -864,6 +882,14 @@ input UpdateMarqueVehiculeInput {
   id: String!
   libelle: String
   logoUrl: String
+}
+
+input UpdateModePaiementInput {
+  description: String
+  icon: String
+  id: String!
+  libelle: String
+  type: ModePaiement
 }
 
 input UpdateRoleInput {

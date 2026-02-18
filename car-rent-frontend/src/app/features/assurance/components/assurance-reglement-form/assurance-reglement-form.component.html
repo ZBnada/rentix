@@ -1,0 +1,211 @@
+<div class="space-y-4">
+    <!-- Header -->
+    <div class="flex items-center justify-between">
+        <h3 class="text-lg font-semibold text-gray-900">Règlements</h3>
+        <button
+                type="button"
+                (click)="addReglement()"
+                class="inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-orange-700 bg-orange-50 border border-orange-200 rounded-lg hover:bg-orange-100 transition-colors"
+        >
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+            </svg>
+            Ajouter un règlement
+        </button>
+    </div>
+
+    <!-- Liste des règlements -->
+    @if (reglements.controls.length > 0) {
+        <div class="space-y-4" formArrayName="reglements">
+            @for (reglement of reglements.controls; track $index; let i = $index) {
+                <div [formGroupName]="i" class="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                    <!-- Header du règlement -->
+                    <div class="flex items-center justify-between mb-4">
+                        <h4 class="text-sm font-medium text-gray-700">Règlement #{{ i + 1 }}</h4>
+                        <button
+                                type="button"
+                                (click)="removeReglement(i)"
+                                class="text-red-600 hover:text-red-800 transition-colors"
+                        >
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                            </svg>
+                        </button>
+                    </div>
+
+                    <!-- Champs du règlement -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <!-- Mode de paiement -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">
+                                Mode de paiement <span class="text-red-500">*</span>
+                            </label>
+                            <select
+                                    formControlName="modePaiementId"
+                                    [class]="getFieldClasses(reglement.get('modePaiementId'))"
+                            >
+                                <option value="">Sélectionnez un mode</option>
+                                @for (mode of modesPaiement; track mode.id) {
+                                    <option [value]="mode.id">{{ mode.icon }} {{ mode.libelle }}</option>
+                                }
+                            </select>
+                        </div>
+
+                        <!-- Montant -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">
+                                Montant (TND) <span class="text-red-500">*</span>
+                            </label>
+                            <input
+                                    type="number"
+                                    formControlName="montant"
+                                    (input)="calculateTotal()"
+                                    step="0.001"
+                                    min="0"
+                                    placeholder="0.000"
+                                    [class]="getFieldClasses(reglement.get('montant'))"
+                            />
+                        </div>
+
+                        <!-- Date d'opération -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">
+                                Date d'opération <span class="text-red-500">*</span>
+                            </label>
+                            <input
+                                    type="date"
+                                    formControlName="dateOperation"
+                                    [class]="getFieldClasses(reglement.get('dateOperation'))"
+                            />
+                        </div>
+
+                        <!-- Échéance -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">
+                                Échéance
+                            </label>
+                            <input
+                                    type="date"
+                                    formControlName="echeance"
+                                    [class]="getFieldClasses(reglement.get('echeance'))"
+                            />
+                        </div>
+
+                        <!-- Désignation -->
+                        <div class="md:col-span-2">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">
+                                Désignation
+                            </label>
+                            <input
+                                    type="text"
+                                    formControlName="designation"
+                                    placeholder="Ex: Première échéance"
+                                    [class]="getFieldClasses(reglement.get('designation'))"
+                            />
+                        </div>
+
+                        <!-- Référence -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">
+                                Référence
+                            </label>
+                            <input
+                                    type="text"
+                                    formControlName="referencePiece"
+                                    placeholder="N° chèque, virement..."
+                                    [class]="getFieldClasses(reglement.get('referencePiece'))"
+                            />
+                        </div>
+
+                        <!-- Banque -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">
+                                Banque
+                            </label>
+                            <input
+                                    type="text"
+                                    formControlName="banque"
+                                    placeholder="Ex: BIAT"
+                                    [class]="getFieldClasses(reglement.get('banque'))"
+                            />
+                        </div>
+
+                        <!-- Porteur -->
+                        <div class="md:col-span-2">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">
+                                Porteur
+                            </label>
+                            <input
+                                    type="text"
+                                    formControlName="porteur"
+                                    placeholder="Nom du porteur"
+                                    [class]="getFieldClasses(reglement.get('porteur'))"
+                            />
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+
+        <!-- Résumé -->
+        <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+            <div class="flex items-center justify-between mb-2">
+                <span class="text-sm font-medium text-gray-700">Total des règlements:</span>
+                <span class="text-lg font-bold text-gray-900">{{ totalReglements() | number:'1.3-3' }} TND</span>
+            </div>
+            <div class="flex items-center justify-between">
+                <span class="text-sm font-medium text-gray-700">Montant de l'assurance:</span>
+                <span class="text-lg font-bold text-gray-900">{{ montantTotal | number:'1.3-3' }} TND</span>
+            </div>
+            <hr class="my-2 border-blue-300" />
+            <div class="flex items-center justify-between">
+                <span class="text-sm font-medium text-gray-700">Différence:</span>
+                <span
+                        class="text-lg font-bold"
+                        [class]="isBalanced() ? 'text-green-600' : 'text-red-600'"
+                >
+          {{ (totalReglements() - montantTotal) | number:'1.3-3' }} TND
+        </span>
+            </div>
+
+            @if (!isBalanced()) {
+                <div class="mt-3 flex items-start gap-2 text-sm text-red-700">
+                    <svg class="w-5 h-5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+                    </svg>
+                    <span>Le total des règlements doit correspondre au montant de l'assurance</span>
+                </div>
+            }
+            @else {
+                <div class="mt-3 flex items-start gap-2 text-sm text-green-700">
+                    <svg class="w-5 h-5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                    </svg>
+                    <span>Les règlements sont équilibrés</span>
+                </div>
+            }
+        </div>
+    }
+
+    @else {
+        <div class="text-center py-8 bg-gray-50 rounded-lg border-2 border-dashed border-gray-300">
+            <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <h3 class="mt-2 text-sm font-medium text-gray-900">Aucun règlement</h3>
+            <p class="mt-1 text-sm text-gray-500">Ajoutez au moins un règlement pour cette assurance</p>
+            <div class="mt-4">
+                <button
+                        type="button"
+                        (click)="addReglement()"
+                        class="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-orange-700 bg-orange-50 border border-orange-200 rounded-lg hover:bg-orange-100 transition-colors"
+                >
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                    </svg>
+                    Ajouter le premier règlement
+                </button>
+            </div>
+        </div>
+    }
+</div>

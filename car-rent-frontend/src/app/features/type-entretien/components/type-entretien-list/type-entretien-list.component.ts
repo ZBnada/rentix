@@ -7,7 +7,7 @@ import { TypeEntretien } from '../../models/type-entretien.model';
 import { TypeEntretienService } from '../../services/type-entretien.service';
 import { NotificationService } from '../../../../core/services/notification.service';
 import { formatDistance } from 'date-fns';
-import { fr } from 'date-fns/locale';
+import { enUS } from 'date-fns/locale';
 
 /**
  * Component for displaying and managing maintenance types list
@@ -26,6 +26,9 @@ export class TypeEntretienListComponent implements OnInit, OnDestroy {
     searchTerm: string = '';
     showOnlyMandatory: boolean = false;
     selectedTypeEntretien: TypeEntretien | null = null;
+    viewMode: 'table' | 'grid' = 'table';
+    exportDateFrom: string = new Date(new Date().getFullYear(), 0, 1).toISOString().split('T')[0];
+    exportDateTo: string   = new Date().toISOString().split('T')[0];
 
     private destroy$ = new Subject<void>();
 
@@ -62,7 +65,7 @@ export class TypeEntretienListComponent implements OnInit, OnDestroy {
                 error: (error) => {
                     console.error('Error loading maintenance types:', error);
                     this.notificationService.error(
-                        'Erreur lors du chargement des types d\'entretien'
+                        'Error loading maintenance types'
                     );
                     this.isLoading = false;
                 },
@@ -75,7 +78,6 @@ export class TypeEntretienListComponent implements OnInit, OnDestroy {
     applyFilters(): void {
         let filtered = [...this.typesEntretien];
 
-        // Apply search filter
         if (this.searchTerm.trim()) {
             const searchLower = this.searchTerm.toLowerCase();
             filtered = filtered.filter(
@@ -86,7 +88,6 @@ export class TypeEntretienListComponent implements OnInit, OnDestroy {
             );
         }
 
-        // Apply mandatory filter
         if (this.showOnlyMandatory) {
             filtered = filtered.filter((type) => type.estObligatoire);
         }
@@ -107,6 +108,13 @@ export class TypeEntretienListComponent implements OnInit, OnDestroy {
     toggleMandatoryFilter(): void {
         this.showOnlyMandatory = !this.showOnlyMandatory;
         this.applyFilters();
+    }
+
+    /**
+     * Toggle between table and grid view
+     */
+    toggleViewMode(): void {
+        this.viewMode = this.viewMode === 'table' ? 'grid' : 'table';
     }
 
     /**
@@ -148,7 +156,7 @@ export class TypeEntretienListComponent implements OnInit, OnDestroy {
 
         if (!confirmed) return;
 
-        this.notificationService.loading('Suppression en cours...');
+        this.notificationService.loading('Deleting...');
 
         this.typeEntretienService
             .deleteTypeEntretien(typeEntretien.id)
@@ -182,14 +190,10 @@ export class TypeEntretienListComponent implements OnInit, OnDestroy {
     formatFrequency(jours?: number | null, km?: number | null): string {
         const parts: string[] = [];
 
-        if (jours) {
-            parts.push(`${jours} jours`);
-        }
-        if (km) {
-            parts.push(`${km.toLocaleString('fr-FR')} km`);
-        }
+        if (jours) parts.push(`${jours} days`);
+        if (km) parts.push(`${km.toLocaleString('en-US')} km`);
 
-        return parts.length > 0 ? parts.join(' ou ') : 'Non définie';
+        return parts.length > 0 ? parts.join(' or ') : 'Not defined';
     }
 
     /**
@@ -198,7 +202,7 @@ export class TypeEntretienListComponent implements OnInit, OnDestroy {
     formatDate(date: Date): string {
         return formatDistance(new Date(date), new Date(), {
             addSuffix: true,
-            locale: fr,
+            locale: enUS,
         });
     }
 
@@ -207,9 +211,10 @@ export class TypeEntretienListComponent implements OnInit, OnDestroy {
      */
     getMandatoryBadgeClass(estObligatoire: boolean): string {
         return estObligatoire
-            ? 'bg-red-100 text-red-800'
-            : 'bg-gray-100 text-gray-800';
+            ? 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400'
+            : 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300';
     }
+
 
     /**
      * Track by function for ngFor optimization

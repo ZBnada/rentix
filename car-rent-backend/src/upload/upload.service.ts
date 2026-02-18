@@ -244,4 +244,114 @@ export class UploadService {
 
     return `${this.baseUrl}${relativePath}`;
   }
+
+  /**
+   * ✨ NOUVEAU - Upload d'un document d'assurance (PDF ou image)
+   */
+  async uploadAssuranceDocument(
+    file: Express.Multer.File,
+    assuranceId: string,
+  ): Promise<UploadedFileInfo> {
+    // Validation du type de fichier (PDF + images)
+    this.validateAssuranceDocumentFile(file);
+
+    // Créer le dossier spécifique pour les assurances
+    const assuranceDir = path.join(this.uploadDir, 'assurances', 'documents');
+    this.ensureDirExists(assuranceDir);
+
+    // Générer un nom unique pour le fichier
+    const fileExtension = path.extname(file.originalname);
+    const fileName = `${assuranceId}-${uuidv4()}${fileExtension}`;
+    const filePath = path.join(assuranceDir, fileName);
+
+    // Sauvegarder le fichier
+    await fs.promises.writeFile(filePath, file.buffer);
+
+    // Construire l'URL relative
+    const relativePath = `/uploads/assurances/documents/${fileName}`;
+    const fileUrl = `${this.baseUrl}${relativePath}`;
+
+    console.log('✅ Document assurance uploadé:', {
+      fileName,
+      relativePath,
+      fileUrl,
+    });
+
+    return {
+      fileName,
+      filePath: relativePath,
+      fileUrl,
+      mimeType: file.mimetype,
+      size: file.size,
+    };
+  }
+
+  /**
+   * ✨ NOUVEAU - Supprimer un document d'assurance
+   */
+  async deleteAssuranceDocument(documentPath: string): Promise<boolean> {
+    if (!documentPath) return false;
+
+    try {
+      // Si c'est une URL complète, extraire le chemin relatif
+      let relativePath = documentPath;
+      if (documentPath.startsWith('http')) {
+        const url = new URL(documentPath);
+        relativePath = url.pathname;
+      }
+
+      // Construire le chemin complet du fichier
+      const fullPath = path.join(process.cwd(), relativePath);
+
+      console.log('🗑️ Suppression document assurance:', fullPath);
+
+      // Vérifier si le fichier existe
+      if (fs.existsSync(fullPath)) {
+        await fs.promises.unlink(fullPath);
+        console.log('✅ Document assurance supprimé');
+        return true;
+      }
+
+      console.log('⚠️ Fichier non trouvé');
+      return false;
+    } catch (error) {
+      console.error(
+        '❌ Erreur lors de la suppression du document assurance:',
+        error,
+      );
+      return false;
+    }
+  }
+
+  /**
+   * ✨ NOUVEAU - Validation du fichier document d'assurance (PDF ou image)
+   */
+  private validateAssuranceDocumentFile(file: Express.Multer.File): void {
+    if (!file) {
+      throw new BadRequestException('Aucun fichier fourni');
+    }
+
+    // Vérifier le type MIME (PDF + images)
+    const allowedMimeTypes = [
+      'application/pdf',
+      'image/jpeg',
+      'image/jpg',
+      'image/png',
+      'image/webp',
+      'image/gif',
+    ];
+    if (!allowedMimeTypes.includes(file.mimetype)) {
+      throw new BadRequestException(
+        'Format de fichier non autorisé. Utilisez PDF, JPG, PNG, WEBP ou GIF',
+      );
+    }
+
+    // Vérifier la taille (max 10MB pour PDF)
+    const maxSize = 10 * 1024 * 1024; // 10MB
+    if (file.size > maxSize) {
+      throw new BadRequestException(
+        'Fichier trop volumineux. Taille maximale : 10MB',
+      );
+    }
+  }
 }

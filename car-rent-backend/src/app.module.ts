@@ -13,10 +13,13 @@ import { EmailModule } from './email/email.module';
 import { ApolloServerPluginLandingPageLocalDefault } from '@apollo/server/plugin/landingPage/default';
 import { VehiculeModule } from './vehicule/vehicule.module';
 import { MarqueVehiculeModule } from './marque-vehicule/marque-vehicule.module';
-import { EntretienModule } from './entretien/entretien.module';
 import { EntretienASuivreModule } from './entretien-asuivre/entretien-a-suivre.module';
 import { TypeEntretienModule } from './type-entretien/type-entretien.module';
 import { NotificationModule } from './notification/notification.module';
+import { ModePaiementModule } from './mode-paiement/mode-paiement.module';
+import { AssuranceModule } from './assurance/assurance.module';
+import { CarnetEntretienModule } from './carnet-entretien/carnet-entretien.module';
+import { VignetteModule } from './vignette/vignette.module';
 
 @Module({
   imports: [
@@ -36,7 +39,7 @@ import { NotificationModule } from './notification/notification.module';
         password: configService.get<string>('DB_PASSWORD') || '',
         database: configService.get<string>('DB_DATABASE') || 'car_rental',
         entities: [__dirname + '/**/*.entity{.ts,.js}'],
-        synchronize: configService.get<boolean>('DB_SYNCHRONIZE') || true,
+        synchronize: false,
         logging: configService.get<boolean>('DB_LOGGING') || false,
         charset: 'utf8mb4',
         timezone: '+00:00',
@@ -70,10 +73,13 @@ import { NotificationModule } from './notification/notification.module';
     AuthModule,
     VehiculeModule,
     MarqueVehiculeModule,
-    EntretienModule,
     EntretienASuivreModule,
     TypeEntretienModule,
     NotificationModule,
+    ModePaiementModule,
+    AssuranceModule,
+    CarnetEntretienModule,
+    VignetteModule,
   ],
 })
 export class AppModule {}

@@ -1,0 +1,149 @@
+<!-- Modal Backdrop -->
+<div
+        class="modal-backdrop fixed inset-0 z-50 flex items-center justify-center bg-black/50 animate-in fade-in duration-200"
+        (click)="onBackdropClick($event)">
+
+    <!-- Modal Content -->
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-2xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto animate-in slide-in-from-top-4 duration-300">
+
+        <!-- Header -->
+        <div class="sticky top-0 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-6 py-4 flex items-center justify-between z-10">
+            <div>
+                <h2 class="text-2xl font-bold text-gray-900 dark:text-white">Edit Maintenance</h2>
+                <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                    {{ entretien.codeEntretien }} - {{ entretien.designation }}
+                </p>
+            </div>
+            <button
+                    (click)="onClose()"
+                    class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+                <svg class="h-6 w-6 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+        </div>
+
+        <!-- Body -->
+        <form (ngSubmit)="onSubmit()" class="p-6 space-y-6">
+
+            <!-- Read-only base information -->
+            <div class="bg-gray-50 dark:bg-gray-900 rounded-lg p-4 space-y-3">
+                <h3 class="font-semibold text-gray-900 dark:text-white mb-3">Information</h3>
+                <div class="grid grid-cols-2 gap-4 text-sm">
+                    <div>
+                        <span class="text-gray-500">Vehicle:</span>
+                        <span class="ml-2 font-medium">{{ entretien.vehiculeMatricule }}</span>
+                    </div>
+                    <div>
+                        <span class="text-gray-500">Start date:</span>
+                        <span class="ml-2 font-medium">{{ formatDateForInput(entretien.dateDebut) }}</span>
+                    </div>
+                    <div>
+                        <span class="text-gray-500">Start mileage:</span>
+                        <span class="ml-2 font-medium">{{ entretien.kilometrageDebut }} km</span>
+                    </div>
+                    <div>
+                        <span class="text-gray-500">Estimated cost:</span>
+                        <span class="ml-2 font-medium">{{ entretien.coutEstime }} TND</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Editable fields -->
+            <div class="space-y-4">
+
+                <!-- Status -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        Status
+                    </label>
+                    <select
+                            [value]="formData().statut"
+                            (change)="updateField('statut', $any($event.target).value)"
+                            class="input-primary">
+                        <option *ngFor="let statut of statuts" [value]="statut">{{ statut }}</option>
+                    </select>
+                </div>
+
+                <!-- End date -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        End date
+                    </label>
+                    <input
+                            type="date"
+                            [value]="formatDateForInput(formData().dateFin)"
+                            (change)="onDateFinChange($event)"
+                            class="input-primary"
+                    />
+                </div>
+
+                <!-- End mileage -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        End mileage
+                    </label>
+                    <input
+                            type="number"
+                            [value]="formData().kilometrageFin || ''"
+                            (input)="updateField('kilometrageFin', $any($event.target).value ? +$any($event.target).value : undefined)"
+                            placeholder="e.g. 125000"
+                            class="input-primary"
+                    />
+                </div>
+
+                <!-- Actual cost -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        Actual cost (TND)
+                    </label>
+                    <input
+                            type="number"
+                            step="0.001"
+                            [value]="formData().coutReel || ''"
+                            (input)="updateField('coutReel', $any($event.target).value ? +$any($event.target).value : undefined)"
+                            placeholder="e.g. 150.500"
+                            class="input-primary"
+                    />
+                </div>
+
+                <!-- Notes -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        Notes
+                    </label>
+                    <textarea
+                            [value]="formData().notes || ''"
+                            (input)="updateField('notes', $any($event.target).value)"
+                            rows="4"
+                            placeholder="Add notes about this maintenance..."
+                            class="input-primary resize-none"
+                    ></textarea>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="flex items-center justify-end gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
+                <button
+                        type="button"
+                        (click)="onClose()"
+                        class="btn-secondary"
+                        [disabled]="isSaving()">
+                    Cancel
+                </button>
+                <button
+                        type="submit"
+                        class="btn-primary flex items-center gap-2"
+                        [disabled]="isSaving()">
+                    <svg *ngIf="isSaving()" class="animate-spin h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                    </svg>
+                    <svg *ngIf="!isSaving()" class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                    </svg>
+                    {{ isSaving() ? 'Saving...' : 'Save' }}
+                </button>
+            </div>
+        </form>
+    </div>
+</div>

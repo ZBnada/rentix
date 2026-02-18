@@ -54,9 +54,34 @@ export const dashboardRoutes: Routes = [
                     .then(m => m.TYPE_ENTRETIEN_ROUTES),
             },
             {
-                path: 'entretien',
-                loadChildren: () => import('../entretien/entretien.routes')
-                    .then(m => m.ENTRETIEN_ROUTES),
+                path: 'entretiens-a-suivre',
+                loadChildren: () =>
+                    import('../entretien-a-suivre/entretien-a-suivre.routes').then(
+                        (m) => m.ENTRETIEN_A_SUIVRE_ROUTES
+                    ),
+            },
+            {
+                path: 'modes-paiement',
+                loadChildren: () =>
+                    import('../mode-paiement/mode-paiement.routes').then(
+                        (m) => m.MODE_PAIEMENT_ROUTES
+                    ),
+                title: 'Modes de Paiement'
+            },
+            {
+                path: 'Insurance',
+                loadChildren: () =>
+                    import('../assurance/assurance.routes')
+                        .then(m => m.ASSURANCE_ROUTES),
+                title: 'profil'
+            },
+            {
+                path: 'carnet-entretien',
+                loadChildren: () =>
+                    import('../carnet-entretien/carnet-entretien.routes').then(
+                        (m) => m.CARNET_ENTRETIEN_ROUTES
+                    ),
+                title: 'Carnet d\'Entretien',
             },
             {
                 path: 'profil',

@@ -1,7 +1,6 @@
-
 <div class="dark:bg-gray-dark dark:text-gray-300">
     <!-- Admin Page Wrapper -->
-    <div class="flex h-screen overflow-hidden">
+    <div class="flex h-screen">
 
         <!-- Sidebar -->
         <app-sidebar-private
@@ -10,13 +9,15 @@
         </app-sidebar-private>
 
         <!-- Content Area -->
-        <div class="relative flex flex-1 flex-col">
+        <div class="relative flex flex-1 flex-col overflow-hidden">
 
-            <!-- Header - FIXE en haut -->
-            <app-header (toggleSidebar)="toggleSidebar()"></app-header>
+            <!-- Header - STICKY -->
+            <div class="sticky top-0 z-999 bg-white dark:bg-gray-dark">
+                <app-header (toggleSidebar)="toggleSidebar()"></app-header>
+            </div>
 
             <!-- Main Content - SCROLLABLE -->
-            <main class="flex-1 overflow-y-auto overflow-x-hidden">
+            <main class="flex-1 overflow-y-auto overflow-x-hidden bg-gray-50 dark:bg-gray-dark">
                 <div class="mx-auto max-w-screen-2xl p-4 md:p-6 2xl:p-10">
                     <!-- Toutes les pages admin seront affichées ici -->
                     <router-outlet></router-outlet>
