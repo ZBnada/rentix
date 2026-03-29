@@ -1,10 +1,10 @@
-import { Component, OnInit, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { ActivatedRoute, Router } from '@angular/router';
+import {Component, OnInit, signal} from '@angular/core';
+import {CommonModule} from '@angular/common';
+import {ActivatedRoute, Router} from '@angular/router';
 import Swal from 'sweetalert2';
-import { AssuranceFormComponent, AssuranceFormData } from '../../components/assurance-form/assurance-form.component';
-import { AssuranceService } from '../../services/assurance.service';
-import { ModePaiementService } from '../../../mode-paiement/services/mode-paiement.service';
+import {AssuranceFormComponent, AssuranceFormData} from '../../components/assurance-form/assurance-form.component';
+import {AssuranceService} from '../../services/assurance.service';
+import {ModePaiementService} from '../../../mode-paiement/services/mode-paiement.service';
 
 /**
  * Page de formulaire Assurance (Création/Modification)
@@ -31,16 +31,21 @@ export class AssuranceFormPageComponent implements OnInit {
         private modePaiementService: ModePaiementService,
         // TODO: Injecter VehiculeService quand disponible
         // private vehiculeService: VehiculeService,
-    ) {}
+    ) {
+    }
 
     ngOnInit(): void {
+        console.log('Component ngOnInit');
         this.loadDependencies();
 
         const id = this.route.snapshot.paramMap.get('id');
+        console.log(id, 'aaaaaaaaaa')
         if (id) {
             this.isEditMode.set(true);
             this.pageTitle.set('Modifier l\'assurance');
             this.loadAssurance(id);
+
+
         }
     }
 

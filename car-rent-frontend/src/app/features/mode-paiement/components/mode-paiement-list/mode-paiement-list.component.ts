@@ -3,37 +3,50 @@ import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import Swal from 'sweetalert2';
+import { ModePaiementUtils } from '../../models/mode-paiement-config.model';
 import {
-    ModePaiementType,
-    ModePaiementUtils,
-} from '../../models/mode-paiement-config.model';
-import { ModePaiementService, ModePaiement } from '../../services/mode-paiement.service';
+    ModePaiementService,
+    ModePaiement,
+    CreateModePaiementDto,
+    UpdateModePaiementDto,
+} from '../../services/mode-paiement.service';
+import { ModePaiementFormComponent } from '../mode-paiement-form/mode-paiement-form.component';
 
-/**
- * Composant de liste des modes de paiement
- */
+interface ModePaiementFormData {
+    id?: string;
+    type?: string;
+    libelle?: string;
+    description?: string;
+    icon?: string;
+}
+
 @Component({
     selector: 'app-mode-paiement-list',
     standalone: true,
-    imports: [CommonModule, RouterModule, FormsModule],
+    imports: [CommonModule, RouterModule, FormsModule, ModePaiementFormComponent],
     templateUrl: './mode-paiement-list.component.html',
 })
 export class ModePaiementListComponent implements OnInit {
-    // Signaux pour la réactivité
     modesPaiement = signal<ModePaiement[]>([]);
-    searchTerm = signal<string>('');
-    isLoading = signal<boolean>(false);
+    searchTerm    = signal<string>('');
+    isLoading     = signal<boolean>(false);
+    viewMode      = signal<'table' | 'grid'>('table');
+    isSaving      = signal<boolean>(false);
 
-    // Utilitaires
+    // Create/Edit Modal
+    showModal   = signal<boolean>(false);
+    isEditMode  = signal<boolean>(false);
+    initialData = signal<ModePaiementFormData | undefined>(undefined);
+
+    // Detail Modal
+    showDetailModal = signal<boolean>(false);
+    selectedMp      = signal<ModePaiement | null>(null);
+
     ModePaiementUtils = ModePaiementUtils;
 
-    // Liste filtrée (computed)
     filteredModesPaiement = computed(() => {
         const term = this.searchTerm().toLowerCase();
-        if (!term) {
-            return this.modesPaiement();
-        }
-
+        if (!term) return this.modesPaiement();
         return this.modesPaiement().filter(
             (mp) =>
                 mp.libelle.toLowerCase().includes(term) ||
@@ -42,56 +55,184 @@ export class ModePaiementListComponent implements OnInit {
         );
     });
 
-    constructor(
-        private modePaiementService: ModePaiementService,
-    ) {}
+    constructor(private modePaiementService: ModePaiementService) {}
 
-    ngOnInit(): void {
-        this.loadModesPaiement();
+    ngOnInit(): void { this.loadModesPaiement(); }
+
+    // ── View toggle ────────────────────────────────────────────
+    toggleViewMode(): void {
+        this.viewMode.set(this.viewMode() === 'table' ? 'grid' : 'table');
     }
 
-    /**
-     * Charger tous les modes de paiement
-     */
-    loadModesPaiement(): void {
-        this.isLoading.set(true);
+    // ── Detail Modal ───────────────────────────────────────────
+    openDetailModal(mp: ModePaiement, event: Event): void {
+        event.stopPropagation();
+        this.selectedMp.set(mp);
+        this.showDetailModal.set(true);
+    }
 
-        this.modePaiementService.findAllModesPaiement().subscribe({
-            next: (data) => {
-                this.modesPaiement.set(data);
-                this.isLoading.set(false);
+    closeDetailModal(): void {
+        this.showDetailModal.set(false);
+        this.selectedMp.set(null);
+    }
+
+    openEditFromDetail(): void {
+        const mp = this.selectedMp();
+        if (!mp) return;
+        this.closeDetailModal();
+        this.isEditMode.set(true);
+        this.isSaving.set(false);
+        this.initialData.set({
+            id:          mp.id,
+            type:        mp.type,
+            libelle:     mp.libelle,
+            description: mp.description,
+            icon:        mp.icon,
+        });
+        this.showModal.set(true);
+    }
+
+    // ── Create/Edit Modal ──────────────────────────────────────
+    openCreateModal(): void {
+        this.isEditMode.set(false);
+        this.initialData.set(undefined);
+        this.isSaving.set(false);
+        this.showModal.set(true);
+    }
+
+    openEditModal(mp: ModePaiement, event: Event): void {
+        event.stopPropagation();
+        this.isEditMode.set(true);
+        this.isSaving.set(false);
+        this.initialData.set({
+            id:          mp.id,
+            type:        mp.type,
+            libelle:     mp.libelle,
+            description: mp.description,
+            icon:        mp.icon,
+        });
+        this.showModal.set(true);
+    }
+
+    closeModal(): void {
+        this.showModal.set(false);
+        this.initialData.set(undefined);
+        this.isSaving.set(false);
+    }
+
+    onSubmit(formData: ModePaiementFormData): void {
+        if (this.isEditMode()) {
+            this.updateModePaiement(formData);
+        } else {
+            this.createModePaiement(formData);
+        }
+    }
+
+    // ── CRUD ───────────────────────────────────────────────────
+    createModePaiement(formData: ModePaiementFormData): void {
+        const sameLibelle = this.modesPaiement().some(
+            (mp) => mp.libelle.toLowerCase().trim() === (formData.libelle ?? '').toLowerCase().trim()
+        );
+        const sameType = this.modesPaiement().some(
+            (mp) => mp.type.toLowerCase().trim() === (formData.type ?? '').toLowerCase().trim()
+        );
+
+        if (sameLibelle) {
+            Swal.fire({
+                title: 'Already Exists',
+                html: `A payment method with the label <strong>${formData.libelle}</strong> already exists.`,
+                icon: 'warning', confirmButtonText: 'OK',
+                customClass: { popup: 'rentix-popup', title: 'rentix-title', confirmButton: 'rentix-confirm-btn' },
+                buttonsStyling: false,
+            });
+            this.isSaving.set(false);
+            return;
+        }
+
+        if (sameType) {
+            Swal.fire({
+                title: 'Type Already Used',
+                html: `A payment method with the type <strong>${formData.type}</strong> already exists.`,
+                icon: 'warning', confirmButtonText: 'OK',
+                customClass: { popup: 'rentix-popup', title: 'rentix-title', confirmButton: 'rentix-confirm-btn' },
+                buttonsStyling: false,
+            });
+            this.isSaving.set(false);
+            return;
+        }
+
+        this.isSaving.set(true);
+        const dto: CreateModePaiementDto = {
+            type: formData.type as string,
+            libelle: formData.libelle as string,
+            description: formData.description,
+            icon: formData.icon,
+        };
+        this.modePaiementService.createModePaiement(dto).subscribe({
+            next: () => {
+                this.isSaving.set(false);
+                this.closeModal();
+                this.showSuccess('Payment method created successfully');
+                this.loadModesPaiement();
             },
-            error: (error) => {
-                console.error('Erreur chargement modes paiement:', error);
-                this.isLoading.set(false);
-                this.showError('Impossible de charger les modes de paiement');
+            error: (err) => {
+                console.error(err);
+                this.isSaving.set(false);
+                this.showError(err.message || 'Error creating payment method');
             },
         });
     }
 
-    /**
-     * Rechercher des modes de paiement
-     */
-    onSearch(term: string): void {
-        this.searchTerm.set(term);
+    updateModePaiement(formData: ModePaiementFormData): void {
+        this.isSaving.set(true);
+        const dto: UpdateModePaiementDto = {
+            id:          formData.id as string,
+            type:        formData.type as string,
+            libelle:     formData.libelle as string,
+            description: formData.description,
+            icon:        formData.icon,
+        };
+        this.modePaiementService.updateModePaiement(dto).subscribe({
+            next: () => {
+                this.isSaving.set(false);
+                this.closeModal();
+                this.showSuccess('Payment method updated successfully');
+                this.loadModesPaiement();
+            },
+            error: (err) => {
+                console.error(err);
+                this.isSaving.set(false);
+                this.showError(err.message || 'Error updating payment method');
+            },
+        });
     }
 
-    /**
-     * Supprimer un mode de paiement
-     */
-    async deleteModePaiement(id: string, libelle: string): Promise<void> {
+    loadModesPaiement(): void {
+        this.isLoading.set(true);
+        this.modePaiementService.findAllModesPaiement().subscribe({
+            next:  (data) => { this.modesPaiement.set(data); this.isLoading.set(false); },
+            error: (err)  => {
+                console.error(err);
+                this.isLoading.set(false);
+                this.showError('Unable to load payment methods');
+            },
+        });
+    }
+
+    onSearch(term: string): void { this.searchTerm.set(term); }
+
+    async deleteModePaiement(id: string, libelle: string, event: Event): Promise<void> {
+        event.stopPropagation();
         const result = await Swal.fire({
-            title: 'Confirmer la suppression',
-            html: `Êtes-vous sûr de vouloir supprimer le mode de paiement <strong>${libelle}</strong> ?`,
+            title: 'Confirm Deletion',
+            html: `Are you sure you want to delete <strong>${libelle}</strong>?`,
             icon: 'warning',
             showCancelButton: true,
-            confirmButtonText: 'Oui, supprimer',
-            cancelButtonText: 'Annuler',
+            confirmButtonText: 'Yes, delete',
+            cancelButtonText: 'Cancel',
             customClass: {
-                popup: 'rentix-popup',
-                title: 'rentix-title',
-                confirmButton: 'rentix-confirm-btn',
-                cancelButton: 'rentix-cancel-btn',
+                popup: 'rentix-popup', title: 'rentix-title',
+                confirmButton: 'rentix-confirm-btn', cancelButton: 'rentix-cancel-btn',
             },
             buttonsStyling: false,
         });
@@ -99,48 +240,31 @@ export class ModePaiementListComponent implements OnInit {
         if (result.isConfirmed) {
             this.modePaiementService.deleteModePaiement(id).subscribe({
                 next: () => {
-                    this.showSuccess('Mode de paiement supprimé avec succès');
+                    this.closeDetailModal();
+                    this.showSuccess('Payment method deleted successfully');
                     this.loadModesPaiement();
                 },
-                error: (error) => {
-                    console.error('Erreur suppression:', error);
-                    this.showError('Erreur lors de la suppression');
+                error: (err) => {
+                    console.error(err);
+                    this.showError(err.message || 'Error deleting payment method');
                 },
             });
         }
     }
 
-    /**
-     * Afficher un message de succès
-     */
+    // ── Notifications ──────────────────────────────────────────
     private showSuccess(message: string): void {
         Swal.fire({
-            title: 'Succès',
-            text: message,
-            icon: 'success',
-            timer: 3000,
-            showConfirmButton: false,
-            customClass: {
-                popup: 'rentix-popup',
-                title: 'rentix-title',
-            },
+            title: 'Success', text: message, icon: 'success',
+            timer: 3000, showConfirmButton: false,
+            customClass: { popup: 'rentix-popup', title: 'rentix-title' },
         });
     }
 
-    /**
-     * Afficher un message d'erreur
-     */
     private showError(message: string): void {
         Swal.fire({
-            title: 'Erreur',
-            text: message,
-            icon: 'error',
-            confirmButtonText: 'OK',
-            customClass: {
-                popup: 'rentix-popup',
-                title: 'rentix-title',
-                confirmButton: 'rentix-confirm-btn',
-            },
+            title: 'Error', text: message, icon: 'error', confirmButtonText: 'OK',
+            customClass: { popup: 'rentix-popup', title: 'rentix-title', confirmButton: 'rentix-confirm-btn' },
             buttonsStyling: false,
         });
     }

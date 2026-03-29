@@ -39,48 +39,41 @@ export class CarnetEntretienPageComponent implements OnInit {
         this.loadVehicules();
     }
 
-    /**
-     * Load all vehicles with their maintenance count
-     */
     loadVehicules(): void {
         this.isLoading.set(true);
-        console.log('🔄 FRONTEND: Loading vehicles...');
 
         this.vehicleService.getAllVehicles().subscribe({
             next: (vehicles: VehicleModel[]) => {
-                console.log('✅ FRONTEND: Vehicles received:', vehicles.length);
-
-                // Create a request for each vehicle to count its maintenances
                 const requests = vehicles.map((v: VehicleModel) =>
                     this.carnetService.getEntretiensVehicule(v.id)
                 );
 
-                // Execute all requests in parallel
                 forkJoin(requests).subscribe({
                     next: (allEntretiens: CarnetEntretien[][]) => {
-                        const mapped: VehiculeWithEntretiens[] = vehicles.map((v: VehicleModel, index: number) => ({
-                            id: v.id,
-                            matricule: v.registrationNumber,
-                            marque: v.brand.label,
-                            type: v.type,
-                            nombreEntretiens: allEntretiens[index].length,
-                        }));
-
-                        console.log('✅ FRONTEND: Vehicles with counters:', mapped);
+                        const mapped: VehiculeWithEntretiens[] = vehicles.map(
+                            (v: VehicleModel, index: number) => ({
+                                id: v.id,
+                                matricule: v.registrationNumber,
+                                marque: v.brand.label,
+                                type: v.type,
+                                nombreEntretiens: allEntretiens[index].length,
+                            })
+                        );
                         this.vehicules.set(mapped);
                         this.filteredVehicules.set(mapped);
                         this.isLoading.set(false);
                     },
                     error: (error: any) => {
-                        console.error('❌ FRONTEND: Error loading counters:', error);
-                        // On error, still display vehicles with 0 maintenances
-                        const mapped: VehiculeWithEntretiens[] = vehicles.map((v: VehicleModel) => ({
-                            id: v.id,
-                            matricule: v.registrationNumber,
-                            marque: v.brand.label,
-                            type: v.type,
-                            nombreEntretiens: 0,
-                        }));
+                        console.error('❌ Error loading counters:', error);
+                        const mapped: VehiculeWithEntretiens[] = vehicles.map(
+                            (v: VehicleModel) => ({
+                                id: v.id,
+                                matricule: v.registrationNumber,
+                                marque: v.brand.label,
+                                type: v.type,
+                                nombreEntretiens: 0,
+                            })
+                        );
                         this.vehicules.set(mapped);
                         this.filteredVehicules.set(mapped);
                         this.isLoading.set(false);
@@ -88,18 +81,17 @@ export class CarnetEntretienPageComponent implements OnInit {
                 });
             },
             error: (error: any) => {
-                console.error('❌ FRONTEND: Error loading vehicles:', error);
+                console.error('❌ Error loading vehicles:', error);
                 this.errorMessage.set('Error loading vehicles');
                 this.isLoading.set(false);
             },
         });
     }
 
-    /**
-     * Search for a vehicle
-     */
-    onSearch(): void {
-        const term = this.searchTerm().toLowerCase();
+    onSearch(event: Event): void {
+        const term = (event.target as HTMLInputElement).value.toLowerCase().trim();
+        this.searchTerm.set(term);
+
         if (!term) {
             this.filteredVehicules.set(this.vehicules());
             return;
@@ -114,71 +106,50 @@ export class CarnetEntretienPageComponent implements OnInit {
         this.filteredVehicules.set(filtered);
     }
 
-    /**
-     * Select a vehicle and load its maintenances
-     */
     selectVehicule(vehicule: VehiculeWithEntretiens): void {
-        console.log('🔍 FRONTEND: Selecting vehicle:', vehicule);
-        console.log('🔍 FRONTEND: vehiculeId =', vehicule.id);
-
         this.selectedVehicule.set(vehicule);
         this.isLoadingEntretiens.set(true);
 
         this.carnetService.getEntretiensVehicule(vehicule.id).subscribe({
             next: (entretiens: CarnetEntretien[]) => {
-                console.log('✅ FRONTEND: Maintenances received:', entretiens);
-                console.log('✅ FRONTEND: Number of maintenances:', entretiens.length);
-
                 this.entretiens.set(entretiens);
                 this.isLoadingEntretiens.set(false);
 
-                // Update the maintenance count
                 const updatedVehicules = this.vehicules().map((v) =>
-                    v.id === vehicule.id ? { ...v, nombreEntretiens: entretiens.length } : v
+                    v.id === vehicule.id
+                        ? { ...v, nombreEntretiens: entretiens.length }
+                        : v
                 );
                 this.vehicules.set(updatedVehicules);
                 this.filteredVehicules.set(updatedVehicules);
             },
             error: (error: any) => {
-                console.error('❌ FRONTEND: Error loading maintenances:', error);
-                console.error('❌ FRONTEND: Error details:', JSON.stringify(error, null, 2));
+                console.error('❌ Error loading maintenances:', error);
                 this.errorMessage.set('Error loading maintenances');
                 this.isLoadingEntretiens.set(false);
             },
         });
     }
 
-    /**
-     * Open the edit modal
-     */
     openEditModal(entretien: CarnetEntretien): void {
         this.selectedEntretien.set(entretien);
         this.showModal.set(true);
     }
 
-    /**
-     * Close the modal
-     */
     closeModal(): void {
         this.showModal.set(false);
         this.selectedEntretien.set(null);
     }
 
-    /**
-     * Save changes
-     */
     onSaveEntretien(updatedEntretien: CarnetEntretien): void {
-        // Reload maintenances
         if (this.selectedVehicule()) {
             this.selectVehicule(this.selectedVehicule()!);
         }
         this.closeModal();
     }
 
-    /**
-     * Delete a maintenance record
-     */
-    onDeleteEntretien(entretien: CarnetEntretien): void {
+    onDeleteEntretien(entretien: CarnetEntretien, event: Event): void {
+        event.stopPropagation();
         Swal.fire({
             title: 'Delete this maintenance?',
             html: `Are you sure you want to delete maintenance <strong>${entretien.codeEntretien}</strong>?<br>This action is irreversible.`,
@@ -210,7 +181,6 @@ export class CarnetEntretienPageComponent implements OnInit {
                             buttonsStyling: false,
                             timer: 3000,
                         });
-                        // Reload
                         if (this.selectedVehicule()) {
                             this.selectVehicule(this.selectedVehicule()!);
                         }
@@ -235,36 +205,51 @@ export class CarnetEntretienPageComponent implements OnInit {
         });
     }
 
-    /**
-     * Get the status CSS class
-     */
-    getStatutClass(statut: string): string {
-        const classes: Record<string, string> = {
-            EN_ATTENTE: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-500',
-            EN_COURS: 'bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-500',
-            TERMINE: 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-500',
-            ANNULE: 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-500',
+    getStatutConfig(statut: string): { label: string; dot: string; badge: string } {
+        const configs: Record<string, { label: string; dot: string; badge: string }> = {
+            EN_ATTENTE: {
+                label: 'Pending',
+                dot: 'bg-amber-400',
+                badge: 'bg-amber-50 text-amber-700 border border-amber-200',
+            },
+            EN_COURS: {
+                label: 'In Progress',
+                dot: 'bg-blue-500',
+                badge: 'bg-blue-50 text-blue-700 border border-blue-200',
+            },
+            TERMINE: {
+                label: 'Completed',
+                dot: 'bg-emerald-500',
+                badge: 'bg-emerald-50 text-emerald-700 border border-emerald-200',
+            },
+            ANNULE: {
+                label: 'Cancelled',
+                dot: 'bg-red-500',
+                badge: 'bg-red-50 text-red-600 border border-red-200',
+            },
         };
-        return classes[statut] || 'bg-gray-100 text-gray-800';
+        return configs[statut] || {
+            label: statut,
+            dot: 'bg-gray-400',
+            badge: 'bg-gray-50 text-gray-600 border border-gray-200',
+        };
     }
 
-    /**
-     * Format a date
-     */
     formatDate(date: Date | null): string {
-        if (!date) return '-';
+        if (!date) return '—';
         return new Date(date).toLocaleDateString('en-GB');
     }
 
-    /**
-     * Format a currency amount
-     */
     formatCurrency(amount: number | null): string {
-        if (amount === null) return '-';
+        if (amount === null) return '—';
         return new Intl.NumberFormat('fr-TN', {
             style: 'currency',
             currency: 'TND',
             minimumFractionDigits: 3,
         }).format(amount);
+    }
+
+    getTotalCoutReel(): number {
+        return this.entretiens().reduce((s, e) => s + Number(e.coutReel ?? 0), 0);
     }
 }

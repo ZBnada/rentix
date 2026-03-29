@@ -1,0 +1,232 @@
+<div class="space-y-5">
+
+    <!-- Header -->
+    <div class="flex items-center justify-between">
+        <div>
+            <h1 class="text-xl font-bold text-gray-900">Vehicle Stickers</h1>
+            <p class="text-sm text-gray-500 mt-0.5">
+                {{ vignettes.length }} sticker{{ vignettes.length > 1 ? 's' : '' }}
+            </p>
+        </div>
+        <button (click)="openCreateForm()"
+                class="flex items-center gap-2 px-4 py-2.5 bg-slate-800 text-white text-sm font-semibold rounded-xl hover:bg-slate-700 transition-all shadow-sm active:scale-95">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
+            </svg>
+            New Sticker
+        </button>
+    </div>
+
+    <!-- Main Card -->
+    <div class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
+
+        @if (isLoading) {
+            <div class="flex items-center justify-center py-16">
+                <div class="flex flex-col items-center gap-3">
+                    <div class="w-8 h-8 border-4 border-slate-200 border-t-slate-600 rounded-full animate-spin"></div>
+                    <span class="text-sm text-gray-500">Loading...</span>
+                </div>
+            </div>
+        }
+
+        @if (!isLoading && vignettes.length === 0) {
+            <div class="flex flex-col items-center justify-center py-16 gap-3">
+                <div class="w-14 h-14 bg-slate-50 rounded-2xl flex items-center justify-center">
+                    <svg class="w-7 h-7 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                              d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                    </svg>
+                </div>
+                <p class="text-gray-500 text-sm font-medium">No stickers found</p>
+                <button (click)="openCreateForm()"
+                        class="text-slate-700 text-sm font-semibold hover:text-slate-900 transition-colors underline underline-offset-2">
+                    Create the first sticker →
+                </button>
+            </div>
+        }
+
+        @if (!isLoading && vignettes.length > 0) {
+            <div class="overflow-x-auto">
+                <table class="w-full text-sm">
+                    <thead class="bg-gray-50 border-b border-gray-200">
+                    <tr>
+                        <th class="px-4 py-3.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Vehicle</th>
+                        <th class="px-4 py-3.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Validity Date</th>
+                        <th class="px-4 py-3.5 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider">Amount</th>
+                        <th class="px-4 py-3.5 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider">Remaining</th>
+                        <th class="px-4 py-3.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Operation Date</th>
+                        <th class="px-4 py-3.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Entered By</th>
+                        <th class="px-4 py-3.5 text-center text-xs font-semibold text-gray-500 uppercase tracking-wider">Status</th>
+                        <th class="px-4 py-3.5 text-center text-xs font-semibold text-gray-500 uppercase tracking-wider w-24">Actions</th>
+                    </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-100">
+                        @for (v of vignettes; track v.id) {
+                            <tr (click)="openDetail(v)" class="hover:bg-slate-50/60 transition-colors cursor-pointer">
+
+
+                                <td class="px-4 py-3.5">
+                                    <div class="font-semibold text-gray-800">{{ v.vehicule.matricule }}</div>
+                                    <div class="text-xs text-gray-400 mt-0.5">{{ v.vehicule.marque?.libelle }}</div>
+                                </td>
+
+                                <td class="px-4 py-3.5 text-gray-600">{{ formatDate(v.dateFinValidite) }}</td>
+
+                                <td class="px-4 py-3.5 text-right">
+                                    <span class="font-semibold text-gray-900">{{ v.montant | number:'1.3-3' }}</span>
+                                    <span class="text-xs text-gray-400 ml-1">TND</span>
+                                </td>
+
+                                <td class="px-4 py-3.5 text-right">
+                                    <span class="font-bold"
+                                          [ngClass]="{ 'text-emerald-500': v.montantReste === 0, 'text-red-500': v.montantReste > 0 }">
+                                        {{ v.montantReste | number:'1.3-3' }}
+                                    </span>
+                                    <span class="text-xs text-gray-400 ml-1">TND</span>
+                                </td>
+
+                                <td class="px-4 py-3.5 text-gray-600">{{ formatDate(v.dateOperation) }}</td>
+
+                                <td class="px-4 py-3.5 text-gray-500">{{ v.saisiPar || '—' }}</td>
+
+                                <td class="px-4 py-3.5 text-center">
+                                    <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold"
+                                          [ngClass]="getStatutConfig(v.statut).classes">
+                                        {{ getStatutConfig(v.statut).label }}
+                                    </span>
+                                </td>
+
+                                <td class="px-4 py-3.5 text-center" (click)="$event.stopPropagation()">
+                                    <div class="flex items-center justify-center gap-1">
+                                        <button (click)="openEditForm(v, $event)" [disabled]="!canEdit(v)"
+                                                class="flex items-center justify-center w-8 h-8 rounded-lg transition-all"
+                                                [ngClass]="canEdit(v) ? 'text-gray-400 hover:text-blue-600 hover:bg-blue-50' : 'text-gray-200 cursor-not-allowed'"
+                                                [title]="canEdit(v) ? 'Edit' : 'Cannot edit (' + v.statut + ')'">
+                                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                                            </svg>
+                                        </button>
+                                        <button (click)="openDeleteConfirm(v, $event)" [disabled]="!canDelete(v)"
+                                                class="flex items-center justify-center w-8 h-8 rounded-lg transition-all"
+                                                [ngClass]="canDelete(v) ? 'text-gray-400 hover:text-red-600 hover:bg-red-50' : 'text-gray-200 cursor-not-allowed'"
+                                                [title]="canDelete(v) ? 'Delete' : 'Cannot delete (validated)'">
+                                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                            </svg>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                    <tfoot class="bg-gray-50 border-t-2 border-gray-200">
+                    <tr>
+                        <td colspan="2" class="px-4 py-3 text-xs font-bold text-gray-500 uppercase">
+                            Total ({{ vignettes.length }} sticker{{ vignettes.length > 1 ? 's' : '' }})
+                        </td>
+                        <td class="px-4 py-3 text-right font-bold text-sm text-gray-900">
+                            {{ getTotalMontant() | number:'1.3-3' }}
+                            <span class="text-xs text-gray-400 ml-1 font-normal">TND</span>
+                        </td>
+                        <td colspan="6"></td>
+                    </tr>
+                    </tfoot>
+                </table>
+            </div>
+        }
+    </div>
+</div>
+
+<!-- Detail Popup -->
+<app-vignette-detail
+        *ngIf="showDetail && selectedVignette"
+        [vignette]="selectedVignette"
+        (closed)="closeDetail()"
+        (editRequested)="onEditFromDetail($event)"
+/>
+
+<!-- Form Popup -->
+<app-vignette-form
+        *ngIf="showForm"
+        [vignetteToEdit]="vignetteToEdit"
+        (vignetteCreated)="onVignetteCreated($event)"
+        (vignetteUpdated)="onVignetteUpdated($event)"
+        (formClosed)="closeForm()"
+/>
+
+<!-- Delete Confirm Popup -->
+@if (showDeleteConfirm) {
+    <div class="fixed inset-0 z-[9999] flex items-center justify-center p-4">
+        <div class="absolute inset-0 bg-gray-900/60 backdrop-blur-sm" (click)="closeDeleteConfirm()"></div>
+        <div class="relative z-10 w-full max-w-md bg-white rounded-2xl shadow-2xl overflow-hidden border border-gray-200">
+
+            <!-- Chrome bar -->
+            <div class="flex items-center justify-between px-5 py-3 bg-gray-100 border-b border-gray-200">
+                <nav class="flex items-center gap-1.5 text-xs">
+                    <span class="text-gray-400 font-medium">Vehicle Stickers</span>
+                    <svg class="w-3 h-3 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
+                    </svg>
+                    <span class="font-semibold text-gray-700">Delete</span>
+                </nav>
+                <button (click)="closeDeleteConfirm()"
+                        class="flex items-center justify-center w-6 h-6 text-gray-400 hover:text-gray-600 rounded transition-colors">
+                    <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+
+            <div class="flex flex-col items-center pt-7 pb-4 px-6">
+                <div class="w-14 h-14 bg-red-50 rounded-2xl flex items-center justify-center mb-4">
+                    <svg class="w-7 h-7 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"/>
+                    </svg>
+                </div>
+                <h3 class="text-lg font-bold text-gray-900">Confirm Deletion</h3>
+                <p class="text-sm text-gray-500 text-center mt-2">
+                    Delete sticker
+                    <span class="font-semibold text-gray-800">
+                        #{{ vignetteToDelete?.numeroFiche }}
+                    </span>
+                    for vehicle
+                    <span class="font-semibold text-gray-800">{{ vignetteToDelete?.vehicule?.matricule }}</span>?
+                    <br/>This action cannot be undone.
+                </p>
+            </div>
+
+            <div class="mx-6 mb-5 p-3 bg-gray-50 rounded-xl border border-gray-200">
+                <div class="flex items-center justify-between text-xs">
+                    <span class="text-gray-500">Amount</span>
+                    <span class="font-semibold text-gray-800">{{ vignetteToDelete?.montant | number:'1.3-3' }} TND</span>
+                </div>
+                <div class="flex items-center justify-between text-xs mt-1.5">
+                    <span class="text-gray-500">Status</span>
+                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold"
+                          [ngClass]="vignetteToDelete ? getStatutConfig(vignetteToDelete.statut).classes : ''">
+                        {{ vignetteToDelete ? getStatutConfig(vignetteToDelete.statut).label : '' }}
+                    </span>
+                </div>
+            </div>
+
+            <div class="flex gap-3 px-6 pb-6">
+                <button type="button" (click)="closeDeleteConfirm()" [disabled]="isDeleting"
+                        class="flex-1 px-4 py-2.5 text-sm font-semibold text-gray-700 bg-white border border-gray-300 rounded-xl hover:bg-gray-50 transition-colors disabled:opacity-50">
+                    Cancel
+                </button>
+                <button type="button" (click)="confirmDelete()" [disabled]="isDeleting"
+                        class="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-semibold text-white bg-red-500 rounded-xl hover:bg-red-600 transition-colors disabled:opacity-50">
+                    @if (isDeleting) {
+                        <div class="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin"></div>
+                        Deleting...
+                    } @else {
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                        </svg>
+                        Yes, Delete
+                    }
+                </button>
+            </div>
+        </div>
+    </div>
+}

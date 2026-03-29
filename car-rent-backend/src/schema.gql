@@ -92,6 +92,26 @@ enum ClasseVehicule {
   UTILITAIRE
 }
 
+type ControleTechniqueResource {
+  annulePar: String
+  dateFinValidite: String!
+  dateOperation: String!
+  id: String!
+  lignesReglement: [LigneReglementControleTechniqueResource!]!
+  matriculeVehicule: String!
+  modifieLe: DateTime!
+  modifiePar: String
+  montant: Float!
+  montantReste: Float!
+  numeroFiche: Int!
+  saisiLe: DateTime!
+  saisiPar: String
+  statut: StatutControleTechnique!
+  validePar: String
+  vehicule: Vehicule!
+  vehiculeId: String!
+}
+
 input CreateAssuranceInput {
   dateDebut: DateTime!
   dateFinValidite: DateTime!
@@ -117,6 +137,37 @@ input CreateAssuranceReglementInput {
   referencePiece: String
 }
 
+input CreateControleTechniqueInput {
+  dateFinValidite: DateTime!
+  dateOperation: DateTime!
+  lignesReglement: [CreateLigneReglementControleTechniqueInput!] = []
+  montant: Float!
+  saisiPar: String
+  vehiculeId: String!
+}
+
+input CreateLigneReglementControleTechniqueInput {
+  banque: String
+  dateOperation: DateTime!
+  designation: String
+  echeance: DateTime
+  modePaiementId: String!
+  montant: Float!
+  porteur: String
+  referencePiece: String
+}
+
+input CreateLigneReglementVignetteInput {
+  banque: String
+  dateOperation: DateTime!
+  designation: String
+  echeance: DateTime
+  modePaiementId: String!
+  montant: Float!
+  porteur: String
+  referencePiece: String
+}
+
 input CreateMarqueVehiculeInput {
   description: String
   id: String
@@ -130,59 +181,6 @@ input CreateModePaiementInput {
   id: String
   libelle: String!
   type: ModePaiement!
-}
-
-input CreateNotificationInput {
-  """Label action"""
-  actionLabel: String
-
-  """URL d'action"""
-  actionUrl: String
-
-  """Couleur"""
-  couleur: String
-
-  """Créée par"""
-  creePar: String
-
-  """Destinataire"""
-  destinataire: String
-
-  """Date d'expiration"""
-  expireLe: DateTime
-
-  """Icône"""
-  icone: String
-
-  """Message"""
-  message: String!
-
-  """Metadata JSON string"""
-  metadata: String
-
-  """Module source"""
-  module: ModuleType!
-
-  """Priorité"""
-  priorite: PrioriteNotification! = NORMALE
-
-  """ID de la référence source"""
-  referenceId: ID!
-
-  """Type de référence"""
-  referenceType: String
-
-  """Rôle destinataire"""
-  roleDestinataire: String
-
-  """Titre"""
-  titre: String!
-
-  """Type de notification"""
-  type: TypeNotification!
-
-  """ID du véhicule"""
-  vehiculeId: ID
 }
 
 input CreateRoleInput {
@@ -262,6 +260,15 @@ input CreateVehiculeInput {
   type: String!
 }
 
+input CreateVignetteInput {
+  dateFinValidite: DateTime!
+  dateOperation: DateTime!
+  lignesReglement: [CreateLigneReglementVignetteInput!]!
+  montant: Float!
+  saisiPar: String
+  vehiculeId: String!
+}
+
 """
 A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
 """
@@ -301,6 +308,37 @@ type EntretienConfiguration {
 
 input ForgotPasswordInput {
   email: String!
+}
+
+type LigneReglementControleTechniqueResource {
+  banque: String
+  controleTechniqueId: String!
+  createdAt: DateTime!
+  dateOperation: String!
+  designation: String
+  echeance: String
+  id: String!
+  modePaiement: ModePaiementType!
+  modePaiementId: String!
+  montant: Float!
+  porteur: String
+  referencePiece: String
+}
+
+type LigneReglementVignetteType {
+  banque: String
+  createdAt: DateTime!
+  dateOperation: String!
+  designation: String
+  echeance: String
+  estActif: Boolean!
+  id: ID!
+  modePaiement: ModePaiementType!
+  modePaiementId: String!
+  montant: Float!
+  porteur: String
+  referencePiece: String
+  vignetteId: String!
 }
 
 input LoginInput {
@@ -350,30 +388,9 @@ type ModePaiementType {
   updatedAt: DateTime!
 }
 
-"""Type de module ayant généré la notification"""
-enum ModuleType {
-  """Notification liée à une assurance"""
-  ASSURANCE
-
-  """Notification liée au contrôle technique"""
-  CONTROLE_TECHNIQUE
-
-  """Notification liée à un entretien"""
-  ENTRETIEN
-
-  """Notification liée à une réparation"""
-  REPARATION
-
-  """Notification liée à une révision"""
-  REVISION
-
-  """Notification liée à une vignette"""
-  VIGNETTE
-}
-
 type Mutation {
-  """Archiver une notification"""
-  archiverNotification(id: String!): Boolean!
+  annulerControleTechnique(annulePar: String!, id: String!): ControleTechniqueResource!
+  annulerVignette(annulePar: String!, id: String!): VignetteType!
 
   """Changer l'email de l'utilisateur connecté"""
   changeEmail(changeEmailInput: ChangeEmailInput!): String!
@@ -383,9 +400,8 @@ type Mutation {
 
   """Changer le rôle d'un utilisateur (Admin)"""
   changeUserRole(changeRoleInput: ChangeRoleInput!): UserResource!
-
-  """Créer une nouvelle assurance avec ses règlements"""
   createAssurance(input: CreateAssuranceInput!): Assurance!
+  createControleTechnique(input: CreateControleTechniqueInput!): ControleTechniqueResource!
 
   """Créer une nouvelle marque de véhicule"""
   createMarqueVehicule(input: CreateMarqueVehiculeInput!): MarqueVehicule!
@@ -402,15 +418,12 @@ type Mutation {
 
   """Créer un nouveau véhicule dans le système"""
   createVehicule(input: CreateVehiculeInput!): Vehicule!
-
-  """Créer une nouvelle notification"""
-  creerNotification(input: CreateNotificationInput!): Notification!
-
-  """Supprimer une assurance (désactivation)"""
+  createVignette(input: CreateVignetteInput!): VignetteType!
   deleteAssurance(id: String!): Boolean!
 
   """Supprimer un entretien du carnet (soft delete)"""
   deleteCarnetEntretien(id: String!): Boolean!
+  deleteControleTechnique(id: String!): Boolean!
 
   """Supprimer une marque de véhicule (désactivation)"""
   deleteMarqueVehicule(id: String!): Boolean!
@@ -423,18 +436,13 @@ type Mutation {
 
   """Supprimer un véhicule (désactivation)"""
   deleteVehicule(id: String!): Boolean!
+  deleteVignette(id: String!): Boolean!
 
   """Demander un code de réinitialisation de mot de passe"""
   forgotPassword(forgotPasswordInput: ForgotPasswordInput!): MessageResponse!
 
   """Connexion avec email et mot de passe"""
   login(loginInput: LoginInput!): AuthResponse!
-
-  """Marquer une notification comme lue"""
-  marquerNotificationCommeLue(id: String!): Notification!
-
-  """Marquer toutes les notifications comme lues"""
-  marquerToutesNotificationsCommeLues(destinataire: String): Int!
 
   """Renouveler le token d'accès avec un refresh token"""
   refreshToken(refreshToken: String!): AuthResponse!
@@ -452,20 +460,16 @@ type Mutation {
   """Réinitialiser le mot de passe avec le code reçu"""
   resetPassword(resetPasswordInput: ResetPasswordInput!): MessageResponse!
 
-  """Supprimer une notification (soft delete)"""
-  supprimerNotification(id: String!): Boolean!
-
   """Cocher ou décocher un type d'entretien pour un véhicule"""
   toggleEntretienVehicule(estActive: Boolean!, typeEntretienId: String!, vehiculeId: String!): Boolean!
 
   """Activer ou désactiver un compte utilisateur"""
   toggleUserStatus(userId: ID!): UserResource!
-
-  """Mettre à jour les informations d'une assurance"""
   updateAssurance(input: UpdateAssuranceInput!): Assurance!
 
   """Mettre à jour un entretien du carnet"""
   updateCarnetEntretien(input: UpdateCarnetEntretienInput!): CarnetEntretien!
+  updateControleTechnique(input: UpdateControleTechniqueInput!): ControleTechniqueResource!
 
   """Mettre à jour une marque de véhicule"""
   updateMarqueVehicule(input: UpdateMarqueVehiculeInput!): MarqueVehicule!
@@ -482,151 +486,21 @@ type Mutation {
 
   """Mettre à jour les informations d'un véhicule"""
   updateVehicule(input: UpdateVehiculeInput!): Vehicule!
+  updateVignette(input: UpdateVignetteInput!): VignetteType!
 
   """Valider la configuration des entretiens pour un véhicule"""
   validerConfigurationVehicule(vehiculeId: String!): Boolean!
+  validerControleTechnique(id: String!, validerPar: String!): ControleTechniqueResource!
+  validerVignette(id: String!, validerPar: String!): VignetteType!
 
   """Vérifier l'email avec le code à 6 chiffres"""
   verifyEmail(verifyEmailInput: VerifyEmailInput!): MessageResponse!
 }
 
-type Notification {
-  """Label du bouton"""
-  actionLabel: String
-
-  """URL d'action"""
-  actionUrl: String
-
-  """Couleur"""
-  couleur: String
-
-  """Date de création"""
-  creeLe: DateTime!
-
-  """Créée par"""
-  creePar: String
-
-  """Date de lecture"""
-  dateLecture: DateTime
-
-  """Destinataire"""
-  destinataire: String
-
-  """Est active"""
-  estActive: Boolean!
-
-  """Est archivée"""
-  estArchivee: Boolean!
-
-  """Date d'expiration"""
-  expireLe: DateTime
-
-  """Icône"""
-  icone: String
-
-  """Identifiant unique de la notification"""
-  id: ID!
-
-  """Notification lue"""
-  lue: Boolean!
-
-  """Message détaillé"""
-  message: String!
-
-  """Metadata en JSON"""
-  metadata: String
-
-  """Date de modification"""
-  modifieLe: DateTime!
-
-  """Module source de la notification"""
-  module: ModuleType!
-
-  """Priorité de la notification"""
-  priorite: PrioriteNotification!
-
-  """ID de la référence source"""
-  referenceId: ID!
-
-  """Type de référence"""
-  referenceType: String
-
-  """Rôle du destinataire"""
-  roleDestinataire: String
-
-  """Titre de la notification"""
-  titre: String!
-
-  """Type de notification"""
-  type: TypeNotification!
-
-  """Véhicule concerné"""
-  vehicule: Vehicule
-
-  """ID du véhicule concerné"""
-  vehiculeId: ID
-}
-
-type NotificationStatistiques {
-  """Notifications archivées"""
-  archivees: Int!
-
-  """Notifications critiques"""
-  critiques: Int!
-
-  """Notifications lues"""
-  lues: Int!
-
-  """Notifications non lues"""
-  nonLues: Int!
-
-  """Total de notifications"""
-  total: Int!
-
-  """Notifications urgentes"""
-  urgentes: Int!
-}
-
-type NotificationStatistiquesParModule {
-  """Nombre de notifications"""
-  count: Int!
-
-  """Module"""
-  module: ModuleType!
-
-  """Non lues"""
-  nonLues: Int!
-}
-
-"""Niveau de priorité de la notification"""
-enum PrioriteNotification {
-  """Priorité basse - Information"""
-  BASSE
-
-  """Priorité critique - Action immédiate impérative"""
-  CRITIQUE
-
-  """Priorité haute - Nécessite attention"""
-  HAUTE
-
-  """Priorité normale - À traiter normalement"""
-  NORMALE
-
-  """Priorité urgente - Action rapide requise"""
-  URGENTE
-}
-
 type Query {
-  """Récupérer une assurance par son ID"""
   assurance(id: String!): Assurance
-
-  """Récupérer toutes les assurances actives"""
   assurances: [Assurance!]!
-
-  """Récupérer toutes les assurances d'un véhicule spécifique"""
   assurancesByVehicule(vehiculeId: String!): [Assurance!]!
-
-  """Récupérer les assurances qui expirent dans N jours"""
   assurancesExpiringSoon(daysBeforeExpiry: Int! = 30): [Assurance!]!
 
   """Vérifier que le module d'authentification fonctionne"""
@@ -642,9 +516,9 @@ type Query {
   Récupérer tous les types d'entretien avec leur état (coché/non coché) pour un véhicule
   """
   configurationEntretiensVehicule(vehiculeId: String!): [EntretienConfiguration!]!
-
-  """Compter les notifications non lues"""
-  countNotificationsNonLues(destinataire: String): Int!
+  controleTechnique(id: String!): ControleTechniqueResource!
+  controlesTechniques: [ControleTechniqueResource!]!
+  controlesTechniquesByVehicule(vehiculeId: String!): [ControleTechniqueResource!]!
 
   """Récupérer uniquement les types d'entretien cochés pour un véhicule"""
   entretiensActifsVehicule(vehiculeId: String!): [EntretienConfiguration!]!
@@ -667,30 +541,6 @@ type Query {
 
   """Récupérer tous les modes de paiement actifs"""
   modesPaiement: [ModePaiementType!]!
-
-  """Récupérer une notification par son ID"""
-  notification(id: String!): Notification
-
-  """Récupérer toutes les notifications"""
-  notifications(destinataire: String, limit: Int = 50): [Notification!]!
-
-  """Récupérer les notifications par module"""
-  notificationsByModule(destinataire: String, module: ModuleType!): [Notification!]!
-
-  """Récupérer les notifications par priorité"""
-  notificationsByPriorite(destinataire: String, priorite: PrioriteNotification!): [Notification!]!
-
-  """Récupérer les notifications par véhicule"""
-  notificationsByVehicule(vehiculeId: String!): [Notification!]!
-
-  """Récupérer toutes les notifications non lues"""
-  notificationsNonLues(destinataire: String): [Notification!]!
-
-  """Obtenir les statistiques des notifications"""
-  notificationsStatistiques(destinataire: String): NotificationStatistiques!
-
-  """Obtenir les statistiques par module"""
-  notificationsStatistiquesParModule(destinataire: String): [NotificationStatistiquesParModule!]!
 
   """Récupérer un rôle par son ID"""
   role(id: ID!): Role!
@@ -747,6 +597,9 @@ type Query {
 
   """Récupérer les véhicules disponibles (selon seuil de compteur)"""
   vehiculesDisponibles(seuilCompteur: Float): [Vehicule!]!
+  vignette(id: String!): VignetteType
+  vignettes: [VignetteType!]!
+  vignettesByVehicule(vehiculeId: String!): [VignetteType!]!
 }
 
 input RegisterInput {
@@ -784,6 +637,24 @@ type Role {
   name: String!
   updatedAt: DateTime!
   weight: Int!
+}
+
+"""Statut du contrôle technique"""
+enum StatutControleTechnique {
+  ANNULE
+  BROUILLON
+  VALIDE
+}
+
+"""Statuts possibles pour une vignette"""
+enum StatutVignette {
+  ANNULE
+  BROUILLON
+  VALIDE
+}
+
+type Subscription {
+  assuranceUpdated(ids: [String!]): Assurance
 }
 
 type TypeEntretien {
@@ -827,30 +698,6 @@ type TypeEntretien {
   saisiPar: String
 }
 
-"""Type de notification selon l'urgence"""
-enum TypeNotification {
-  """Alerte importante"""
-  ALERTE
-
-  """Document expiré"""
-  EXPIRE
-
-  """Échéance imminente (1-2 jours avant)"""
-  IMMINENTE
-
-  """Information générale"""
-  INFO
-
-  """Échéance proche (7 jours avant)"""
-  PROCHE
-
-  """En retard (date dépassée)"""
-  RETARD
-
-  """Action urgente requise"""
-  URGENT
-}
-
 input UpdateAssuranceInput {
   dateDebut: DateTime
   dateFinValidite: DateTime
@@ -875,6 +722,17 @@ input UpdateCarnetEntretienInput {
   modifiePar: String
   notes: String
   statut: String
+}
+
+input UpdateControleTechniqueInput {
+  dateFinValidite: DateTime
+  dateOperation: DateTime
+  id: String!
+  lignesReglement: [CreateLigneReglementControleTechniqueInput!] = []
+  modifiePar: String
+  montant: Float
+  saisiPar: String
+  vehiculeId: String
 }
 
 input UpdateMarqueVehiculeInput {
@@ -971,6 +829,17 @@ input UpdateVehiculeInput {
   saisiPar: String
   siegeBebe: Boolean = false
   type: String
+}
+
+input UpdateVignetteInput {
+  dateFinValidite: DateTime
+  dateOperation: DateTime
+  id: String!
+  lignesReglement: [CreateLigneReglementVignetteInput!]
+  modifiePar: String
+  montant: Float
+  saisiPar: String
+  vehiculeId: String
 }
 
 input UserFilterInput {
@@ -1089,4 +958,23 @@ enum VerificationCodeType {
 input VerifyEmailInput {
   code: String!
   email: String!
+}
+
+type VignetteType {
+  dateFinValidite: String!
+  dateOperation: String!
+  estActif: Boolean!
+  id: ID!
+  lignesReglement: [LigneReglementVignetteType!]!
+  matriculeVehicule: String!
+  modifieLe: DateTime!
+  modifiePar: String
+  montant: Float!
+  montantReste: Float!
+  numeroFiche: Int!
+  saisiLe: DateTime!
+  saisiPar: String
+  statut: StatutVignette!
+  vehicule: Vehicule!
+  vehiculeId: String!
 }

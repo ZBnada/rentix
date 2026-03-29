@@ -1,8 +1,16 @@
+import { InputType, Field, PartialType } from '@nestjs/graphql';
+import { IsNotEmpty, IsUUID, IsOptional, IsString } from 'class-validator';
 import { CreateVignetteInput } from './create-vignette.input';
-import { InputType, Field, Int, PartialType } from '@nestjs/graphql';
 
 @InputType()
 export class UpdateVignetteInput extends PartialType(CreateVignetteInput) {
-  @Field(() => Int)
-  id: number;
+  @Field(() => String)
+  @IsNotEmpty({ message: "L'ID de la vignette est obligatoire" })
+  @IsUUID('4')
+  id: string;
+
+  @Field(() => String, { nullable: true })
+  @IsOptional()
+  @IsString()
+  modifiePar?: string;
 }

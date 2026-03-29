@@ -11,8 +11,8 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
       sessionStorage.getItem('access_token');
 
   // Log pour debug
-  console.log('Auth Interceptor - URL:', req.url);
-  console.log('Auth Interceptor - Token exists:', !!token);
+  //console.log('Auth Interceptor - URL:', req.url);
+  //console.log('Auth Interceptor - Token exists:', !!token);
 
   // Ajouter le token à toutes les requêtes vers le backend
   if (token) {
@@ -22,10 +22,10 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
       }
     });
 
-    console.log('Auth Interceptor - Headers:', clonedRequest.headers.get('Authorization'));
+    //console.log('Auth Interceptor - Headers:', clonedRequest.headers.get('Authorization'));
     return next(clonedRequest);
   }
 
-  console.warn('Auth Interceptor - No token found!');
+  //console.warn('Auth Interceptor - No token found!');
   return next(req);
 };

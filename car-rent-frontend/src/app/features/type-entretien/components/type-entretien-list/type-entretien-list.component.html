@@ -1,380 +1,410 @@
-<div class="p-6 space-y-6">
+<div class="space-y-5">
 
-    <!-- Header Section -->
+    <!-- ── Header ─────────────────────────────────────────────── -->
     <div class="flex items-center justify-between">
         <div>
-            <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Maintenance Types</h1>
-            <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                Manage the different available maintenance types
+            <h1 class="text-xl font-bold text-gray-900">Maintenance Types</h1>
+            <p class="text-sm text-gray-500 mt-0.5">
+                {{ filteredTypesEntretien.length }} type{{ filteredTypesEntretien.length > 1 ? 's' : '' }}
             </p>
         </div>
-        <div class="flex items-center gap-2">
-            <!-- View Toggle -->
+
+        <div class="flex gap-2">
+            <!-- Toggle View -->
             <button
                     (click)="toggleViewMode()"
                     type="button"
-                    class="flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700">
+                    class="flex items-center gap-2 px-4 py-2.5 bg-white border border-gray-200 text-gray-600 text-sm font-semibold rounded-xl hover:bg-gray-50 transition-all duration-200 shadow-sm active:scale-95">
                 <ng-container *ngIf="viewMode === 'table'">
-                    <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <svg class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
                         <path d="M5 3a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2V5a2 2 0 00-2-2H5zM5 11a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2v-2a2 2 0 00-2-2H5zM11 5a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V5zM11 13a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
                     </svg>
                     Grid View
                 </ng-container>
                 <ng-container *ngIf="viewMode === 'grid'">
-                    <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <svg class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
                         <path fill-rule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clip-rule="evenodd" />
                     </svg>
                     Table View
                 </ng-container>
             </button>
 
-            <!-- New Type Button -->
+            <!-- New Type -->
             <button
                     (click)="navigateToCreate()"
-                    class="flex items-center gap-2 px-5 py-2.5 bg-orange-500 text-white rounded-lg hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-orange-500 transition-colors font-medium"
-            >
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                    type="button"
+                    class="flex items-center gap-2 px-4 py-2.5 bg-slate-800 text-white text-sm font-semibold rounded-xl hover:bg-slate-700 transition-all duration-200 shadow-sm active:scale-95">
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
                 </svg>
                 New Type
             </button>
         </div>
     </div>
 
-    <!-- Filters & Search Section -->
-    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4">
-        <div class="flex flex-col md:flex-row gap-4 items-center">
-            <!-- Search Input -->
-            <div class="flex-1 w-full">
-                <div class="relative">
-                    <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                        <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-                        </svg>
-                    </div>
-                    <input
-                            type="text"
-                            [(ngModel)]="searchTerm"
-                            (ngModelChange)="onSearchChange()"
-                            placeholder="Search by code, designation or description..."
-                            class="w-full pl-10 pr-4 py-2.5 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors"
-                    />
-                </div>
+    <!-- ── Search & Filters ────────────────────────────────────── -->
+    <div class="bg-white rounded-2xl border border-gray-200 shadow-sm p-4">
+        <div class="flex flex-col sm:flex-row gap-3">
+            <!-- Search -->
+            <div class="relative flex-1">
+                <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400"
+                     fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                </svg>
+                <input
+                        type="text"
+                        [(ngModel)]="searchTerm"
+                        (ngModelChange)="onSearchChange()"
+                        placeholder="Search by code, designation or description..."
+                        class="w-full pl-10 pr-4 py-2.5 text-sm border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-400 focus:border-transparent transition-all bg-gray-50"/>
             </div>
 
-            <!-- Mandatory Filter -->
+            <!-- Mandatory filter -->
             <button
                     (click)="toggleMandatoryFilter()"
-                    [ngClass]="{
-                        'bg-orange-500 text-white border-orange-500': showOnlyMandatory,
-                        'bg-white text-gray-700 border-gray-300 hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600': !showOnlyMandatory
-                    }"
-                    class="flex items-center gap-2 px-4 py-2.5 border rounded-lg font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-orange-500 whitespace-nowrap"
-            >
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    class="flex items-center gap-2 px-3 py-2 text-xs font-semibold rounded-lg transition-all border"
+                    [ngClass]="showOnlyMandatory
+                        ? 'bg-slate-800 text-white border-slate-800'
+                        : 'bg-white text-gray-600 border-gray-200 hover:border-gray-300'">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/>
                 </svg>
                 Mandatory only
             </button>
         </div>
+    </div>
 
-        <!-- Results Count -->
-        <div class="mt-3 text-sm text-gray-600 dark:text-gray-400">
-            <span class="font-medium text-gray-900 dark:text-white">{{ filteredTypesEntretien.length }}</span>
-            {{ filteredTypesEntretien.length > 1 ? 'results' : 'result' }}
+    <!-- ── Loading ─────────────────────────────────────────────── -->
+    <div *ngIf="isLoading" class="bg-white rounded-2xl border border-gray-200 shadow-sm">
+        <div class="flex items-center justify-center py-16">
+            <div class="flex flex-col items-center gap-3">
+                <div class="w-8 h-8 border-4 border-slate-200 border-t-slate-600 rounded-full animate-spin"></div>
+                <span class="text-sm text-gray-500">Loading...</span>
+            </div>
         </div>
     </div>
 
-    <!-- Loading State -->
-    <div *ngIf="isLoading" class="flex items-center justify-center py-12">
-        <div class="flex flex-col items-center gap-3">
-            <svg class="animate-spin h-10 w-10 text-orange-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-            </svg>
-            <p class="text-gray-600 dark:text-gray-400">Loading...</p>
-        </div>
-    </div>
+    <!-- ── Main Card ───────────────────────────────────────────── -->
+    <div *ngIf="!isLoading" class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
 
-    <!-- Empty State -->
-    <div *ngIf="!isLoading && filteredTypesEntretien.length === 0" class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-12">
-        <div class="flex flex-col items-center justify-center text-center">
-            <svg class="w-16 h-16 text-gray-300 dark:text-gray-600 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-            </svg>
-            <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">No maintenance type found</h3>
-            <p class="text-gray-600 dark:text-gray-400 mb-4">
-                {{ searchTerm ? 'No results match your search.' : 'Start by creating a new maintenance type.' }}
+        <!-- Empty State -->
+        <div *ngIf="filteredTypesEntretien.length === 0"
+             class="flex flex-col items-center justify-center py-16 gap-3">
+            <div class="w-14 h-14 bg-slate-50 rounded-2xl flex items-center justify-center">
+                <svg class="w-7 h-7 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                          d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                </svg>
+            </div>
+            <p class="text-gray-500 text-sm font-medium">
+                {{ searchTerm ? 'No results match your search.' : 'No maintenance type found.' }}
             </p>
-            <button
-                    *ngIf="!searchTerm"
-                    (click)="navigateToCreate()"
-                    class="px-5 py-2.5 bg-orange-500 text-white rounded-lg hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-orange-500 transition-colors font-medium"
-            >
-                Create a maintenance type
+            <button *ngIf="!searchTerm" (click)="navigateToCreate()"
+                    class="text-slate-700 text-sm font-semibold hover:text-slate-900 transition-colors underline underline-offset-2">
+                Create the first type →
             </button>
         </div>
-    </div>
 
-    <!-- ===================== TABLE VIEW ===================== -->
-    <div *ngIf="!isLoading && filteredTypesEntretien.length > 0 && viewMode === 'table'"
-         class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
-        <div class="overflow-x-auto">
+        <!-- ===== TABLE VIEW ===== -->
+        <div *ngIf="filteredTypesEntretien.length > 0 && viewMode === 'table'" class="overflow-x-auto">
             <table class="w-full text-sm">
-                <thead>
-                <tr class="bg-gray-50 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700">
-                    <th class="px-5 py-3.5 text-left text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">Code</th>
-                    <th class="px-5 py-3.5 text-left text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">Designation</th>
-                    <th class="px-5 py-3.5 text-left text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">Status</th>
-                    <th class="px-5 py-3.5 text-left text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">Frequency</th>
-                    <th class="px-5 py-3.5 text-left text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">Avg. Cost</th>
-                    <th class="px-5 py-3.5 text-left text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">Last Modified</th>
-                    <th class="px-5 py-3.5 text-right text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">Actions</th>
+                <thead class="bg-gray-50 border-b border-gray-200">
+                <tr>
+                    <th class="px-4 py-3.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Code</th>
+                    <th class="px-4 py-3.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Designation</th>
+                    <th class="px-4 py-3.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Status</th>
+                    <th class="px-4 py-3.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Frequency</th>
+                    <th class="px-4 py-3.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Avg. Cost</th>
+                    <th class="px-4 py-3.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Last Modified</th>
+                    <th class="px-4 py-3.5 text-center text-xs font-semibold text-gray-500 uppercase tracking-wider w-28">Actions</th>
                 </tr>
                 </thead>
-                <tbody class="divide-y divide-gray-100 dark:divide-gray-700">
-                <tr
-                        *ngFor="let type of filteredTypesEntretien; trackBy: trackByTypeId"
-                        class="hover:bg-orange-50/40 dark:hover:bg-orange-900/10 transition-colors duration-150"
-                >
-                    <td class="px-5 py-3.5">
-                            <span class="inline-flex items-center px-2.5 py-1 rounded-md bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-400 text-xs font-bold">
+                <tbody class="divide-y divide-gray-100">
+                <tr *ngFor="let type of filteredTypesEntretien; trackBy: trackByTypeId"
+                    (click)="viewDetails(type)"
+                    class="hover:bg-slate-50/60 transition-colors cursor-pointer">
+
+                    <!-- Code -->
+                    <td class="px-4 py-3.5">
+                            <span class="inline-flex items-center px-2.5 py-1 rounded-md bg-slate-100 text-slate-700 text-xs font-bold">
                                 {{ type.codeEntretien }}
                             </span>
                     </td>
-                    <td class="px-5 py-3.5">
-                        <div class="font-medium text-gray-900 dark:text-white">{{ type.designation }}</div>
-                        <div *ngIf="type.description" class="text-xs text-gray-500 dark:text-gray-400 mt-0.5 line-clamp-1">{{ type.description }}</div>
+
+                    <!-- Designation -->
+                    <td class="px-4 py-3.5">
+                        <div class="font-semibold text-gray-800">{{ type.designation }}</div>
+                        <div *ngIf="type.description" class="text-xs text-gray-400 mt-0.5 line-clamp-1">
+                            {{ type.description }}
+                        </div>
                     </td>
-                    <td class="px-5 py-3.5">
-                            <span [ngClass]="getMandatoryBadgeClass(type.estObligatoire)" class="px-2.5 py-1 text-xs font-semibold rounded-full">
+
+                    <!-- Status -->
+                    <td class="px-4 py-3.5">
+                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold"
+                                  [ngClass]="type.estObligatoire
+                                    ? 'bg-red-50 text-red-600 border border-red-200'
+                                    : 'bg-gray-50 text-gray-600 border border-gray-200'">
+                                <span class="w-1.5 h-1.5 rounded-full"
+                                      [ngClass]="type.estObligatoire ? 'bg-red-500' : 'bg-gray-400'"></span>
                                 {{ type.estObligatoire ? 'Mandatory' : 'Optional' }}
                             </span>
                     </td>
-                    <td class="px-5 py-3.5 text-sm text-gray-600 dark:text-gray-400">
+
+                    <!-- Frequency -->
+                    <td class="px-4 py-3.5 text-sm text-gray-500">
                         {{ formatFrequency(type.frequenceJoursRecommandee, type.frequenceKmRecommandee) }}
                     </td>
-                    <td class="px-5 py-3.5">
-                        <span class="font-semibold text-orange-600 dark:text-orange-400">{{ type.coutMoyenEstime.toFixed(3) }} DT</span>
+
+                    <!-- Avg Cost -->
+                    <td class="px-4 py-3.5">
+                        <span class="font-semibold text-gray-900">{{ type.coutMoyenEstime.toFixed(3) }}</span>
+                        <span class="text-xs text-gray-400 ml-1">DT</span>
                     </td>
-                    <td class="px-5 py-3.5 text-xs text-gray-500 dark:text-gray-400">
+
+                    <!-- Last Modified -->
+                    <td class="px-4 py-3.5 text-xs text-gray-400">
                         {{ formatDate(type.modifieLe) }}
                     </td>
-                    <td class="px-5 py-3.5">
-                        <div class="flex justify-end gap-1.5">
-                            <button
-                                    (click)="viewDetails(type)"
-                                    class="p-2 text-gray-500 hover:text-orange-500 hover:bg-orange-50 dark:hover:bg-orange-900/20 rounded-lg transition-colors"
-                                    title="View details">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+
+                    <!-- Actions -->
+                    <td class="px-4 py-3.5 text-center" (click)="$event.stopPropagation()">
+                        <div class="flex items-center justify-center gap-1">
+                            <button (click)="viewDetails(type)"
+                                    class="flex items-center justify-center w-8 h-8 text-gray-400 hover:text-slate-700 hover:bg-slate-100 rounded-lg transition-all"
+                                    title="View">
+                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
                                 </svg>
                             </button>
-                            <button
-                                    (click)="navigateToEdit(type.id)"
-                                    class="p-2 text-gray-500 hover:text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors"
+                            <button (click)="navigateToEdit(type.id)"
+                                    class="flex items-center justify-center w-8 h-8 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all"
                                     title="Edit">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
                                 </svg>
                             </button>
-                            <button
-                                    (click)="deleteTypeEntretien(type)"
-                                    class="p-2 text-gray-500 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
+                            <button (click)="deleteTypeEntretien(type)"
+                                    class="flex items-center justify-center w-8 h-8 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all"
                                     title="Delete">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
                                 </svg>
                             </button>
                         </div>
                     </td>
                 </tr>
                 </tbody>
+
+                <!-- Footer -->
+                <tfoot class="bg-gray-50 border-t-2 border-gray-200">
+                <tr>
+                    <td colspan="7" class="px-4 py-3 text-xs font-bold text-gray-500 uppercase">
+                        Total — {{ filteredTypesEntretien.length }} type{{ filteredTypesEntretien.length > 1 ? 's' : '' }}
+                    </td>
+                </tr>
+                </tfoot>
             </table>
         </div>
-    </div>
 
-    <!-- ===================== GRID VIEW ===================== -->
-    <div *ngIf="!isLoading && filteredTypesEntretien.length > 0 && viewMode === 'grid'"
-         class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <div
-                *ngFor="let type of filteredTypesEntretien; trackBy: trackByTypeId"
-                class="card group bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 hover:shadow-md transition-shadow"
-        >
-            <!-- Card Header -->
-            <div class="p-4 border-b border-gray-100 dark:border-gray-700">
-                <div class="flex items-start justify-between">
-                    <div class="flex-1">
-                        <div class="flex items-center gap-2 mb-1">
-                            <span class="px-2 py-1 text-xs font-semibold bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-400 rounded">
-                                {{ type.codeEntretien }}
-                            </span>
-                            <span [ngClass]="getMandatoryBadgeClass(type.estObligatoire)" class="px-2 py-1 text-xs font-semibold rounded">
-                                {{ type.estObligatoire ? 'Mandatory' : 'Optional' }}
-                            </span>
-                        </div>
-                        <h3 class="text-lg font-semibold text-gray-900 dark:text-white line-clamp-2">
-                            {{ type.designation }}
-                        </h3>
+        <!-- ===== GRID VIEW ===== -->
+        <div *ngIf="filteredTypesEntretien.length > 0 && viewMode === 'grid'"
+             class="p-5 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+            <div *ngFor="let type of filteredTypesEntretien; trackBy: trackByTypeId"
+                 (click)="viewDetails(type)"
+                 class="group border border-gray-200 rounded-2xl overflow-hidden hover:shadow-md hover:border-slate-300 transition-all duration-200 cursor-pointer bg-white">
+
+                <!-- Card Header -->
+                <div class="p-4 border-b border-gray-100">
+                    <div class="flex items-center gap-2 mb-2">
+                        <span class="px-2.5 py-1 text-xs font-bold bg-slate-100 text-slate-700 rounded-lg">
+                            {{ type.codeEntretien }}
+                        </span>
+                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold"
+                              [ngClass]="type.estObligatoire
+                                ? 'bg-red-50 text-red-600 border border-red-200'
+                                : 'bg-gray-50 text-gray-600 border border-gray-200'">
+                            <span class="w-1.5 h-1.5 rounded-full"
+                                  [ngClass]="type.estObligatoire ? 'bg-red-500' : 'bg-gray-400'"></span>
+                            {{ type.estObligatoire ? 'Mandatory' : 'Optional' }}
+                        </span>
                     </div>
-                </div>
-            </div>
-
-            <!-- Card Body -->
-            <div class="p-4 space-y-3">
-                <div *ngIf="type.description" class="text-sm text-gray-600 dark:text-gray-400 line-clamp-2">
-                    {{ type.description }}
+                    <h3 class="font-semibold text-gray-800 text-base line-clamp-2">{{ type.designation }}</h3>
                 </div>
 
-                <!-- Frequency -->
-                <div class="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
-                    <svg class="w-4 h-4 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                    </svg>
-                    <span>{{ formatFrequency(type.frequenceJoursRecommandee, type.frequenceKmRecommandee) }}</span>
+                <!-- Card Body -->
+                <div class="p-4 space-y-3">
+                    <p *ngIf="type.description" class="text-xs text-gray-400 line-clamp-2">
+                        {{ type.description }}
+                    </p>
+
+                    <!-- Frequency -->
+                    <div class="flex items-center gap-2 text-xs text-gray-500">
+                        <svg class="w-3.5 h-3.5 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        <span>{{ formatFrequency(type.frequenceJoursRecommandee, type.frequenceKmRecommandee) }}</span>
+                    </div>
+
+                    <!-- Cost -->
+                    <div class="rounded-xl bg-slate-50 border border-slate-100 p-3">
+                        <div class="text-xs text-slate-500 mb-0.5">Average estimated cost</div>
+                        <div class="text-xl font-bold text-slate-800">
+                            {{ type.coutMoyenEstime.toFixed(3) }}
+                            <span class="text-xs font-normal text-slate-400 ml-1">DT</span>
+                        </div>
+                    </div>
+
+                    <!-- Last Modified -->
+                    <p class="text-xs text-gray-400 pt-1 border-t border-gray-100">
+                        Modified {{ formatDate(type.modifieLe) }}
+                    </p>
                 </div>
 
-                <!-- Cost -->
-                <div class="rounded-lg bg-orange-50 dark:bg-orange-900/20 px-3 py-2">
-                    <div class="text-xs text-orange-500 dark:text-orange-400 mb-0.5">Average estimated cost</div>
-                    <div class="text-xl font-bold text-orange-600 dark:text-orange-400">{{ type.coutMoyenEstime.toFixed(3) }} DT</div>
+                <!-- Card Actions -->
+                <div class="flex gap-1 px-4 py-3 border-t border-gray-100 bg-gray-50"
+                     (click)="$event.stopPropagation()">
+                    <button (click)="viewDetails(type)"
+                            class="flex items-center justify-center w-8 h-8 text-gray-400 hover:text-slate-700 hover:bg-slate-100 rounded-lg transition-all"
+                            title="View">
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                        </svg>
+                    </button>
+                    <button (click)="navigateToEdit(type.id)"
+                            class="flex items-center justify-center w-8 h-8 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all"
+                            title="Edit">
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                        </svg>
+                    </button>
+                    <button (click)="deleteTypeEntretien(type)"
+                            class="flex items-center justify-center w-8 h-8 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all"
+                            title="Delete">
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                        </svg>
+                    </button>
                 </div>
-
-                <!-- Last Modified -->
-                <div class="pt-1 border-t border-gray-100 dark:border-gray-700">
-                    <p class="text-xs text-gray-500 dark:text-gray-400">Modified {{ formatDate(type.modifieLe) }}</p>
-                </div>
-            </div>
-
-            <!-- Card Actions -->
-            <div class="p-4 bg-gray-50 dark:bg-gray-900/40 border-t border-gray-100 dark:border-gray-700 flex items-center justify-end gap-2 rounded-b-lg">
-                <button
-                        (click)="viewDetails(type)"
-                        class="p-2 text-gray-500 hover:text-orange-500 hover:bg-orange-50 dark:hover:bg-orange-900/20 rounded-lg transition-colors"
-                        title="View details">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
-                    </svg>
-                </button>
-                <button
-                        (click)="navigateToEdit(type.id)"
-                        class="p-2 text-gray-500 hover:text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors"
-                        title="Edit">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
-                    </svg>
-                </button>
-                <button
-                        (click)="deleteTypeEntretien(type)"
-                        class="p-2 text-gray-500 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
-                        title="Delete">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
-                    </svg>
-                </button>
             </div>
         </div>
     </div>
 
-    <!-- ===================== DETAILS MODAL ===================== -->
-    <div
-            *ngIf="selectedTypeEntretien"
-            class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
-            (click)="closeDetails()"
-    >
-        <div
-                class="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto"
-                (click)="$event.stopPropagation()"
-        >
+    <!-- ===== DETAILS MODAL ===== -->
+    <div *ngIf="selectedTypeEntretien"
+         class="fixed inset-0 z-[9999] flex items-center justify-center p-4"
+         (click)="closeDetails()">
+
+        <div class="absolute inset-0 bg-gray-900/60 backdrop-blur-sm"></div>
+
+        <div class="relative z-10 w-full max-w-2xl bg-white rounded-2xl shadow-2xl overflow-hidden"
+             (click)="$event.stopPropagation()">
+
             <!-- Modal Header -->
-            <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between sticky top-0 bg-white dark:bg-gray-800 z-10">
-                <h2 class="text-xl font-bold text-gray-900 dark:text-white">Maintenance type details</h2>
-                <button
-                        (click)="closeDetails()"
-                        class="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+            <div class="flex items-center justify-between px-6 py-4 border-b border-gray-100 bg-gray-50">
+                <div>
+                    <h2 class="text-base font-bold text-gray-900">Maintenance type details</h2>
+                    <p class="text-xs text-gray-400 mt-0.5">{{ selectedTypeEntretien.codeEntretien }} · {{ selectedTypeEntretien.designation }}</p>
+                </div>
+                <button (click)="closeDetails()"
+                        class="flex items-center justify-center w-8 h-8 text-gray-400 hover:text-gray-600 hover:bg-gray-200 rounded-lg transition-all">
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
                     </svg>
                 </button>
             </div>
 
             <!-- Modal Body -->
-            <div class="px-6 py-6 space-y-6">
+            <div class="px-6 py-5 space-y-5 max-h-[60vh] overflow-y-auto">
+
+                <!-- Code + Status -->
                 <div class="grid grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Code</label>
-                        <p class="text-base text-gray-900 dark:text-white font-semibold">{{ selectedTypeEntretien.codeEntretien }}</p>
+                        <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">Code</p>
+                        <span class="inline-flex items-center px-2.5 py-1 rounded-lg bg-slate-100 text-slate-700 text-sm font-bold">
+                            {{ selectedTypeEntretien.codeEntretien }}
+                        </span>
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Status</label>
-                        <span [ngClass]="getMandatoryBadgeClass(selectedTypeEntretien.estObligatoire)" class="inline-block px-3 py-1 text-sm font-semibold rounded">
+                        <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">Status</p>
+                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold"
+                              [ngClass]="selectedTypeEntretien.estObligatoire
+                                ? 'bg-red-50 text-red-600 border border-red-200'
+                                : 'bg-gray-50 text-gray-600 border border-gray-200'">
+                            <span class="w-1.5 h-1.5 rounded-full"
+                                  [ngClass]="selectedTypeEntretien.estObligatoire ? 'bg-red-500' : 'bg-gray-400'"></span>
                             {{ selectedTypeEntretien.estObligatoire ? 'Mandatory' : 'Optional' }}
                         </span>
                     </div>
                 </div>
 
+                <!-- Designation -->
                 <div>
-                    <label class="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Designation</label>
-                    <p class="text-base text-gray-900 dark:text-white">{{ selectedTypeEntretien.designation }}</p>
+                    <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">Designation</p>
+                    <p class="text-sm font-medium text-gray-800">{{ selectedTypeEntretien.designation }}</p>
                 </div>
 
+                <!-- Description -->
                 <div *ngIf="selectedTypeEntretien.description">
-                    <label class="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Description</label>
-                    <p class="text-base text-gray-900 dark:text-white">{{ selectedTypeEntretien.description }}</p>
+                    <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">Description</p>
+                    <p class="text-sm text-gray-600">{{ selectedTypeEntretien.description }}</p>
                 </div>
 
+                <!-- Frequency -->
                 <div class="grid grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Frequency (days)</label>
-                        <p class="text-base text-gray-900 dark:text-white">{{ selectedTypeEntretien.frequenceJoursRecommandee || 'Not defined' }}</p>
+                        <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">Frequency (days)</p>
+                        <p class="text-sm font-medium text-gray-800">{{ selectedTypeEntretien.frequenceJoursRecommandee || 'Not defined' }}</p>
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Frequency (km)</label>
-                        <p class="text-base text-gray-900 dark:text-white">{{ selectedTypeEntretien.frequenceKmRecommandee?.toLocaleString('en-US') || 'Not defined' }}</p>
+                        <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">Frequency (km)</p>
+                        <p class="text-sm font-medium text-gray-800">{{ selectedTypeEntretien.frequenceKmRecommandee?.toLocaleString('en-US') || 'Not defined' }}</p>
                     </div>
                 </div>
 
-                <div>
-                    <label class="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Average estimated cost</label>
-                    <p class="text-base text-orange-600 dark:text-orange-400 font-semibold">{{ selectedTypeEntretien.coutMoyenEstime.toFixed(3) }} DT</p>
+                <!-- Cost -->
+                <div class="rounded-xl bg-slate-50 border border-slate-100 p-4">
+                    <p class="text-xs text-slate-500 mb-1">Average estimated cost</p>
+                    <p class="text-2xl font-bold text-slate-800">
+                        {{ selectedTypeEntretien.coutMoyenEstime.toFixed(3) }}
+                        <span class="text-sm font-normal text-slate-400 ml-1">DT</span>
+                    </p>
                 </div>
 
-                <div class="pt-4 border-t border-gray-200 dark:border-gray-700 space-y-2">
-                    <div class="grid grid-cols-2 gap-4 text-sm">
-                        <div>
-                            <span class="text-gray-500 dark:text-gray-400">Created on:</span>
-                            <span class="ml-2 text-gray-900 dark:text-white">{{ formatDate(selectedTypeEntretien.saisiLe) }}</span>
-                        </div>
-                        <div>
-                            <span class="text-gray-500 dark:text-gray-400">Modified on:</span>
-                            <span class="ml-2 text-gray-900 dark:text-white">{{ formatDate(selectedTypeEntretien.modifieLe) }}</span>
-                        </div>
+                <!-- Audit -->
+                <div class="pt-4 border-t border-gray-100 grid grid-cols-2 gap-4 text-xs">
+                    <div>
+                        <p class="text-gray-400 mb-0.5">Created on</p>
+                        <p class="font-medium text-gray-700">{{ formatDate(selectedTypeEntretien.saisiLe) }}</p>
                     </div>
-                    <div class="grid grid-cols-2 gap-4 text-sm" *ngIf="selectedTypeEntretien.saisiPar || selectedTypeEntretien.modifiePar">
-                        <div *ngIf="selectedTypeEntretien.saisiPar">
-                            <span class="text-gray-500 dark:text-gray-400">Created by:</span>
-                            <span class="ml-2 text-gray-900 dark:text-white">{{ selectedTypeEntretien.saisiPar }}</span>
-                        </div>
-                        <div *ngIf="selectedTypeEntretien.modifiePar">
-                            <span class="text-gray-500 dark:text-gray-400">Modified by:</span>
-                            <span class="ml-2 text-gray-900 dark:text-white">{{ selectedTypeEntretien.modifiePar }}</span>
-                        </div>
+                    <div>
+                        <p class="text-gray-400 mb-0.5">Modified on</p>
+                        <p class="font-medium text-gray-700">{{ formatDate(selectedTypeEntretien.modifieLe) }}</p>
+                    </div>
+                    <div *ngIf="selectedTypeEntretien.saisiPar">
+                        <p class="text-gray-400 mb-0.5">Created by</p>
+                        <p class="font-medium text-gray-700">{{ selectedTypeEntretien.saisiPar }}</p>
+                    </div>
+                    <div *ngIf="selectedTypeEntretien.modifiePar">
+                        <p class="text-gray-400 mb-0.5">Modified by</p>
+                        <p class="font-medium text-gray-700">{{ selectedTypeEntretien.modifiePar }}</p>
                     </div>
                 </div>
             </div>
 
             <!-- Modal Footer -->
-            <div class="px-6 py-4 bg-gray-50 dark:bg-gray-900/40 border-t border-gray-200 dark:border-gray-700 flex items-center justify-end gap-3 rounded-b-lg">
-                <button
-                        (click)="closeDetails()"
-                        class="px-5 py-2.5 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+            <div class="flex gap-3 px-6 py-4 bg-gray-50 border-t border-gray-100">
+                <button (click)="closeDetails()"
+                        class="flex-1 px-4 py-2.5 text-sm font-semibold text-gray-700 bg-white border border-gray-300 rounded-xl hover:bg-gray-50 transition-colors">
                     Close
                 </button>
-                <button
-                        (click)="navigateToEdit(selectedTypeEntretien.id); closeDetails()"
-                        class="px-5 py-2.5 text-sm font-medium text-white bg-orange-500 rounded-lg hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-orange-500 transition-colors">
+                <button (click)="navigateToEdit(selectedTypeEntretien.id); closeDetails()"
+                        class="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-semibold text-white bg-slate-800 rounded-xl hover:bg-slate-700 transition-colors">
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                    </svg>
                     Edit
                 </button>
             </div>

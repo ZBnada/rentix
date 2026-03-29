@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, OnChanges, Input, Output, EventEmitter, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import {
@@ -7,9 +7,6 @@ import {
     FormFieldConfig,
 } from '../../config/mode-paiement-form.config';
 
-/**
- * Interface pour Mode Paiement (remplacée par le modèle auto-généré)
- */
 interface ModePaiementFormData {
     id?: string;
     type?: string;
@@ -18,24 +15,21 @@ interface ModePaiementFormData {
     icon?: string;
 }
 
-/**
- * Composant de formulaire dynamique pour Mode Paiement
- */
 @Component({
     selector: 'app-mode-paiement-form',
     standalone: true,
     imports: [CommonModule, ReactiveFormsModule],
     templateUrl: './mode-paiement-form.component.html',
 })
-export class ModePaiementFormComponent implements OnInit {
+export class ModePaiementFormComponent implements OnInit, OnChanges {
     @Input() initialData?: ModePaiementFormData;
     @Input() isEditMode = false;
+    @Input() isSaving = false;   // ← le parent contrôle le spinner
     @Output() submitForm = new EventEmitter<ModePaiementFormData>();
     @Output() cancel = new EventEmitter<void>();
 
     form!: FormGroup;
     formFields: FormFieldConfig[] = MODE_PAIEMENT_FORM_CONFIG;
-    isSubmitting = false;
 
     constructor(private formBuilder: FormBuilder) {}
 
@@ -46,20 +40,23 @@ export class ModePaiementFormComponent implements OnInit {
         }
     }
 
-    /**
-     * Initialiser le formulaire
-     */
+    ngOnChanges(changes: SimpleChanges): void {
+        // Quand initialData change (ouverture modal edit/create)
+        if (changes['initialData'] && this.form) {
+            this.form.reset();
+            if (this.initialData) {
+                this.form.patchValue(this.initialData);
+            }
+        }
+    }
+
     private initializeForm(): void {
         const controls = ModePaiementFormBuilder.buildFormControls();
         this.form = this.formBuilder.group(controls);
     }
 
-    /**
-     * Soumettre le formulaire
-     */
     onSubmit(): void {
         if (this.form.valid) {
-            this.isSubmitting = true;
             const formData: ModePaiementFormData = {
                 ...this.form.value,
                 ...(this.initialData?.id && { id: this.initialData.id }),
@@ -70,61 +67,39 @@ export class ModePaiementFormComponent implements OnInit {
         }
     }
 
-    /**
-     * Annuler le formulaire
-     */
     onCancel(): void {
         this.cancel.emit();
     }
 
-    /**
-     * Marquer tous les champs comme touchés pour afficher les erreurs
-     */
     private markFormGroupTouched(formGroup: FormGroup): void {
         Object.keys(formGroup.controls).forEach((key) => {
-            const control = formGroup.get(key);
-            control?.markAsTouched();
+            formGroup.get(key)?.markAsTouched();
         });
     }
 
-    /**
-     * Vérifier si un champ a une erreur
-     */
     hasError(fieldName: string, errorType?: string): boolean {
         const control = this.form.get(fieldName);
         if (!control) return false;
-
-        if (errorType) {
-            return control.hasError(errorType) && control.touched;
-        }
+        if (errorType) return control.hasError(errorType) && control.touched;
         return control.invalid && control.touched;
     }
 
-    /**
-     * Obtenir le message d'erreur pour un champ
-     */
     getErrorMessage(fieldName: string): string {
         const control = this.form.get(fieldName);
         if (!control || !control.errors) return '';
-
         const errors = control.errors;
         if (errors['required']) return 'Ce champ est obligatoire';
         if (errors['maxlength']) return `Maximum ${errors['maxlength'].requiredLength} caractères`;
         if (errors['minlength']) return `Minimum ${errors['minlength'].requiredLength} caractères`;
         if (errors['email']) return 'Email invalide';
         if (errors['pattern']) return 'Format invalide';
-
         return 'Valeur invalide';
     }
 
-    /**
-     * Obtenir les classes CSS pour un champ
-     */
     getFieldClasses(fieldName: string): string {
-        const baseClasses = 'w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 transition-colors';
-        const errorClasses = 'border-red-300 focus:ring-red-500 focus:border-red-500';
-        const successClasses = 'border-gray-300 focus:ring-orange-500 focus:border-orange-500';
-
-        return `${baseClasses} ${this.hasError(fieldName) ? errorClasses : successClasses}`;
+        const base = 'w-full px-4 py-2.5 border rounded-xl focus:outline-none focus:ring-2 transition-all text-sm bg-gray-50';
+        const error = 'border-red-300 focus:ring-red-400 focus:border-red-400';
+        const normal = 'border-gray-200 focus:ring-slate-400 focus:border-transparent';
+        return `${base} ${this.hasError(fieldName) ? error : normal}`;
     }
 }

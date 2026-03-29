@@ -24,37 +24,25 @@ export class ConfigurationEntretiensComponent implements OnInit {
         this.loadData();
     }
 
-    /**
-     * Load all vehicles and their configurations
-     */
     loadData(): void {
         this.isLoading = true;
         this.errorMessage = '';
 
-        console.log('🔄 Starting data loading...');
-
-        // Load maintenance types
         this.entretienASuivreService.getAllTypesEntretien().subscribe({
             next: (types) => {
-                console.log('✅ Maintenance types loaded:', types);
                 this.typesEntretien = types;
 
-                // Load configurations for all vehicles
-                this.entretienASuivreService
-                    .getAllConfigurationsEntretiens()
-                    .subscribe({
-                        next: (lignes) => {
-                            console.log('✅ Configurations loaded:', lignes);
-                            this.lignesTableau = lignes;
-                            this.isLoading = false;
-                            console.log('✅ Loading completed successfully!');
-                        },
-                        error: (error) => {
-                            console.error('❌ Error loading configurations:', error);
-                            this.errorMessage = 'Error loading configurations';
-                            this.isLoading = false;
-                        },
-                    });
+                this.entretienASuivreService.getAllConfigurationsEntretiens().subscribe({
+                    next: (lignes) => {
+                        this.lignesTableau = lignes;
+                        this.isLoading = false;
+                    },
+                    error: (error) => {
+                        console.error('❌ Error loading configurations:', error);
+                        this.errorMessage = 'Error loading configurations';
+                        this.isLoading = false;
+                    },
+                });
             },
             error: (error) => {
                 console.error('❌ Error loading maintenance types:', error);
@@ -64,10 +52,6 @@ export class ConfigurationEntretiensComponent implements OnInit {
         });
     }
 
-    /**
-     * Toggle a checkbox with confirmation
-     * ✅ AUTOMATICALLY CREATES IN THE LOGBOOK IF CHECKED
-     */
     onToggleEntretien(
         vehiculeId: string,
         typeEntretienId: string,
@@ -75,15 +59,10 @@ export class ConfigurationEntretiensComponent implements OnInit {
     ): void {
         const newState = !estActive;
 
-        console.log('🔄 Toggle:', { vehiculeId, typeEntretienId, newState });
-
         this.entretienASuivreService
             .toggleEntretien(vehiculeId, typeEntretienId, newState)
             .subscribe({
                 next: () => {
-                    console.log('✅ Toggle successful');
-
-                    // Update locally
                     const ligne = this.lignesTableau.find(
                         (l) => l.vehicule.id === vehiculeId
                     );
@@ -97,7 +76,6 @@ export class ConfigurationEntretiensComponent implements OnInit {
                                 newState
                             );
 
-                            // ✅ CONFIRMATION IF CHECKED (added to logbook)
                             if (newState) {
                                 Swal.fire({
                                     title: 'Maintenance added!',
@@ -114,7 +92,6 @@ export class ConfigurationEntretiensComponent implements OnInit {
                                     timerProgressBar: true,
                                 });
                             } else {
-                                // ✅ Message if unchecked
                                 Swal.fire({
                                     title: 'Maintenance removed',
                                     html: `Maintenance <strong>${typeEntretien.codeEntretien}</strong> has been removed for vehicle <strong>${ligne.vehicule.matricule}</strong>.`,
@@ -135,8 +112,6 @@ export class ConfigurationEntretiensComponent implements OnInit {
                 },
                 error: (error) => {
                     console.error('❌ Error toggling maintenance:', error);
-
-                    // ✅ ERROR MESSAGE
                     Swal.fire({
                         title: 'Error!',
                         text: 'Unable to update the maintenance.',
@@ -153,32 +128,27 @@ export class ConfigurationEntretiensComponent implements OnInit {
             });
     }
 
-    /**
-     * Check if a maintenance is active for a vehicle
-     */
-    isEntretienActive(
-        ligne: LigneTableauEntretiens,
-        codeEntretien: string
-    ): boolean {
+    isEntretienActive(ligne: LigneTableauEntretiens, codeEntretien: string): boolean {
         return ligne.entretiensParCode.get(codeEntretien) ?? false;
     }
 
-    /**
-     * Find the maintenance type ID by its code
-     */
     getTypeEntretienId(codeEntretien: string): string {
         return (
-            this.typesEntretien.find((t) => t.codeEntretien === codeEntretien)?.id ??
-            ''
+            this.typesEntretien.find((t) => t.codeEntretien === codeEntretien)?.id ?? ''
         );
     }
 
-    /**
-     * Validate configurations (F5)
-     */
-    valider(): void {
-        console.log('✅ Configurations validated');
+    getTotalActive(): number {
+        let count = 0;
+        this.lignesTableau.forEach(ligne => {
+            this.typesEntretien.forEach(type => {
+                if (this.isEntretienActive(ligne, type.codeEntretien)) count++;
+            });
+        });
+        return count;
+    }
 
+    valider(): void {
         Swal.fire({
             title: 'Configuration saved!',
             text: 'The maintenance tracking has been configured successfully.',

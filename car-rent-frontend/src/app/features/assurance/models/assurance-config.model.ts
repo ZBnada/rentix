@@ -6,7 +6,7 @@ import { format } from 'date-fns';
 export interface Assurance {
     id: string;
     vehiculeId: string;
-    vehicule?: any; // VehiculeResource du backend
+    vehicule?: any;
     prestataire: string;
     dateDebut: Date;
     dateFinValidite: Date;
@@ -30,7 +30,7 @@ export interface AssuranceReglement {
     id: string;
     assuranceId: string;
     modePaiementId: string;
-    modePaiement?: any; // ModePaiementResource
+    modePaiement?: any;
     designation?: string;
     montant: number;
     echeance?: Date;
@@ -106,10 +106,25 @@ export class AssuranceUtils {
     }
 
     /**
-     * Formater une date
+     * Formater une date de façon sécurisée
+     * ✅ Protégé contre les valeurs null / undefined / invalides
+     *    qui causaient "RangeError: Invalid time value"
      */
-    static formatDate(date: Date | string): string {
-        return format(new Date(date), 'dd/MM/yyyy');
+    static formatDate(date: Date | string | null | undefined): string {
+        // Valeur absente → tiret
+        if (date === null || date === undefined || date === '') return '—';
+
+        try {
+            const d = new Date(date);
+
+            // new Date() peut retourner une date invalide sans exception
+            // isNaN(d.getTime()) détecte ce cas
+            if (isNaN(d.getTime())) return '—';
+
+            return format(d, 'dd/MM/yyyy');
+        } catch {
+            return '—';
+        }
     }
 
     /**

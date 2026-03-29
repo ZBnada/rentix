@@ -1,11 +1,8 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { Observable, throwError } from 'rxjs';
+import { map, catchError } from 'rxjs/operators';
 
-/**
- * Interface pour ModePaiement
- */
 export interface ModePaiement {
     id: string;
     type: string;
@@ -17,9 +14,6 @@ export interface ModePaiement {
     updatedAt: Date;
 }
 
-/**
- * Interface pour la création/modification
- */
 export interface CreateModePaiementDto {
     type: string;
     libelle: string;
@@ -31,167 +25,144 @@ export interface UpdateModePaiementDto extends Partial<CreateModePaiementDto> {
     id: string;
 }
 
-/**
- * Service pour la gestion des modes de paiement
- */
-@Injectable({
-    providedIn: 'root',
-})
+interface GraphQLResponse<T> {
+    data?: T;
+    errors?: { message: string; extensions?: { code?: string } }[];
+}
+
+@Injectable({ providedIn: 'root' })
 export class ModePaiementService {
-    // URL directe - MODIFIER ICI selon votre configuration
     private readonly apiUrl = 'http://localhost:3000/graphql';
 
     constructor(private http: HttpClient) {}
 
-    /**
-     * Récupérer tous les modes de paiement actifs
-     */
+    // ── Helpers ────────────────────────────────────────────────
+    private cleanInput<T extends object>(input: T): Partial<T> {
+        return Object.fromEntries(
+            Object.entries(input).filter(([_, v]) => v !== undefined && v !== null && v !== '')
+        ) as Partial<T>;
+    }
+
+    private handleResponse<T>(response: GraphQLResponse<T>, key: keyof T): T[keyof T] {
+        if (response.errors?.length) {
+            throw new Error(response.errors.map(e => e.message).join(', '));
+        }
+        if (!response.data || response.data[key] === null || response.data[key] === undefined) {
+            throw new Error('Invalid server response');
+        }
+        return response.data[key];
+    }
+
+    // ── Queries ────────────────────────────────────────────────
     findAllModesPaiement(): Observable<ModePaiement[]> {
         const query = `
-      query {
-        modesPaiement {
-          id
-          type
-          libelle
-          description
-          icon
-          estActif
-          createdAt
-          updatedAt
-        }
-      }
-    `;
-
+            query {
+                modesPaiement {
+                    id type libelle description icon estActif createdAt updatedAt
+                }
+            }
+        `;
         return this.http
-            .post<{ data: { modesPaiement: ModePaiement[] } }>(this.apiUrl, {
-                query,
-            })
-            .pipe(map((response) => response.data.modesPaiement));
+            .post<GraphQLResponse<{ modesPaiement: ModePaiement[] }>>(this.apiUrl, { query })
+            .pipe(
+                map(res  => this.handleResponse(res, 'modesPaiement') as ModePaiement[]),
+                catchError(err => throwError(() => new Error(err.message || 'Network error')))
+            );
     }
 
-    /**
-     * Récupérer un mode de paiement par son ID
-     */
     findModePaiementById(id: string): Observable<ModePaiement> {
         const query = `
-      query($id: String!) {
-        modePaiement(id: $id) {
-          id
-          type
-          libelle
-          description
-          icon
-          estActif
-          createdAt
-          updatedAt
-        }
-      }
-    `;
-
+            query($id: String!) {
+                modePaiement(id: $id) {
+                    id type libelle description icon estActif createdAt updatedAt
+                }
+            }
+        `;
         return this.http
-            .post<{ data: { modePaiement: ModePaiement } }>(this.apiUrl, {
-                query,
-                variables: { id },
-            })
-            .pipe(map((response) => response.data.modePaiement));
+            .post<GraphQLResponse<{ modePaiement: ModePaiement }>>(this.apiUrl, { query, variables: { id } })
+            .pipe(
+                map(res  => this.handleResponse(res, 'modePaiement') as ModePaiement),
+                catchError(err => throwError(() => new Error(err.message || 'Network error')))
+            );
     }
 
-    /**
-     * Rechercher des modes de paiement par libellé
-     */
     searchModesPaiementByLibelle(searchTerm: string): Observable<ModePaiement[]> {
         const query = `
-      query($searchTerm: String!) {
-        searchModesPaiement(searchTerm: $searchTerm) {
-          id
-          type
-          libelle
-          description
-          icon
-          estActif
-          createdAt
-          updatedAt
-        }
-      }
-    `;
-
+            query($searchTerm: String!) {
+                searchModesPaiement(searchTerm: $searchTerm) {
+                    id type libelle description icon estActif createdAt updatedAt
+                }
+            }
+        `;
         return this.http
-            .post<{ data: { searchModesPaiement: ModePaiement[] } }>(this.apiUrl, {
-                query,
-                variables: { searchTerm },
-            })
-            .pipe(map((response) => response.data.searchModesPaiement));
+            .post<GraphQLResponse<{ searchModesPaiement: ModePaiement[] }>>(this.apiUrl, { query, variables: { searchTerm } })
+            .pipe(
+                map(res  => this.handleResponse(res, 'searchModesPaiement') as ModePaiement[]),
+                catchError(err => throwError(() => new Error(err.message || 'Network error')))
+            );
     }
 
-    /**
-     * Créer un nouveau mode de paiement
-     */
+    // ── Mutations ──────────────────────────────────────────────
     createModePaiement(input: CreateModePaiementDto): Observable<ModePaiement> {
         const mutation = `
-      mutation($input: CreateModePaiementInput!) {
-        createModePaiement(input: $input) {
-          id
-          type
-          libelle
-          description
-          icon
-          estActif
-          createdAt
-          updatedAt
-        }
-      }
-    `;
-
+            mutation($input: CreateModePaiementInput!) {
+                createModePaiement(input: $input) {
+                    id type libelle description icon estActif createdAt updatedAt
+                }
+            }
+        `;
+        const cleanedInput = this.cleanInput(input);
         return this.http
-            .post<{ data: { createModePaiement: ModePaiement } }>(this.apiUrl, {
-                query: mutation,
-                variables: { input },
-            })
-            .pipe(map((response) => response.data.createModePaiement));
+            .post<GraphQLResponse<{ createModePaiement: ModePaiement }>>(
+                this.apiUrl,
+                { query: mutation, variables: { input: cleanedInput } }
+            )
+            .pipe(
+                map(res  => this.handleResponse(res, 'createModePaiement') as ModePaiement),
+                catchError(err => throwError(() => new Error(err.message || 'Network error')))
+            );
     }
 
-    /**
-     * Mettre à jour un mode de paiement
-     */
     updateModePaiement(input: UpdateModePaiementDto): Observable<ModePaiement> {
         const mutation = `
-      mutation($input: UpdateModePaiementInput!) {
-        updateModePaiement(input: $input) {
-          id
-          type
-          libelle
-          description
-          icon
-          estActif
-          createdAt
-          updatedAt
-        }
-      }
-    `;
-
+            mutation($input: UpdateModePaiementInput!) {
+                updateModePaiement(input: $input) {
+                    id type libelle description icon estActif createdAt updatedAt
+                }
+            }
+        `;
+        const { id, ...rest } = input;
+        const cleanedInput    = { id, ...this.cleanInput(rest) };
         return this.http
-            .post<{ data: { updateModePaiement: ModePaiement } }>(this.apiUrl, {
-                query: mutation,
-                variables: { input },
-            })
-            .pipe(map((response) => response.data.updateModePaiement));
+            .post<GraphQLResponse<{ updateModePaiement: ModePaiement }>>(
+                this.apiUrl,
+                { query: mutation, variables: { input: cleanedInput } }
+            )
+            .pipe(
+                map(res  => this.handleResponse(res, 'updateModePaiement') as ModePaiement),
+                catchError(err => throwError(() => new Error(err.message || 'Network error')))
+            );
     }
 
-    /**
-     * Supprimer un mode de paiement (soft delete)
-     */
     deleteModePaiement(id: string): Observable<boolean> {
         const mutation = `
-      mutation($id: String!) {
-        deleteModePaiement(id: $id)
-      }
-    `;
-
+            mutation($id: String!) {
+                deleteModePaiement(id: $id)
+            }
+        `;
         return this.http
-            .post<{ data: { deleteModePaiement: boolean } }>(this.apiUrl, {
-                query: mutation,
-                variables: { id },
-            })
-            .pipe(map((response) => response.data.deleteModePaiement));
+            .post<GraphQLResponse<{ deleteModePaiement: boolean }>>(
+                this.apiUrl,
+                { query: mutation, variables: { id } }
+            )
+            .pipe(
+                map(res => {
+                    if (res.errors?.length) {
+                        throw new Error(res.errors.map(e => e.message).join(', '));
+                    }
+                    return res.data?.deleteModePaiement ?? false;
+                }),
+                catchError(err => throwError(() => new Error(err.message || 'Network error')))
+            );
     }
 }

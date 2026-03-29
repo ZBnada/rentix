@@ -84,6 +84,20 @@ export const dashboardRoutes: Routes = [
                 title: 'Carnet d\'Entretien',
             },
             {
+                path: 'vignettes',
+                loadChildren: () =>
+                    import('../vignette/vignette.routes')
+                        .then(m => m.VIGNETTE_ROUTES),
+                title: 'Vignettes'
+            },
+            {
+                path: 'controle-technique',
+                loadChildren: () =>
+                    import('../controle-technique/controle-technique.routes')
+                        .then(m => m.CONTROLE_TECHNIQUE_ROUTES),
+                title: 'controle-technique'
+            },
+            {
                 path: 'profil',
                 loadChildren: () =>
                     import('../profile/profile.routes')

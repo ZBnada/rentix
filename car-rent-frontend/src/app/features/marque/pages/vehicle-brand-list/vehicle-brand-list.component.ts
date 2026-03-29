@@ -1,7 +1,3 @@
-// ==========================================
-// 📁 src/app/features/vehicle-brand/pages/vehicle-brand-list/vehicle-brand-list.component.ts
-// ==========================================
-
 import { Component, OnInit, OnDestroy, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
@@ -14,10 +10,6 @@ import Swal from 'sweetalert2';
 import { VehicleBrandService } from '../../services/vehicle-brand.service';
 import { VehicleBrandModel } from '../../models/vehicle-brand.model';
 
-/**
- * Vehicle Brand List Page Component
- * Displays all vehicle brands in a responsive grid
- */
 @Component({
     selector: 'app-vehicle-brand-list',
     standalone: true,
@@ -31,6 +23,7 @@ export class VehicleBrandListComponent implements OnInit, OnDestroy {
     searchTerm = signal('');
     isLoading = signal(false);
     errorMessage = signal('');
+    viewMode = signal<'grid' | 'table'>('table');
 
     private readonly destroySubject = new Subject<void>();
 
@@ -49,9 +42,6 @@ export class VehicleBrandListComponent implements OnInit, OnDestroy {
         this.destroySubject.complete();
     }
 
-    /**
-     * Load all vehicle brands
-     */
     loadBrands(): void {
         this.isLoading.set(true);
         this.errorMessage.set('');
@@ -73,11 +63,9 @@ export class VehicleBrandListComponent implements OnInit, OnDestroy {
             });
     }
 
-    /**
-     * Search brands by label or description
-     */
-    onSearch(): void {
-        const term = this.searchTerm().toLowerCase().trim();
+    onSearch(event: Event): void {
+        const term = (event.target as HTMLInputElement).value.toLowerCase().trim();
+        this.searchTerm.set(term);
 
         if (!term) {
             this.filteredBrands.set(this.brands());
@@ -92,31 +80,24 @@ export class VehicleBrandListComponent implements OnInit, OnDestroy {
         this.filteredBrands.set(filtered);
     }
 
-    /**
-     * Navigate to create brand page
-     */
+    toggleViewMode(): void {
+        this.viewMode.set(this.viewMode() === 'grid' ? 'table' : 'grid');
+    }
+
     onCreateBrand(): void {
         this.router.navigate(['/dashboard/vehicle-brands/create']);
     }
 
-    /**
-     * Navigate to edit brand page
-     */
     onEditBrand(brandId: string): void {
         this.router.navigate(['/dashboard/vehicle-brands/edit', brandId]);
     }
 
-    /**
-     * Navigate to brand detail page
-     */
     onViewBrand(brandId: string): void {
         this.router.navigate(['/dashboard/vehicle-brands', brandId]);
     }
 
-    /**
-     * Delete a vehicle brand
-     */
-    onDeleteBrand(brandId: string, brandLabel: string): void {
+    onDeleteBrand(brandId: string, brandLabel: string, event: Event): void {
+        event.stopPropagation();
         Swal.fire({
             title: 'Delete Brand?',
             html: `Are you sure you want to delete <strong>${brandLabel}</strong>?<br>This action cannot be undone.`,
@@ -138,9 +119,6 @@ export class VehicleBrandListComponent implements OnInit, OnDestroy {
         });
     }
 
-    /**
-     * Perform the delete operation
-     */
     private performDelete(brandId: string, brandLabel: string): void {
         this.vehicleBrandService
             .deleteBrand(brandId)
@@ -180,23 +158,14 @@ export class VehicleBrandListComponent implements OnInit, OnDestroy {
             });
     }
 
-    /**
-     * Format date using date-fns
-     */
     formatDate(date: Date): string {
         return format(new Date(date), 'MMM dd, yyyy', { locale: enUS });
     }
 
-    /**
-     * Track by function for ngFor optimization
-     */
     trackByBrandId(index: number, brand: VehicleBrandModel): string {
         return brand.id;
     }
 
-    /**
-     * Sanitize image URL for security
-     */
     getSafeImageUrl(url: string | undefined): SafeUrl | null {
         if (!url) return null;
         return this.sanitizer.sanitize(1, url) ? url : null;

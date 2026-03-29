@@ -4,7 +4,7 @@
     min-height: 100px;
 }
 
-/* Disabled state styling */
+/* Disabled state */
 input:disabled,
 textarea:disabled,
 button:disabled {
@@ -13,17 +13,11 @@ button:disabled {
 }
 
 /* Error animation */
-.error-message {
+p.text-xs.text-red-500 {
     animation: slideDown 0.2s ease-out;
 }
 
 @keyframes slideDown {
-    from {
-        opacity: 0;
-        transform: translateY(-4px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+    from { opacity: 0; transform: translateY(-4px); }
+    to   { opacity: 1; transform: translateY(0); }
 }

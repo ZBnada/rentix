@@ -7,22 +7,22 @@ import { join } from 'path';
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
-  // Configuration CORS
   app.enableCors({
     origin: process.env.FRONTEND_URL || 'http://localhost:4200',
     credentials: true,
   });
 
-  // Validation globale
   app.useGlobalPipes(
     new ValidationPipe({
-      whitelist: true,
-      forbidNonWhitelisted: true,
+      // ✅ whitelist:false pour ne pas stripper les nested GraphQL inputs
+      whitelist: false,
       transform: true,
+      transformOptions: {
+        enableImplicitConversion: true,
+      },
     }),
   );
 
-  // Servir les fichiers statiques (uploads)
   app.useStaticAssets(join(__dirname, '..', 'uploads'), {
     prefix: '/uploads/',
   });

@@ -4,22 +4,19 @@
 import { Component, inject, signal, output, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
-import { Subject, takeUntil } from 'rxjs';
+import { Subject } from 'rxjs';
 import { AuthService } from '../../../features/auth/services/auth.service';
-import { NotificationBellComponent } from '@features/notifications/components/notification-bell/notification-bell.component';
-import { NotificationFacadeService } from '@features/notifications/services/notification-facade.service';
 
 @Component({
     selector: 'app-header',
     standalone: true,
-    imports: [CommonModule, NotificationBellComponent],
+    imports: [CommonModule],
     templateUrl: './header.component.html',
     styleUrls: ['./header.component.css']
 })
 export class HeaderComponent implements OnInit, OnDestroy {
     private readonly router = inject(Router);
     private readonly authService = inject(AuthService);
-    private readonly notificationFacade = inject(NotificationFacadeService);
 
     private destroy$ = new Subject<void>();
 
@@ -47,28 +44,11 @@ export class HeaderComponent implements OnInit, OnDestroy {
 
         // Charger l'avatar
         this.loadUserAvatar();
-
-        // Initialiser les notifications
-        this.initializeNotifications();
     }
 
     ngOnDestroy(): void {
         this.destroy$.next();
         this.destroy$.complete();
-    }
-
-    /**
-     * Initialiser les notifications
-     */
-    private initializeNotifications(): void {
-        const user = this.authService.getCurrentUser();
-
-        if (!user || !user.id) {
-            return;
-        }
-
-        // Initialiser le système de notifications
-        this.notificationFacade.initialize(user.id);
     }
 
     /**

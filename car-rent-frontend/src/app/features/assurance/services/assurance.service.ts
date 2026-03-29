@@ -1,11 +1,14 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
+import { Apollo } from 'apollo-angular';
+import { gql } from '@apollo/client/core';
 
-/**
- * Interface pour Assurance
- */
+// ─────────────────────────────────────────────
+// Interfaces
+// ─────────────────────────────────────────────
+
 export interface Assurance {
     id: string;
     vehiculeId: string;
@@ -26,9 +29,6 @@ export interface Assurance {
     estActif: boolean;
 }
 
-/**
- * Interface pour AssuranceReglement
- */
 export interface AssuranceReglement {
     id: string;
     assuranceId: string;
@@ -45,9 +45,6 @@ export interface AssuranceReglement {
     estActif: boolean;
 }
 
-/**
- * DTO pour création d'assurance
- */
 export interface CreateAssuranceDto {
     vehiculeId: string;
     prestataire: string;
@@ -62,9 +59,6 @@ export interface CreateAssuranceDto {
     saisiPar?: string;
 }
 
-/**
- * DTO pour création de règlement
- */
 export interface CreateAssuranceReglementDto {
     modePaiementId: string;
     designation?: string;
@@ -76,25 +70,73 @@ export interface CreateAssuranceReglementDto {
     dateOperation: string | Date;
 }
 
-/**
- * DTO pour mise à jour d'assurance
- */
 export interface UpdateAssuranceDto extends Partial<CreateAssuranceDto> {
     id: string;
     modifiePar?: string;
 }
 
 /**
- * Service pour la gestion des assurances
+ * Payload reçu lors d'un event subscription.
+ * "action" indique ce qui s'est passé côté serveur.
  */
+export interface AssuranceSubscriptionPayload {
+    assuranceUpdated: Partial<Assurance>;
+    action: 'create' | 'update' | 'delete';
+}
+
+// Champs GraphQL réutilisables
+const ASSURANCE_FIELDS = `
+  id
+  vehiculeId
+  prestataire
+  dateDebut
+  dateFinValidite
+  montantTotal
+  dateOperation
+  numeroPolice
+  observations
+  documentUrl
+  saisiPar
+  modifiePar
+  saisiLe
+  modifieLe
+  estActif
+`;
+
+// Subscription GQL (définie une fois, réutilisée)
+
+const ASSURANCE_UPDATED_SUBSCRIPTION = gql`
+  subscription OnAssuranceUpdated($ids: [String!]) {
+    assuranceUpdated(ids: $ids) {
+      id
+      vehiculeId
+      prestataire
+      dateDebut
+      dateFinValidite
+      montantTotal
+      dateOperation
+      numeroPolice
+      observations
+      documentUrl
+      saisiPar
+      modifiePar
+      saisiLe
+      modifieLe
+      estActif
+    }
+  }
+`;
+
+
 @Injectable({
     providedIn: 'root',
 })
 export class AssuranceService {
-    // URL directe - MODIFIER selon votre configuration
+    private readonly apollo = inject(Apollo);
+    private readonly http = inject(HttpClient);
     private readonly apiUrl = 'http://localhost:3000/graphql';
 
-    constructor(private http: HttpClient) {}
+    // ── Queries ──────────────────────────────────
 
     /**
      * Récupérer toutes les assurances actives
@@ -103,36 +145,16 @@ export class AssuranceService {
         const query = `
       query {
         assurances {
-          id
-          vehiculeId
-          prestataire
-          dateDebut
-          dateFinValidite
-          montantTotal
-          dateOperation
-          numeroPolice
-          observations
-          documentUrl
-          saisiPar
-          modifiePar
-          saisiLe
-          modifieLe
-          estActif
+          ${ASSURANCE_FIELDS}
         }
       }
     `;
-
-        return this.http
-            .post<any>(this.apiUrl, { query })
-            .pipe(
-                map((response) => {
-                    if (response.errors) {
-                        console.error('GraphQL Errors:', response.errors);
-                        throw new Error(response.errors[0]?.message || 'GraphQL Error');
-                    }
-                    return response.data?.assurances || [];
-                })
-            );
+        return this.http.post<any>(this.apiUrl, { query }).pipe(
+            map((response) => {
+                if (response.errors) throw new Error(response.errors[0]?.message);
+                return response.data?.assurances || [];
+            }),
+        );
     }
 
     /**
@@ -142,39 +164,16 @@ export class AssuranceService {
         const query = `
       query($id: String!) {
         assurance(id: $id) {
-          id
-          vehiculeId
-          prestataire
-          dateDebut
-          dateFinValidite
-          montantTotal
-          dateOperation
-          numeroPolice
-          observations
-          documentUrl
-          saisiPar
-          modifiePar
-          saisiLe
-          modifieLe
-          estActif
+          ${ASSURANCE_FIELDS}
         }
       }
     `;
-
-        return this.http
-            .post<any>(this.apiUrl, {
-                query,
-                variables: { id },
-            })
-            .pipe(
-                map((response) => {
-                    if (response.errors) {
-                        console.error('GraphQL Errors:', response.errors);
-                        throw new Error(response.errors[0]?.message || 'GraphQL Error');
-                    }
-                    return response.data?.assurance;
-                })
-            );
+        return this.http.post<any>(this.apiUrl, { query, variables: { id } }).pipe(
+            map((response) => {
+                if (response.errors) throw new Error(response.errors[0]?.message);
+                return response.data?.assurance;
+            }),
+        );
     }
 
     /**
@@ -184,37 +183,16 @@ export class AssuranceService {
         const query = `
       query($vehiculeId: String!) {
         assurancesByVehicule(vehiculeId: $vehiculeId) {
-          id
-          vehiculeId
-          prestataire
-          dateDebut
-          dateFinValidite
-          montantTotal
-          dateOperation
-          numeroPolice
-          observations
-          documentUrl
-          saisiLe
-          modifieLe
-          estActif
+          ${ASSURANCE_FIELDS}
         }
       }
     `;
-
-        return this.http
-            .post<any>(this.apiUrl, {
-                query,
-                variables: { vehiculeId },
-            })
-            .pipe(
-                map((response) => {
-                    if (response.errors) {
-                        console.error('GraphQL Errors:', response.errors);
-                        throw new Error(response.errors[0]?.message || 'GraphQL Error');
-                    }
-                    return response.data?.assurancesByVehicule || [];
-                })
-            );
+        return this.http.post<any>(this.apiUrl, { query, variables: { vehiculeId } }).pipe(
+            map((response) => {
+                if (response.errors) throw new Error(response.errors[0]?.message);
+                return response.data?.assurancesByVehicule || [];
+            }),
+        );
     }
 
     /**
@@ -235,125 +213,54 @@ export class AssuranceService {
         }
       }
     `;
-
-        return this.http
-            .post<any>(this.apiUrl, {
-                query,
-                variables: { daysBeforeExpiry },
-            })
-            .pipe(
-                map((response) => {
-                    if (response.errors) {
-                        console.error('GraphQL Errors:', response.errors);
-                        throw new Error(response.errors[0]?.message || 'GraphQL Error');
-                    }
-                    return response.data?.assurancesExpiringSoon || [];
-                })
-            );
+        return this.http.post<any>(this.apiUrl, { query, variables: { daysBeforeExpiry } }).pipe(
+            map((response) => {
+                if (response.errors) throw new Error(response.errors[0]?.message);
+                return response.data?.assurancesExpiringSoon || [];
+            }),
+        );
     }
+
+    // ── Mutations ───────────────────────────────
 
     /**
      * Créer une nouvelle assurance
      */
     createAssurance(input: CreateAssuranceDto): Observable<Assurance> {
-        // Convertir les dates en string ISO
-        const formattedInput = {
-            ...input,
-            dateDebut: this.formatDateForAPI(input.dateDebut),
-            dateFinValidite: this.formatDateForAPI(input.dateFinValidite),
-            dateOperation: this.formatDateForAPI(input.dateOperation),
-            reglements: input.reglements.map(r => ({
-                ...r,
-                dateOperation: this.formatDateForAPI(r.dateOperation),
-                echeance: r.echeance ? this.formatDateForAPI(r.echeance) : undefined,
-            })),
-        };
-
+        const formattedInput = this.formatAssuranceInput(input);
         const mutation = `
       mutation($input: CreateAssuranceInput!) {
         createAssurance(input: $input) {
-          id
-          vehiculeId
-          prestataire
-          dateDebut
-          dateFinValidite
-          montantTotal
-          dateOperation
-          numeroPolice
-          observations
-          documentUrl
-          saisiLe
-          estActif
+          ${ASSURANCE_FIELDS}
         }
       }
     `;
-
-        return this.http
-            .post<any>(this.apiUrl, {
-                query: mutation,
-                variables: { input: formattedInput },
-            })
-            .pipe(
-                map((response) => {
-                    if (response.errors) {
-                        console.error('GraphQL Errors:', response.errors);
-                        throw new Error(response.errors[0]?.message || 'GraphQL Error');
-                    }
-                    return response.data?.createAssurance;
-                })
-            );
+        return this.http.post<any>(this.apiUrl, { query: mutation, variables: { input: formattedInput } }).pipe(
+            map((response) => {
+                if (response.errors) throw new Error(response.errors[0]?.message);
+                return response.data?.createAssurance;
+            }),
+        );
     }
 
     /**
      * Mettre à jour une assurance
      */
     updateAssurance(input: UpdateAssuranceDto): Observable<Assurance> {
-        // Convertir les dates en string ISO
-        const formattedInput: any = { ...input };
-        if (input.dateDebut) formattedInput.dateDebut = this.formatDateForAPI(input.dateDebut);
-        if (input.dateFinValidite) formattedInput.dateFinValidite = this.formatDateForAPI(input.dateFinValidite);
-        if (input.dateOperation) formattedInput.dateOperation = this.formatDateForAPI(input.dateOperation);
-        if (input.reglements) {
-            formattedInput.reglements = input.reglements.map(r => ({
-                ...r,
-                dateOperation: this.formatDateForAPI(r.dateOperation),
-                echeance: r.echeance ? this.formatDateForAPI(r.echeance) : undefined,
-            }));
-        }
-
+        const formattedInput = this.formatAssuranceInput(input);
         const mutation = `
       mutation($input: UpdateAssuranceInput!) {
         updateAssurance(input: $input) {
-          id
-          vehiculeId
-          prestataire
-          dateDebut
-          dateFinValidite
-          montantTotal
-          dateOperation
-          numeroPolice
-          observations
-          documentUrl
-          modifieLe
-          estActif
+          ${ASSURANCE_FIELDS}
         }
       }
     `;
-
-        return this.http
-            .post<any>(this.apiUrl, {
-                query: mutation,
-                variables: { input: formattedInput },
-            })
-            .pipe(
-                map((response) => {
-                    if (response.errors) {
-                        console.error('GraphQL Errors:', response.errors);
-                        throw new Error(response.errors[0]?.message || 'GraphQL Error');
-                    }
-                    return response.data?.updateAssurance;
-                })
-            );
+        return this.http.post<any>(this.apiUrl, { query: mutation, variables: { input: formattedInput } }).pipe(
+            map((response) => {
+                if (response.errors) throw new Error(response.errors[0]?.message);
+                return response.data?.updateAssurance;
+            }),
+        );
     }
 
     /**
@@ -365,62 +272,75 @@ export class AssuranceService {
         deleteAssurance(id: $id)
       }
     `;
+        return this.http.post<any>(this.apiUrl, { query: mutation, variables: { id } }).pipe(
+            map((response) => {
+                if (response.errors) throw new Error(response.errors[0]?.message);
+                return response.data?.deleteAssurance || false;
+            }),
+        );
+    }
 
-        return this.http
-            .post<any>(this.apiUrl, {
-                query: mutation,
-                variables: { id },
+
+    //  --Subscription----------------
+    assuranceUpdated(ids?: string[]): Observable<AssuranceSubscriptionPayload> {
+        return this.apollo
+            .subscribe<{ assuranceUpdated: Assurance }>({
+                query: ASSURANCE_UPDATED_SUBSCRIPTION,
+                variables: { ids: ids ?? [] },
             })
             .pipe(
-                map((response) => {
-                    if (response.errors) {
-                        console.error('GraphQL Errors:', response.errors);
-                        throw new Error(response.errors[0]?.message || 'GraphQL Error');
-                    }
-                    return response.data?.deleteAssurance || false;
-                })
+                map((result) => {
+                    const assurance = result.data?.assuranceUpdated;
+
+                    // On déduit l'action à partir des données reçues :
+                    //   estActif = false  → c'est un delete (soft delete)
+                    //   sinon             → update ou create (le composant gère les deux pareil)
+                    const action: 'create' | 'update' | 'delete' =
+                        assurance?.estActif === false ? 'delete' : 'update';
+
+                    return {
+                        assuranceUpdated: assurance ?? {},
+                        action,
+                    };
+                }),
             );
     }
 
-    /**
-     * Upload d'un document d'assurance
-     */
-    uploadDocument(assuranceId: string, file: File): Observable<{ documentUrl: string }> {
-        const formData = new FormData();
-        formData.append('file', file);
-
-        // REST endpoint pour l'upload
-        return this.http.post<{ documentUrl: string }>(
-            `http://localhost:3000/assurances/${assuranceId}/document`,
-            formData,
-        );
-    }
+    // ── Helpers privés ───────────────────────────
 
     /**
-     * Supprimer un document d'assurance
+     * Formater les dates d'un input assurance avant envoi à l'API.
+     * Convertit Date / string "YYYY-MM-DD" → ISO string.
      */
-    deleteDocument(assuranceId: string): Observable<{ success: boolean }> {
-        return this.http.delete<{ success: boolean }>(
-            `http://localhost:3000/assurances/${assuranceId}/document`,
-        );
-    }
+    private formatAssuranceInput(input: any): any {
+        const formatted: any = { ...input };
 
-    /**
-     * Formater une date pour l'API (ISO string)
-     */
-    private formatDateForAPI(date: string | Date | undefined): string | undefined {
-        if (!date) return undefined;
+        if (input.dateDebut) formatted.dateDebut = this.toISO(input.dateDebut);
+        if (input.dateFinValidite) formatted.dateFinValidite = this.toISO(input.dateFinValidite);
+        if (input.dateOperation) formatted.dateOperation = this.toISO(input.dateOperation);
 
-        if (typeof date === 'string') {
-            // Si c'est déjà une string, vérifier le format
-            if (date.includes('T')) {
-                return date; // Déjà au format ISO
-            }
-            // Format YYYY-MM-DD -> convertir en ISO
-            return new Date(date).toISOString();
+        if (input.reglements) {
+            formatted.reglements = input.reglements.map((r: any) => ({
+                ...r,
+                dateOperation: this.toISO(r.dateOperation),
+                echeance: r.echeance ? this.toISO(r.echeance) : undefined,
+            }));
         }
 
-        // Si c'est un objet Date
+        return formatted;
+    }
+
+    /**
+     * Convertir une date (string ou Date) en ISO string pour l'API.
+     */
+    private toISO(date: string | Date | undefined): string | undefined {
+        if (!date) return undefined;
+        if (typeof date === 'string') {
+            // Déjà ISO (contient "T") → laisser tel quel
+            if (date.includes('T')) return date;
+            // Format "YYYY-MM-DD" → convertir
+            return new Date(date).toISOString();
+        }
         return date.toISOString();
     }
 }

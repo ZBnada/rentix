@@ -10,10 +10,6 @@ import Swal from 'sweetalert2';
 import { VehicleService } from '../../services/vehicle.service';
 import { VehicleModel, getVehicleClassLabel, getEnergyTypeLabel } from '../../models/vehicle.model';
 
-/**
- * Vehicle List Page Component
- * Displays all vehicles in a responsive table/grid
- */
 @Component({
     selector: 'app-vehicle-list',
     standalone: true,
@@ -46,9 +42,6 @@ export class VehicleListComponent implements OnInit, OnDestroy {
         this.destroySubject.complete();
     }
 
-    /**
-     * Load all vehicles
-     */
     loadVehicles(): void {
         this.isLoading.set(true);
         this.errorMessage.set('');
@@ -70,11 +63,9 @@ export class VehicleListComponent implements OnInit, OnDestroy {
             });
     }
 
-    /**
-     * Search vehicles
-     */
-    onSearch(): void {
-        const term = this.searchTerm().toLowerCase().trim();
+    onSearch(event: Event): void {
+        const term = (event.target as HTMLInputElement).value.toLowerCase().trim();
+        this.searchTerm.set(term);
 
         if (!term) {
             this.filteredVehicles.set(this.vehicles());
@@ -91,38 +82,24 @@ export class VehicleListComponent implements OnInit, OnDestroy {
         this.filteredVehicles.set(filtered);
     }
 
-    /**
-     * Toggle view mode
-     */
     toggleViewMode(): void {
         this.viewMode.set(this.viewMode() === 'grid' ? 'table' : 'grid');
     }
 
-    /**
-     * Navigate to create vehicle page
-     */
     onCreateVehicle(): void {
         this.router.navigate(['/dashboard/vehicles/create']);
     }
 
-    /**
-     * Navigate to edit vehicle page
-     */
     onEditVehicle(vehicleId: string): void {
         this.router.navigate(['/dashboard/vehicles/edit', vehicleId]);
     }
 
-    /**
-     * Navigate to vehicle detail page
-     */
     onViewVehicle(vehicleId: string): void {
         this.router.navigate(['/dashboard/vehicles', vehicleId]);
     }
 
-    /**
-     * Delete a vehicle
-     */
-    onDeleteVehicle(vehicleId: string, registrationNumber: string): void {
+    onDeleteVehicle(vehicleId: string, registrationNumber: string, event: Event): void {
+        event.stopPropagation();
         Swal.fire({
             title: 'Delete Vehicle?',
             html: `Are you sure you want to delete vehicle <strong>${registrationNumber}</strong>?<br>This action cannot be undone.`,
@@ -144,9 +121,6 @@ export class VehicleListComponent implements OnInit, OnDestroy {
         });
     }
 
-    /**
-     * Perform the delete operation
-     */
     private performDelete(vehicleId: string, registrationNumber: string): void {
         this.vehicleService
             .deleteVehicle(vehicleId)
@@ -186,16 +160,14 @@ export class VehicleListComponent implements OnInit, OnDestroy {
             });
     }
 
-    /**
-     * Format date
-     */
+    getTotalDailyPrice(): number {
+        return this.filteredVehicles().reduce((s, v) => s + Number(v.dailyRentalPrice), 0);
+    }
+
     formatDate(date: Date): string {
         return format(new Date(date), 'MMM dd, yyyy', { locale: enUS });
     }
 
-    /**
-     * Format currency
-     */
     formatCurrency(amount: number): string {
         return new Intl.NumberFormat('en-TN', {
             style: 'currency',
@@ -205,31 +177,19 @@ export class VehicleListComponent implements OnInit, OnDestroy {
         }).format(amount);
     }
 
-    /**
-     * Get vehicle class label
-     */
     getClassLabel(vehicleClass: any): string {
         return getVehicleClassLabel(vehicleClass);
     }
 
-    /**
-     * Get energy type label
-     */
     getEnergyLabel(energy: any): string {
         return getEnergyTypeLabel(energy);
     }
 
-    /**
-     * Sanitize image URL
-     */
     getSafeImageUrl(url: string | null | undefined): SafeUrl | null {
         if (!url) return null;
         return this.sanitizer.sanitize(1, url) ? url : null;
     }
 
-    /**
-     * Track by function for ngFor
-     */
     trackByVehicleId(index: number, vehicle: VehicleModel): string {
         return vehicle.id;
     }

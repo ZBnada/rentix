@@ -11,7 +11,6 @@ export * from './components/mode-paiement-form/mode-paiement-form.component';
 
 // Pages
 export * from './pages/mode-paiement-index/mode-paiement-index.component';
-export * from './pages/mode-paiement-detail/mode-paiement-detail.component';
 export * from './pages/mode-paiement-form-page/mode-paiement-form-page.component';
 
 // Models

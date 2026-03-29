@@ -23,14 +23,6 @@ export const MODE_PAIEMENT_ROUTES: Routes = [
         title: 'Nouveau Mode de Paiement',
     },
     {
-        path: ':id',
-        loadComponent: () =>
-            import('./pages/mode-paiement-detail/mode-paiement-detail.component').then(
-                (m) => m.ModePaiementDetailComponent,
-            ),
-        title: 'Détail Mode de Paiement',
-    },
-    {
         path: ':id/modifier',
         loadComponent: () =>
             import('./pages/mode-paiement-form-page/mode-paiement-form-page.component').then(

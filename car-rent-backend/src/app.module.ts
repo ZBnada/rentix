@@ -15,11 +15,12 @@ import { VehiculeModule } from './vehicule/vehicule.module';
 import { MarqueVehiculeModule } from './marque-vehicule/marque-vehicule.module';
 import { EntretienASuivreModule } from './entretien-asuivre/entretien-a-suivre.module';
 import { TypeEntretienModule } from './type-entretien/type-entretien.module';
-import { NotificationModule } from './notification/notification.module';
 import { ModePaiementModule } from './mode-paiement/mode-paiement.module';
 import { AssuranceModule } from './assurance/assurance.module';
 import { CarnetEntretienModule } from './carnet-entretien/carnet-entretien.module';
 import { VignetteModule } from './vignette/vignette.module';
+import { ControleTechniqueModule } from './controle-technique/controle-technique.module';
+import { PubSubModule } from './pub-sub';
 
 @Module({
   imports: [
@@ -39,7 +40,7 @@ import { VignetteModule } from './vignette/vignette.module';
         password: configService.get<string>('DB_PASSWORD') || '',
         database: configService.get<string>('DB_DATABASE') || 'car_rental',
         entities: [__dirname + '/**/*.entity{.ts,.js}'],
-        synchronize: false,
+        synchronize: configService.get<string>('NODE_ENV') !== 'production',
         logging: configService.get<boolean>('DB_LOGGING') || false,
         charset: 'utf8mb4',
         timezone: '+00:00',
@@ -62,6 +63,27 @@ import { VignetteModule } from './vignette/vignette.module';
         path: error.path,
       }),
       //  Ceci active Apollo Sandbox
+
+      subscriptions: {
+        'graphql-ws': {
+          path: '/graphql',
+          // onConnect: async (ctx: Context<any, any>) => {
+          //   await authService.onWsConnect(ctx, parametreApplicationService);
+          // },
+          // onDisconnect: (
+          //   ctx: Context<any, any>,
+          //   code: number,
+          //   reason: string,
+          // ) => {
+          //   authService.onWsDisconnect(ctx, code, reason);
+          // },
+          // onSubscribe: (ctx: Context<any, any>, message: SubscribeMessage) => {
+          //   // console.log(message);
+          //   // console.log(message.id);
+          //   // console.log(message.type);
+          // },
+        },
+      },
       plugins: [ApolloServerPluginLandingPageLocalDefault()],
     }),
 
@@ -75,11 +97,12 @@ import { VignetteModule } from './vignette/vignette.module';
     MarqueVehiculeModule,
     EntretienASuivreModule,
     TypeEntretienModule,
-    NotificationModule,
     ModePaiementModule,
     AssuranceModule,
     CarnetEntretienModule,
     VignetteModule,
+    ControleTechniqueModule,
+    PubSubModule,
   ],
 })
 export class AppModule {}

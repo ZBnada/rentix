@@ -1,148 +1,384 @@
-<div class="p-6">
-    <!-- Header -->
-    <div class="mb-6">
-        <div class="flex items-center justify-between mb-4">
-            <div>
-                <h1 class="text-2xl font-bold text-gray-900">Modes de Paiement</h1>
-                <p class="text-sm text-gray-500 mt-1">
-                    Gérez les modes de paiement disponibles dans le système
-                </p>
-            </div>
-            <button
-                    routerLink="nouveau"
-                    class="inline-flex items-center gap-2 px-4 py-2 bg-orange-500 hover:bg-orange-600 text-white font-medium rounded-lg transition-colors duration-200"
-            >
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-                </svg>
-                Nouveau mode de paiement
-            </button>
-        </div>
+<div class="space-y-5">
 
-        <!-- Barre de recherche -->
-        <div class="relative">
-            <input
-                    type="text"
-                    placeholder="Rechercher un mode de paiement..."
-                    [value]="searchTerm()"
-                    (input)="onSearch($any($event.target).value)"
-                    class="w-full px-4 py-2.5 pl-11 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-            />
-            <svg class="absolute left-3 top-3 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-            </svg>
+    <!-- ── Header ─────────────────────────────────────────────── -->
+    <div class="flex items-center justify-between">
+        <div>
+            <h1 class="text-xl font-bold text-gray-900">Payment Methods</h1>
+            <p class="text-sm text-gray-500 mt-0.5">
+                {{ filteredModesPaiement().length }} method{{ filteredModesPaiement().length > 1 ? 's' : '' }}
+            </p>
+        </div>
+        <div class="flex gap-2">
+            <button type="button" (click)="toggleViewMode()"
+                    class="flex items-center gap-2 px-4 py-2.5 bg-white border border-gray-200 text-gray-600 text-sm font-semibold rounded-xl hover:bg-gray-50 transition-all shadow-sm active:scale-95">
+                @if (viewMode() === 'table') {
+                    <svg class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                        <path d="M5 3a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2V5a2 2 0 00-2-2H5zM5 11a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2v-2a2 2 0 00-2-2H5zM11 5a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V5zM11 13a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/>
+                    </svg>
+                    Grid View
+                } @else {
+                    <svg class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clip-rule="evenodd"/>
+                    </svg>
+                    Table View
+                }
+            </button>
+            <button (click)="openCreateModal()"
+                    class="flex items-center gap-2 px-4 py-2.5 bg-slate-800 text-white text-sm font-semibold rounded-xl hover:bg-slate-700 transition-all shadow-sm active:scale-95">
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
+                </svg>
+                New Method
+            </button>
         </div>
     </div>
 
-    <!-- Loading State -->
-    @if (isLoading()) {
-        <div class="flex justify-center items-center py-12">
-            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500"></div>
+    <!-- ── Search ──────────────────────────────────────────────── -->
+    <div class="bg-white rounded-2xl border border-gray-200 shadow-sm p-4">
+        <div class="relative">
+            <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400"
+                 fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+            </svg>
+            <input type="text" placeholder="Search payment methods..."
+                   [value]="searchTerm()"
+                   (input)="onSearch($any($event.target).value)"
+                   class="w-full pl-10 pr-4 py-2.5 text-sm border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-400 focus:border-transparent transition-all bg-gray-50"/>
         </div>
-    }
+    </div>
 
-    <!-- Liste des modes de paiement -->
-    @else if (filteredModesPaiement().length > 0) {
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            @for (modePaiement of filteredModesPaiement(); track modePaiement.id) {
-                <div class="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200 overflow-hidden">
-                    <!-- Header de la carte -->
-                    <div class="p-6 border-b border-gray-100">
-                        <div class="flex items-start justify-between">
-                            <div class="flex items-center gap-3">
-                                <div
-                                        class="w-12 h-12 rounded-lg flex items-center justify-center text-2xl"
-                                        [ngClass]="ModePaiementUtils.getColor(modePaiement.type)"
-                                >
-                                    {{ modePaiement.icon || '💰' }}
+    <!-- ── Main Card ───────────────────────────────────────────── -->
+    <div class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
+
+        @if (isLoading()) {
+            <div class="flex items-center justify-center py-16">
+                <div class="flex flex-col items-center gap-3">
+                    <div class="w-8 h-8 border-4 border-slate-200 border-t-slate-600 rounded-full animate-spin"></div>
+                    <span class="text-sm text-gray-500">Loading...</span>
+                </div>
+            </div>
+        } @else if (filteredModesPaiement().length === 0) {
+            <div class="flex flex-col items-center justify-center py-16 gap-3">
+                <div class="w-14 h-14 bg-slate-50 rounded-2xl flex items-center justify-center">
+                    <svg class="w-7 h-7 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                              d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/>
+                    </svg>
+                </div>
+                <p class="text-gray-500 text-sm font-medium">
+                    {{ searchTerm() ? 'No results found for your search' : 'No payment methods found' }}
+                </p>
+                @if (!searchTerm()) {
+                    <button (click)="openCreateModal()"
+                            class="text-slate-700 text-sm font-semibold hover:text-slate-900 transition-colors underline underline-offset-2">
+                        Create the first method →
+                    </button>
+                }
+            </div>
+        } @else {
+
+            <!-- TABLE VIEW -->
+            @if (viewMode() === 'table') {
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm">
+                        <thead class="bg-gray-50 border-b border-gray-200">
+                        <tr>
+                            <th class="px-4 py-3.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Method</th>
+                            <th class="px-4 py-3.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Type</th>
+                            <th class="px-4 py-3.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Description</th>
+                            <th class="px-4 py-3.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Last Updated</th>
+                            <th class="px-4 py-3.5 text-center text-xs font-semibold text-gray-500 uppercase tracking-wider w-24">Actions</th>
+                        </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-100">
+                            @for (mp of filteredModesPaiement(); track mp.id) {
+                                <tr class="hover:bg-slate-50/60 transition-colors cursor-pointer"
+                                    (click)="openDetailModal(mp, $event)">
+                                    <td class="px-4 py-3.5">
+                                        <div class="flex items-center gap-3">
+                                            <div class="w-9 h-9 rounded-xl flex items-center justify-center text-lg flex-shrink-0"
+                                                 [ngClass]="ModePaiementUtils.getColor(mp.type)">
+                                                {{ mp.icon || '💰' }}
+                                            </div>
+                                            <span class="font-semibold text-gray-800">{{ mp.libelle }}</span>
+                                        </div>
+                                    </td>
+                                    <td class="px-4 py-3.5">
+                                        <span class="inline-flex items-center px-2.5 py-1 rounded-lg bg-slate-100 text-slate-700 text-xs font-semibold">
+                                            {{ mp.type }}
+                                        </span>
+                                    </td>
+                                    <td class="px-4 py-3.5">
+                                        <span class="text-xs text-gray-400 line-clamp-1">{{ mp.description || '—' }}</span>
+                                    </td>
+                                    <td class="px-4 py-3.5 text-xs text-gray-400">
+                                        {{ mp.updatedAt | date: 'dd/MM/yyyy' }}
+                                    </td>
+                                    <td class="px-4 py-3.5 text-center" (click)="$event.stopPropagation()">
+                                        <div class="flex items-center justify-center gap-1">
+                                            <button (click)="openEditModal(mp, $event)"
+                                                    class="flex items-center justify-center w-8 h-8 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all" title="Edit">
+                                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                                                </svg>
+                                            </button>
+                                            <button (click)="deleteModePaiement(mp.id, mp.libelle, $event)"
+                                                    class="flex items-center justify-center w-8 h-8 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all" title="Delete">
+                                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                                </svg>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                        <tfoot class="bg-gray-50 border-t-2 border-gray-200">
+                        <tr>
+                            <td colspan="5" class="px-4 py-3 text-xs font-bold text-gray-500 uppercase">
+                                Total — {{ filteredModesPaiement().length }} method{{ filteredModesPaiement().length > 1 ? 's' : '' }}
+                            </td>
+                        </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            }
+
+            <!-- GRID VIEW -->
+            @if (viewMode() === 'grid') {
+                <div class="p-5 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+                    @for (mp of filteredModesPaiement(); track mp.id) {
+                        <div class="border border-gray-200 rounded-2xl overflow-hidden hover:shadow-md hover:border-slate-300 transition-all cursor-pointer bg-white"
+                             (click)="openDetailModal(mp, $event)">
+                            <div class="p-4 border-b border-gray-100">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-11 h-11 rounded-xl flex items-center justify-center text-2xl flex-shrink-0"
+                                         [ngClass]="ModePaiementUtils.getColor(mp.type)">
+                                        {{ mp.icon || '💰' }}
+                                    </div>
+                                    <div>
+                                        <h3 class="font-semibold text-gray-800">{{ mp.libelle }}</h3>
+                                        <span class="inline-flex items-center px-2 py-0.5 rounded-lg bg-slate-100 text-slate-700 text-xs font-semibold mt-0.5">
+                                            {{ mp.type }}
+                                        </span>
+                                    </div>
                                 </div>
-                                <div>
-                                    <h3 class="text-lg font-semibold text-gray-900">
-                                        {{ modePaiement.libelle }}
-                                    </h3>
-                                    <span class="inline-block px-2 py-0.5 text-xs font-medium bg-gray-100 text-gray-600 rounded">
-                    {{ modePaiement.type }}
-                  </span>
+                            </div>
+                            <div class="p-4 space-y-3">
+                                @if (mp.description) {
+                                    <p class="text-xs text-gray-400 line-clamp-2">{{ mp.description }}</p>
+                                }
+                                <div class="flex items-center gap-1.5 text-xs text-gray-400">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                    </svg>
+                                    Updated {{ mp.updatedAt | date: 'dd/MM/yyyy' }}
                                 </div>
+                            </div>
+                            <div class="flex gap-1 px-4 py-3 border-t border-gray-100 bg-gray-50" (click)="$event.stopPropagation()">
+                                <button (click)="openEditModal(mp, $event)"
+                                        class="flex items-center justify-center w-8 h-8 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all" title="Edit">
+                                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                                    </svg>
+                                </button>
+                                <button (click)="deleteModePaiement(mp.id, mp.libelle, $event)"
+                                        class="flex items-center justify-center w-8 h-8 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all" title="Delete">
+                                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+        }
+    </div>
+</div>
+
+<!-- ===== DETAIL POPUP — PRO DESKTOP STYLE ===== -->
+@if (showDetailModal() && selectedMp(); as mp) {
+    <div class="fixed inset-0 z-[9000] flex items-center justify-center p-4">
+        <div class="absolute inset-0 bg-gray-900/50 backdrop-blur-sm" (click)="closeDetailModal()"></div>
+
+        <div class="relative z-10 w-full max-w-2xl bg-white rounded-2xl shadow-2xl overflow-hidden border border-gray-200">
+
+            <!-- ── Window chrome bar ───────────────────────────── -->
+            <div class="flex items-center justify-between px-5 py-3 bg-gray-100 border-b border-gray-200">
+                <!-- Breadcrumb -->
+                <nav class="flex items-center gap-1.5 text-xs">
+                    <span class="text-gray-400 font-medium">Payment Methods</span>
+                    <svg class="w-3 h-3 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
+                    </svg>
+                    <span class="font-semibold text-gray-700">{{ mp.libelle }}</span>
+                </nav>
+                <button (click)="closeDetailModal()"
+                        class="flex items-center justify-center w-6 h-6 text-gray-400 hover:text-gray-600 rounded transition-colors">
+                    <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+
+            <!-- ── Two-column layout ───────────────────────────── -->
+            <div class="flex">
+
+                <!-- Left sidebar -->
+                <div class="w-56 flex-shrink-0 bg-gray-50 border-r border-gray-200 flex flex-col items-center py-8 px-5 gap-4">
+                    <!-- Big icon -->
+                    <div class="w-20 h-20 rounded-2xl flex items-center justify-center text-4xl shadow-sm border border-gray-200 bg-white"
+                         [ngClass]="ModePaiementUtils.getColor(mp.type)">
+                        {{ mp.icon || '💰' }}
+                    </div>
+                    <div class="text-center">
+                        <h2 class="text-base font-bold text-gray-900">{{ mp.libelle }}</h2>
+                        <span class="inline-flex items-center mt-1.5 px-2.5 py-1 rounded-lg bg-slate-200 text-slate-700 text-xs font-semibold">
+                            {{ mp.type }}
+                        </span>
+                    </div>
+
+                    <!-- Status -->
+                    <div class="w-full pt-3 border-t border-gray-200">
+                        <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2 text-center">Status</p>
+                        @if (mp.estActif) {
+                            <div class="flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl bg-emerald-50 border border-emerald-200">
+                                <span class="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></span>
+                                <span class="text-xs font-bold text-emerald-700">Active</span>
+                            </div>
+                        } @else {
+                            <div class="flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl bg-gray-100 border border-gray-200">
+                                <span class="w-2 h-2 bg-gray-400 rounded-full"></span>
+                                <span class="text-xs font-bold text-gray-500">Inactive</span>
+                            </div>
+                        }
+                    </div>
+
+                    <!-- Sidebar actions -->
+                    <div class="w-full flex flex-col gap-2 mt-auto pt-4 border-t border-gray-200">
+                        <button (click)="openEditFromDetail()"
+                                class="w-full flex items-center justify-center gap-2 px-3 py-2 bg-slate-800 text-white text-xs font-semibold rounded-xl hover:bg-slate-700 transition-colors active:scale-95">
+                            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                            </svg>
+                            Edit
+                        </button>
+                        <button (click)="deleteModePaiement(mp.id, mp.libelle, $event)"
+                                class="w-full flex items-center justify-center gap-2 px-3 py-2 bg-white border border-red-200 text-red-600 text-xs font-semibold rounded-xl hover:bg-red-50 transition-colors">
+                            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                            </svg>
+                            Delete
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Right content -->
+                <div class="flex-1 flex flex-col">
+
+                    <!-- Content area -->
+                    <div class="flex-1 p-6 space-y-5 overflow-y-auto">
+
+                        <!-- Description -->
+                        <div>
+                            <div class="flex items-center gap-2 mb-2">
+                                <svg class="w-3.5 h-3.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h12M4 18h8"/>
+                                </svg>
+                                <span class="text-xs font-bold text-gray-400 uppercase tracking-wider">Description</span>
+                            </div>
+                            <p class="text-sm text-gray-700 bg-gray-50 rounded-xl px-4 py-3 border border-gray-100 leading-relaxed">
+                                {{ mp.description || 'No description available.' }}
+                            </p>
+                        </div>
+
+                        <!-- Details row -->
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="bg-gray-50 rounded-xl p-4 border border-gray-100">
+                                <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Payment Type</p>
+                                <span class="inline-flex items-center px-3 py-1.5 rounded-lg text-sm font-semibold"
+                                      [ngClass]="ModePaiementUtils.getColor(mp.type)">
+                                    {{ mp.type }}
+                                </span>
+                            </div>
+                            <div class="bg-gray-50 rounded-xl p-4 border border-gray-100">
+                                <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Icon</p>
+                                <div class="text-3xl">{{ mp.icon || '💰' }}</div>
+                            </div>
+                        </div>
+
+                        <!-- Timestamps -->
+                        <div class="bg-gray-50 rounded-xl p-4 border border-gray-100 space-y-2.5">
+                            <p class="text-xs font-bold text-gray-400 uppercase tracking-wider">Timestamps</p>
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-2 text-xs text-gray-500">
+                                    <svg class="w-3.5 h-3.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                    </svg>
+                                    Created
+                                </div>
+                                <span class="text-xs font-semibold text-gray-700 bg-white px-2.5 py-1 rounded-lg border border-gray-200">
+                                    {{ mp.createdAt | date: 'dd/MM/yyyy — HH:mm' }}
+                                </span>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-2 text-xs text-gray-500">
+                                    <svg class="w-3.5 h-3.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                                    </svg>
+                                    Last updated
+                                </div>
+                                <span class="text-xs font-semibold text-gray-700 bg-white px-2.5 py-1 rounded-lg border border-gray-200">
+                                    {{ mp.updatedAt | date: 'dd/MM/yyyy — HH:mm' }}
+                                </span>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Corps de la carte -->
-                    <div class="p-6">
-                        @if (modePaiement.description) {
-                            <p class="text-sm text-gray-600 mb-4">
-                                {{ modePaiement.description }}
-                            </p>
-                        }
-
-                        <div class="flex items-center gap-2 text-xs text-gray-500">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                            </svg>
-                            <span>Modifié le {{ modePaiement.updatedAt | date: 'dd/MM/yyyy' }}</span>
-                        </div>
-                    </div>
-
-                    <!-- Footer avec actions -->
-                    <div class="px-6 py-4 bg-gray-50 border-t border-gray-100 flex items-center justify-end gap-2">
-                        <button
-                                [routerLink]="[modePaiement.id]"
-                                class="inline-flex items-center gap-1 px-3 py-1.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
-                        >
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                            </svg>
-                            Voir
-                        </button>
-                        <button
-                                [routerLink]="[modePaiement.id, 'modifier']"
-                                class="inline-flex items-center gap-1 px-3 py-1.5 text-sm font-medium text-orange-700 bg-orange-50 border border-orange-200 rounded-lg hover:bg-orange-100 transition-colors"
-                        >
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                            </svg>
-                            Modifier
-                        </button>
-                        <button
-                                (click)="deleteModePaiement(modePaiement.id, modePaiement.libelle)"
-                                class="inline-flex items-center gap-1 px-3 py-1.5 text-sm font-medium text-red-700 bg-red-50 border border-red-200 rounded-lg hover:bg-red-100 transition-colors"
-                        >
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                            </svg>
-                            Supprimer
-                        </button>
+                    <!-- Status bar -->
+                    <div class="px-5 py-2.5 bg-gray-50 border-t border-gray-200 flex items-center justify-between">
+                        <span class="text-xs text-gray-400">ID: <span class="font-mono text-gray-600">{{ mp.id }}</span></span>
+                        <span class="text-xs text-gray-400">Rentix — Payment Methods</span>
                     </div>
                 </div>
-            }
+            </div>
         </div>
-    }
+    </div>
+}
 
-    <!-- État vide -->
-    @else {
-        <div class="text-center py-12">
-            <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
-            </svg>
-            <h3 class="mt-2 text-sm font-medium text-gray-900">Aucun mode de paiement</h3>
-            <p class="mt-1 text-sm text-gray-500">
-                {{ searchTerm() ? 'Aucun résultat trouvé pour votre recherche' : 'Commencez par créer un nouveau mode de paiement' }}
-            </p>
-            @if (!searchTerm()) {
-                <div class="mt-6">
-                    <button
-                            routerLink="nouveau"
-                            class="inline-flex items-center gap-2 px-4 py-2 bg-orange-500 hover:bg-orange-600 text-white font-medium rounded-lg transition-colors duration-200"
-                    >
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-                        </svg>
-                        Créer un mode de paiement
-                    </button>
-                </div>
-            }
+<!-- ===== CREATE / EDIT MODAL ===== -->
+@if (showModal()) {
+    <div class="fixed inset-0 z-[9000] flex items-center justify-center p-4">
+        <div class="absolute inset-0 bg-gray-900/60 backdrop-blur-sm" (click)="closeModal()"></div>
+        <div class="relative z-10 w-full max-w-lg bg-white rounded-2xl shadow-2xl overflow-hidden">
+            <!-- Chrome bar with breadcrumb -->
+            <div class="flex items-center justify-between px-5 py-3 bg-gray-100 border-b border-gray-200">
+                <nav class="flex items-center gap-1.5 text-xs">
+                    <span class="text-gray-400 font-medium">Payment Methods</span>
+                    <svg class="w-3 h-3 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
+                    </svg>
+                    <span class="font-semibold text-gray-700">
+                        {{ isEditMode() ? 'Edit' : 'New Method' }}
+                    </span>
+                </nav>
+                <button (click)="closeModal()"
+                        class="flex items-center justify-center w-6 h-6 text-gray-400 hover:text-gray-600 rounded transition-colors">
+                    <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+            <div class="px-6 py-5 max-h-[70vh] overflow-y-auto">
+                <app-mode-paiement-form
+                        [initialData]="initialData()"
+                        [isEditMode]="isEditMode()"
+                        [isSaving]="isSaving()"
+                        (submitForm)="onSubmit($event)"
+                        (cancel)="closeModal()">
+                </app-mode-paiement-form>
+            </div>
         </div>
-    }
-</div>
+    </div>
+}

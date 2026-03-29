@@ -1,249 +1,281 @@
-<div class="p-6">
+<div class="space-y-5">
+
     <!-- Header -->
-    <div class="mb-6">
-        <div class="flex items-center justify-between mb-4">
-            <div>
-                <h1 class="text-2xl font-bold text-gray-900">Assurances</h1>
-                <p class="text-sm text-gray-500 mt-1">
-                    Gérez les assurances de vos véhicules
-                </p>
-            </div>
-            <button
-                    routerLink="/dashboard/assurances/nouveau"
-                    class="inline-flex items-center gap-2 px-4 py-2 bg-orange-500 hover:bg-orange-600 text-white font-medium rounded-lg transition-colors duration-200"
-            >
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-                </svg>
-                Nouvelle assurance
-            </button>
+    <div class="flex items-center justify-between">
+        <div>
+            <h1 class="text-xl font-bold text-gray-900">Insurance Contracts</h1>
+            <p class="text-sm text-gray-500 mt-0.5">
+                {{ assurances().length }} contract{{ assurances().length > 1 ? 's' : '' }}
+            </p>
         </div>
+        <button (click)="openCreateModal()"
+                class="flex items-center gap-2 px-4 py-2.5 bg-slate-800 text-white text-sm font-semibold rounded-xl hover:bg-slate-700 transition-all shadow-sm active:scale-95">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
+            </svg>
+            New Insurance
+        </button>
+    </div>
 
-        <!-- Statistiques -->
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-            <div class="bg-white rounded-lg shadow-sm p-4 border-l-4 border-blue-500">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <p class="text-sm text-gray-600">Total</p>
-                        <p class="text-2xl font-bold text-gray-900">{{ stats().total }}</p>
-                    </div>
-                    <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-                        <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                        </svg>
-                    </div>
-                </div>
-            </div>
 
-            <div class="bg-white rounded-lg shadow-sm p-4 border-l-4 border-green-500">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <p class="text-sm text-gray-600">Actives</p>
-                        <p class="text-2xl font-bold text-green-600">{{ stats().active }}</p>
-                    </div>
-                    <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
-                        <span class="text-2xl">✅</span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="bg-white rounded-lg shadow-sm p-4 border-l-4 border-orange-500">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <p class="text-sm text-gray-600">Expirent bientôt</p>
-                        <p class="text-2xl font-bold text-orange-600">{{ stats().expiring }}</p>
-                    </div>
-                    <div class="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
-                        <span class="text-2xl">⚠️</span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="bg-white rounded-lg shadow-sm p-4 border-l-4 border-red-500">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <p class="text-sm text-gray-600">Expirées</p>
-                        <p class="text-2xl font-bold text-red-600">{{ stats().expired }}</p>
-                    </div>
-                    <div class="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center">
-                        <span class="text-2xl">❌</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Filtres -->
-        <div class="flex flex-col sm:flex-row gap-4">
-            <!-- Barre de recherche -->
-            <div class="flex-1 relative">
-                <input
-                        type="text"
-                        placeholder="Rechercher par prestataire, n° police, immatriculation..."
-                        [value]="searchTerm()"
-                        (input)="onSearch($any($event.target).value)"
-                        class="w-full px-4 py-2.5 pl-11 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-                />
-                <svg class="absolute left-3 top-3 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+    <!-- Search + Filters -->
+    <div class="bg-white rounded-2xl border border-gray-200 shadow-sm p-4">
+        <div class="flex flex-col sm:flex-row gap-3">
+            <div class="relative flex-1">
+                <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
                 </svg>
+                <input type="text" (input)="onSearch($event)"
+                       placeholder="Search provider, policy no., plate..."
+                       class="w-full pl-10 pr-4 py-2.5 text-sm border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-400 focus:border-transparent transition-all bg-gray-50"/>
             </div>
-
-            <!-- Filtre par statut -->
-            <div class="flex gap-2">
-                <button
-                        (click)="onFilterChange('all')"
-                        [class]="filterStatus() === 'all' ? 'bg-orange-500 text-white' : 'bg-white text-gray-700 hover:bg-gray-50'"
-                        class="px-4 py-2 border border-gray-300 rounded-lg font-medium transition-colors"
-                >
-                    Tous
+            <div class="flex gap-2 flex-wrap">
+                <button (click)="onFilterChange('all')"
+                        class="px-3 py-2 text-xs font-semibold rounded-lg transition-all border"
+                        [ngClass]="filterStatus() === 'all' ? 'bg-slate-800 text-white border-slate-800' : 'bg-white text-gray-600 border-gray-200 hover:border-gray-300'">
+                    All ({{ stats().total }})
                 </button>
-                <button
-                        (click)="onFilterChange('active')"
-                        [class]="filterStatus() === 'active' ? 'bg-green-500 text-white' : 'bg-white text-gray-700 hover:bg-gray-50'"
-                        class="px-4 py-2 border border-gray-300 rounded-lg font-medium transition-colors"
-                >
-                    Actives
+                <button (click)="onFilterChange('active')"
+                        class="px-3 py-2 text-xs font-semibold rounded-lg transition-all border"
+                        [ngClass]="filterStatus() === 'active' ? 'bg-emerald-600 text-white border-emerald-600' : 'bg-white text-gray-600 border-gray-200 hover:border-gray-300'">
+                    Active ({{ stats().active }})
                 </button>
-                <button
-                        (click)="onFilterChange('expiring')"
-                        [class]="filterStatus() === 'expiring' ? 'bg-orange-500 text-white' : 'bg-white text-gray-700 hover:bg-gray-50'"
-                        class="px-4 py-2 border border-gray-300 rounded-lg font-medium transition-colors"
-                >
-                    À renouveler
+                <button (click)="onFilterChange('expiring')"
+                        class="px-3 py-2 text-xs font-semibold rounded-lg transition-all border"
+                        [ngClass]="filterStatus() === 'expiring' ? 'bg-amber-500 text-white border-amber-500' : 'bg-white text-gray-600 border-gray-200 hover:border-gray-300'">
+                    Expiring ({{ stats().expiring }})
                 </button>
-                <button
-                        (click)="onFilterChange('expired')"
-                        [class]="filterStatus() === 'expired' ? 'bg-red-500 text-white' : 'bg-white text-gray-700 hover:bg-gray-50'"
-                        class="px-4 py-2 border border-gray-300 rounded-lg font-medium transition-colors"
-                >
-                    Expirées
+                <button (click)="onFilterChange('expired')"
+                        class="px-3 py-2 text-xs font-semibold rounded-lg transition-all border"
+                        [ngClass]="filterStatus() === 'expired' ? 'bg-red-500 text-white border-red-500' : 'bg-white text-gray-600 border-gray-200 hover:border-gray-300'">
+                    Expired ({{ stats().expired }})
                 </button>
             </div>
         </div>
     </div>
 
-    <!-- Loading State -->
-    @if (isLoading()) {
-        <div class="flex justify-center items-center py-12">
-            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500"></div>
-        </div>
-    }
+    <!-- Table card -->
+    <div class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
 
-    <!-- Liste des assurances -->
-    @else if (filteredAssurances().length > 0) {
-        <div class="grid grid-cols-1 gap-4">
-            @for (assurance of filteredAssurances(); track assurance.id) {
-                <div class="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200 overflow-hidden">
-                    <div class="p-6">
-                        <div class="flex items-start justify-between">
-                            <!-- Info principale -->
-                            <div class="flex-1">
-                                <div class="flex items-center gap-3 mb-3">
-                                    <div class="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
-                                        <svg class="w-6 h-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                                        </svg>
-                                    </div>
-                                    <div>
-                                        <h3 class="text-lg font-semibold text-gray-900">{{ assurance.prestataire }}</h3>
-                                        <p class="text-sm text-gray-500">
-                                            {{ assurance.vehicule?.immatriculation }} - {{ assurance.vehicule?.marque }} {{ assurance.vehicule?.modele }}
-                                        </p>
-                                    </div>
-                                </div>
-
-                                <!-- Détails -->
-                                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
-                                    <div>
-                                        <p class="text-xs text-gray-500">N° Police</p>
-                                        <p class="text-sm font-medium text-gray-900">{{ assurance.numeroPolice || 'N/A' }}</p>
-                                    </div>
-                                    <div>
-                                        <p class="text-xs text-gray-500">Montant</p>
-                                        <p class="text-sm font-medium text-gray-900">{{ AssuranceUtils.formatMontant(assurance.montantTotal) }}</p>
-                                    </div>
-                                    <div>
-                                        <p class="text-xs text-gray-500">Validité</p>
-                                        <p class="text-sm font-medium text-gray-900">
-                                            {{ AssuranceUtils.formatDate(assurance.dateDebut) }} - {{ AssuranceUtils.formatDate(assurance.dateFinValidite) }}
-                                        </p>
-                                    </div>
-                                    <div>
-                                        <p class="text-xs text-gray-500">Jours restants</p>
-                                        <p class="text-sm font-medium" [class]="AssuranceUtils.getDaysRemaining(assurance) < 30 ? 'text-orange-600' : 'text-gray-900'">
-                                            {{ AssuranceUtils.getDaysRemaining(assurance) }} jours
-                                        </p>
-                                    </div>
-                                </div>
-
-                                <!-- Statut -->
-                                <span [class]="AssuranceUtils.getStatusBadgeClass(assurance)">
-                  {{ AssuranceUtils.getStatus(assurance).icon }}
-                                    {{ AssuranceUtils.getStatus(assurance).label }}
-                </span>
-                            </div>
-
-                            <!-- Actions -->
-                            <div class="flex flex-col gap-2 ml-4">
-                                <button
-                                        [routerLink]="['/dashboard/assurances', assurance.id]"
-                                        class="inline-flex items-center gap-1 px-3 py-1.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
-                                >
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                                    </svg>
-                                    Voir
-                                </button>
-                                <button
-                                        [routerLink]="['/dashboard/assurances', assurance.id, 'modifier']"
-                                        class="inline-flex items-center gap-1 px-3 py-1.5 text-sm font-medium text-orange-700 bg-orange-50 border border-orange-200 rounded-lg hover:bg-orange-100 transition-colors"
-                                >
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                                    </svg>
-                                    Modifier
-                                </button>
-                                <button
-                                        (click)="deleteAssurance(assurance.id, assurance.prestataire)"
-                                        class="inline-flex items-center gap-1 px-3 py-1.5 text-sm font-medium text-red-700 bg-red-50 border border-red-200 rounded-lg hover:bg-red-100 transition-colors"
-                                >
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                    </svg>
-                                    Supprimer
-                                </button>
-                            </div>
-                        </div>
-                    </div>
+        @if (isLoading()) {
+            <div class="flex items-center justify-center py-16">
+                <div class="flex flex-col items-center gap-3">
+                    <div class="w-8 h-8 border-4 border-slate-200 border-t-slate-600 rounded-full animate-spin"></div>
+                    <span class="text-sm text-gray-500">Loading...</span>
                 </div>
-            }
-        </div>
-    }
+            </div>
+        }
 
-    <!-- État vide -->
-    @else {
-        <div class="text-center py-12">
-            <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-            </svg>
-            <h3 class="mt-2 text-sm font-medium text-gray-900">Aucune assurance</h3>
-            <p class="mt-1 text-sm text-gray-500">
-                {{ searchTerm() ? 'Aucun résultat trouvé pour votre recherche' : 'Commencez par créer une nouvelle assurance' }}
-            </p>
-            @if (!searchTerm()) {
-                <div class="mt-6">
-                    <button
-                            routerLink="/dashboard/assurances/nouveau"
-                            class="inline-flex items-center gap-2 px-4 py-2 bg-orange-500 hover:bg-orange-600 text-white font-medium rounded-lg transition-colors duration-200"
-                    >
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-                        </svg>
-                        Créer une assurance
+        @if (!isLoading() && filteredAssurances().length === 0) {
+            <div class="flex flex-col items-center justify-center py-16 gap-3">
+                <div class="w-14 h-14 bg-slate-50 rounded-2xl flex items-center justify-center">
+                    <svg class="w-7 h-7 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+                    </svg>
+                </div>
+                <p class="text-gray-500 text-sm font-medium">
+                    {{ searchTerm() ? 'No results for "' + searchTerm() + '"' : 'No insurance contracts found' }}
+                </p>
+                @if (!searchTerm()) {
+                    <button (click)="openCreateModal()"
+                            class="text-slate-700 text-sm font-semibold hover:text-slate-900 transition-colors underline underline-offset-2">
+                        Create the first contract →
                     </button>
-                </div>
-            }
-        </div>
-    }
+                }
+            </div>
+        }
+
+        @if (!isLoading() && filteredAssurances().length > 0) {
+            <div class="overflow-x-auto">
+                <table class="w-full text-sm">
+                    <thead class="bg-gray-50 border-b border-gray-200">
+                    <tr>
+                        <th class="px-4 py-3.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Vehicle</th>
+                        <th class="px-4 py-3.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Provider</th>
+                        <th class="px-4 py-3.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Policy No.</th>
+                        <th class="px-4 py-3.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Period</th>
+                        <th class="px-4 py-3.5 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider">Amount</th>
+                        <th class="px-4 py-3.5 text-center text-xs font-semibold text-gray-500 uppercase tracking-wider">Status</th>
+                        <th class="px-4 py-3.5 text-center text-xs font-semibold text-gray-500 uppercase tracking-wider w-28">Actions</th>
+                    </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-100">
+                        @for (a of filteredAssurances(); track a.id) {
+                            <tr (click)="viewDetails(a)"
+                                class="hover:bg-slate-50/60 transition-colors cursor-pointer"
+                                [ngClass]="getStatutConfig(a).row">
+
+                                <td class="px-4 py-3.5">
+                                    <div class="font-semibold text-gray-800">{{ getVehiculeDisplay(a) }}</div>
+                                    <div class="text-xs text-gray-400 mt-0.5">{{ getVehiculeMarque(a) }}</div>
+                                </td>
+
+                                <td class="px-4 py-3.5">
+                                    <div class="flex items-center gap-2">
+                                        <div class="w-7 h-7 bg-slate-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                                            <svg class="w-3.5 h-3.5 text-slate-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+                                            </svg>
+                                        </div>
+                                        <span class="font-medium text-gray-800">{{ a.prestataire }}</span>
+                                    </div>
+                                </td>
+
+                                <td class="px-4 py-3.5">
+                                    @if (a.numeroPolice) {
+                                        <span class="font-mono text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded-md">{{ a.numeroPolice }}</span>
+                                    } @else {
+                                        <span class="text-gray-300">—</span>
+                                    }
+                                </td>
+
+                                <td class="px-4 py-3.5">
+                                    <div class="text-gray-700 text-xs font-medium">{{ formatDate(a.dateDebut) }}</div>
+                                    <div class="flex items-center gap-1 text-xs text-gray-400 mt-0.5">
+                                        <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+                                        </svg>
+                                        {{ formatDate(a.dateFinValidite) }}
+                                    </div>
+                                </td>
+
+                                <td class="px-4 py-3.5 text-right">
+                                    <span class="font-semibold text-gray-900">{{ a.montantTotal | number:'1.3-3' }}</span>
+                                    <span class="text-xs text-gray-400 ml-1">TND</span>
+                                </td>
+
+                                <td class="px-4 py-3.5 text-center">
+                                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold"
+                                          [ngClass]="getStatutConfig(a).badge">
+                                        <span class="w-1.5 h-1.5 rounded-full" [ngClass]="getStatutConfig(a).dot"></span>
+                                        {{ getStatutConfig(a).label }}
+                                    </span>
+                                </td>
+
+                                <td class="px-4 py-3.5 text-center" (click)="$event.stopPropagation()">
+                                    <div class="flex items-center justify-center gap-1">
+                                        <button (click)="viewDetails(a)"
+                                                class="flex items-center justify-center w-8 h-8 text-gray-400 hover:text-slate-700 hover:bg-slate-100 rounded-lg transition-all"
+                                                title="View details">
+                                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                                            </svg>
+                                        </button>
+                                        <button (click)="openEditModal(a)"
+                                                class="flex items-center justify-center w-8 h-8 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all"
+                                                title="Edit">
+                                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                                            </svg>
+                                        </button>
+                                        <button (click)="openDeleteConfirm(a, $event)"
+                                                class="flex items-center justify-center w-8 h-8 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all"
+                                                title="Delete">
+                                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                            </svg>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                    <tfoot class="bg-gray-50 border-t-2 border-gray-200">
+                    <tr>
+                        <td colspan="4" class="px-4 py-3 text-xs font-bold text-gray-500 uppercase">
+                            Total ({{ filteredAssurances().length }} contract{{ filteredAssurances().length > 1 ? 's' : '' }})
+                        </td>
+                        <td class="px-4 py-3 text-right font-bold text-sm text-gray-900">
+                            {{ getTotalMontant() | number:'1.3-3' }}
+                            <span class="text-xs text-gray-400 ml-1 font-normal">TND</span>
+                        </td>
+                        <td colspan="2"></td>
+                    </tr>
+                    </tfoot>
+                </table>
+            </div>
+        }
+    </div>
 </div>
+
+<!-- Form Modal -->
+<app-assurance-form-modal
+        *ngIf="showFormModal()"
+        [assuranceToEdit]="assuranceToEdit()"
+        (assuranceCreated)="onAssuranceCreated($event)"
+        (assuranceUpdated)="onAssuranceUpdated($event)"
+        (formClosed)="closeFormModal()"
+/>
+
+<!-- Delete Confirm -->
+@if (showDeleteConfirm()) {
+    <div class="fixed inset-0 z-[9999] flex items-center justify-center p-4">
+        <div class="absolute inset-0 bg-gray-900/60 backdrop-blur-sm" (click)="closeDeleteConfirm()"></div>
+        <div class="relative z-10 w-full max-w-md bg-white rounded-2xl shadow-2xl overflow-hidden border border-gray-200">
+
+            <!-- Chrome bar -->
+            <div class="flex items-center justify-between px-5 py-3 bg-gray-100 border-b border-gray-200">
+                <nav class="flex items-center gap-1.5 text-xs">
+                    <span class="text-gray-400 font-medium">Insurance Contracts</span>
+                    <svg class="w-3 h-3 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
+                    </svg>
+                    <span class="font-semibold text-gray-700">Delete</span>
+                </nav>
+                <button (click)="closeDeleteConfirm()"
+                        class="flex items-center justify-center w-6 h-6 text-gray-400 hover:text-gray-600 rounded transition-colors">
+                    <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+
+            <div class="flex flex-col items-center pt-7 pb-4 px-6">
+                <div class="w-14 h-14 bg-red-50 rounded-2xl flex items-center justify-center mb-4">
+                    <svg class="w-7 h-7 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"/>
+                    </svg>
+                </div>
+                <h3 class="text-lg font-bold text-gray-900">Confirm Deletion</h3>
+                <p class="text-sm text-gray-500 text-center mt-2">
+                    Delete the insurance from
+                    <span class="font-semibold text-gray-800">{{ assuranceToDelete()?.prestataire }}</span>
+                    for vehicle
+                    <span class="font-semibold text-gray-800">{{ getVehiculeDisplay(assuranceToDelete()!) }}</span>?
+                    <br/>This action cannot be undone.
+                </p>
+            </div>
+
+            <div class="mx-6 mb-5 p-3 bg-gray-50 rounded-xl border border-gray-200">
+                <div class="flex items-center justify-between text-xs">
+                    <span class="text-gray-500">Policy No.</span>
+                    <span class="font-mono font-semibold text-gray-700">{{ assuranceToDelete()?.numeroPolice || '—' }}</span>
+                </div>
+                <div class="flex items-center justify-between text-xs mt-1.5">
+                    <span class="text-gray-500">Total Amount</span>
+                    <span class="font-semibold text-gray-800">{{ assuranceToDelete()?.montantTotal | number:'1.3-3' }} TND</span>
+                </div>
+            </div>
+
+            <div class="flex gap-3 px-6 pb-6">
+                <button type="button" (click)="closeDeleteConfirm()" [disabled]="isDeletingAssurance()"
+                        class="flex-1 px-4 py-2.5 text-sm font-semibold text-gray-700 bg-white border border-gray-300 rounded-xl hover:bg-gray-50 transition-colors disabled:opacity-50">
+                    Cancel
+                </button>
+                <button type="button" (click)="confirmDelete()" [disabled]="isDeletingAssurance()"
+                        class="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-semibold text-white bg-red-500 rounded-xl hover:bg-red-600 transition-colors disabled:opacity-50">
+                    @if (isDeletingAssurance()) {
+                        <div class="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin"></div>
+                        Deleting...
+                    } @else {
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                        </svg>
+                        Yes, Delete
+                    }
+                </button>
+            </div>
+        </div>
+    </div>
+}

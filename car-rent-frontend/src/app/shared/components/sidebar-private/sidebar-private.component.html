@@ -13,12 +13,10 @@
     <!-- Sidebar Header -->
     <div class="flex items-center justify-between gap-2 px-6 py-5.5 lg:py-6.5">
         <a href="/dashboard" class="flex items-center gap-2">
-            <!-- Logo RentIX - Plus grand et sans contour -->
             <span class="text-3xl font-black tracking-tight text-gray-900 dark:text-white">
-        Rent<span class="text-orange-500">I</span>X
-      </span>
+                Rent<span class="text-orange-500">I</span>X
+            </span>
         </a>
-
         <button
                 (click)="handleCloseSidebar()"
                 class="block lg:hidden p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-900">
@@ -31,7 +29,6 @@
     <!-- Sidebar Menu -->
     <div class="no-scrollbar flex flex-col overflow-y-auto duration-300 ease-linear">
         <nav class="mt-5 px-4 py-4 lg:mt-9 lg:px-6">
-            <!-- Menu Group -->
             <div>
                 <h3 class="mb-4 ml-4 text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase">
                     MENU
@@ -40,8 +37,9 @@
                 <ul class="mb-6 flex flex-col gap-1.5">
                     @for (item of menuItems; track item.label) {
                         <li>
+
+                            <!-- ── Niveau 1 : lien direct ── -->
                             @if (!item.children) {
-                                <!-- Single Menu Item -->
                                 <a
                                         [routerLink]="item.route"
                                         routerLinkActive="menu-item-active"
@@ -50,71 +48,137 @@
                                         class="group relative flex items-center gap-2.5 rounded-lg px-4 py-2 font-medium duration-300 ease-in-out"
                                         [class.menu-item-active]="rla.isActive"
                                         [class.menu-item-inactive]="!rla.isActive">
-
-                                    <svg
-                                            class="w-5 h-5"
-                                            [class.menu-item-icon-active]="rla.isActive"
-                                            [class.menu-item-icon-inactive]="!rla.isActive"
-                                            fill="none"
-                                            stroke="currentColor"
-                                            viewBox="0 0 24 24">
-                                        <path
-                                                stroke-linecap="round"
-                                                stroke-linejoin="round"
-                                                stroke-width="2"
-                                                [attr.d]="getIcon(item.icon)"/>
+                                    <svg class="w-5 h-5"
+                                         [class.menu-item-icon-active]="rla.isActive"
+                                         [class.menu-item-icon-inactive]="!rla.isActive"
+                                         fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" [attr.d]="getIcon(item.icon)"/>
                                     </svg>
-
                                     {{ item.label }}
+                                    @if (item.badge) {
+                                        <span class="ml-auto inline-flex items-center justify-center px-1.5 py-0.5 text-xs font-bold rounded-full leading-none"
+                                              [class]="getBadgeClasses(item.badgeType)">
+                                            {{ item.badge }}
+                                        </span>
+                                    }
                                 </a>
+
                             } @else {
-                                <!-- Menu Item with Submenu -->
+                                <!-- ── Niveau 1 : accordion ── -->
                                 <button
                                         (click)="toggleMenu(item.label)"
                                         class="group relative flex w-full items-center justify-between gap-2.5 rounded-lg px-4 py-2 font-medium duration-300 ease-in-out menu-item-inactive">
-
                                     <div class="flex items-center gap-2.5">
-                                        <svg
-                                                class="w-5 h-5 menu-item-icon-inactive"
-                                                fill="none"
-                                                stroke="currentColor"
-                                                viewBox="0 0 24 24">
-                                            <path
-                                                    stroke-linecap="round"
-                                                    stroke-linejoin="round"
-                                                    stroke-width="2"
-                                                    [attr.d]="getIcon(item.icon)"/>
+                                        <svg class="w-5 h-5 menu-item-icon-inactive"
+                                             fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" [attr.d]="getIcon(item.icon)"/>
                                         </svg>
-
                                         {{ item.label }}
+                                        @if (item.badge) {
+                                            <span class="ml-1 inline-flex items-center justify-center px-1.5 py-0.5 text-xs font-bold rounded-full leading-none"
+                                                  [class]="getBadgeClasses(item.badgeType)">
+                                                {{ item.badge }}
+                                            </span>
+                                        }
                                     </div>
-
-                                    <svg
-                                            class="w-4 h-4 transition-transform duration-200"
-                                            [class.rotate-180]="isMenuExpanded(item.label)"
-                                            fill="none"
-                                            stroke="currentColor"
-                                            viewBox="0 0 24 24">
+                                    <svg class="w-4 h-4 transition-transform duration-200"
+                                         [class.rotate-180]="isMenuExpanded(item.label)"
+                                         fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
                                     </svg>
                                 </button>
 
-                                <!-- Submenu -->
+                                <!-- ── Niveau 2 ── -->
                                 @if (isMenuExpanded(item.label)) {
-                                    <div class="translate transform overflow-hidden duration-200 ease-in-out">
-                                        <ul class="mt-2 mb-4 flex flex-col gap-2.5 pl-6">
-                                            @for (child of item.children; track child.label) {
-                                                <li>
+                                    <ul class="mt-1 mb-2 flex flex-col gap-0.5 pl-3">
+                                        @for (child of item.children; track child.label) {
+                                            <li>
+
+                                                <!-- Niveau 2 : lien direct -->
+                                                @if (!child.children) {
                                                     <a
                                                             [routerLink]="child.route"
                                                             routerLinkActive="active-submenu-item"
-                                                            class="group relative flex items-center gap-2.5 rounded-md px-4 py-2 font-medium text-gray-600 dark:text-gray-400 duration-300 ease-in-out hover:text-gray-900 dark:hover:text-white">
+                                                            #rla2="routerLinkActive"
+                                                            [routerLinkActiveOptions]="{exact: false}"
+                                                            class="group relative flex items-center gap-2.5 rounded-lg px-4 py-2 text-sm font-medium duration-300 ease-in-out"
+                                                            [class.menu-item-active]="rla2.isActive"
+                                                            [class.menu-item-inactive]="!rla2.isActive">
+                                                        <svg class="w-4 h-4 flex-shrink-0"
+                                                             [class.menu-item-icon-active]="rla2.isActive"
+                                                             [class.menu-item-icon-inactive]="!rla2.isActive"
+                                                             fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" [attr.d]="getIcon(child.icon)"/>
+                                                        </svg>
                                                         {{ child.label }}
+                                                        @if (child.badge) {
+                                                            <span class="ml-auto inline-flex items-center justify-center px-1.5 py-0.5 text-xs font-bold rounded-full leading-none"
+                                                                  [class]="getBadgeClasses(child.badgeType)">
+                                                                {{ child.badge }}
+                                                            </span>
+                                                        }
                                                     </a>
-                                                </li>
-                                            }
-                                        </ul>
-                                    </div>
+
+                                                } @else {
+                                                    <!-- Niveau 2 : sous-accordion -->
+                                                    <button
+                                                            (click)="toggleMenu(child.label)"
+                                                            class="group relative flex w-full items-center justify-between gap-2.5 rounded-lg px-4 py-2 text-sm font-medium duration-300 ease-in-out menu-item-inactive">
+                                                        <div class="flex items-center gap-2.5">
+                                                            <svg class="w-4 h-4 flex-shrink-0 menu-item-icon-inactive"
+                                                                 fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" [attr.d]="getIcon(child.icon)"/>
+                                                            </svg>
+                                                            {{ child.label }}
+                                                            @if (child.badge) {
+                                                                <span class="ml-1 inline-flex items-center justify-center px-1.5 py-0.5 text-xs font-bold rounded-full leading-none"
+                                                                      [class]="getBadgeClasses(child.badgeType)">
+                                                                    {{ child.badge }}
+                                                                </span>
+                                                            }
+                                                        </div>
+                                                        <svg class="w-3.5 h-3.5 transition-transform duration-200"
+                                                             [class.rotate-180]="isMenuExpanded(child.label)"
+                                                             fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                                                        </svg>
+                                                    </button>
+
+                                                    <!-- ── Niveau 3 ── -->
+                                                    @if (isMenuExpanded(child.label)) {
+                                                        <ul class="mt-1 mb-1 flex flex-col gap-0.5 pl-3 ml-2 border-l-2 border-orange-100 dark:border-orange-900/30">
+                                                            @for (grandchild of child.children; track grandchild.label) {
+                                                                <li>
+                                                                    <a
+                                                                            [routerLink]="grandchild.route"
+                                                                            routerLinkActive="active-submenu-item"
+                                                                            #rla3="routerLinkActive"
+                                                                            [routerLinkActiveOptions]="{exact: false}"
+                                                                            class="group relative flex items-center gap-2 rounded-lg px-4 py-1.5 text-sm font-medium duration-300 ease-in-out"
+                                                                            [class.menu-item-active]="rla3.isActive"
+                                                                            [class.menu-item-inactive]="!rla3.isActive">
+                                                                        <svg class="w-3.5 h-3.5 flex-shrink-0"
+                                                                             [class.menu-item-icon-active]="rla3.isActive"
+                                                                             [class.menu-item-icon-inactive]="!rla3.isActive"
+                                                                             fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" [attr.d]="getIcon(grandchild.icon)"/>
+                                                                        </svg>
+                                                                        {{ grandchild.label }}
+                                                                        @if (grandchild.badge) {
+                                                                            <span class="ml-auto inline-flex items-center justify-center px-1.5 py-0.5 text-xs font-bold rounded-full leading-none"
+                                                                                  [class]="getBadgeClasses(grandchild.badgeType)">
+                                                                                {{ grandchild.badge }}
+                                                                            </span>
+                                                                        }
+                                                                    </a>
+                                                                </li>
+                                                            }
+                                                        </ul>
+                                                    }
+                                                }
+                                            </li>
+                                        }
+                                    </ul>
                                 }
                             }
                         </li>
@@ -127,33 +191,26 @@
                 <h3 class="mb-4 ml-4 text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase">
                     OTHERS
                 </h3>
-
                 <ul class="mb-6 flex flex-col gap-1.5">
                     <li>
-                        <a
-                                href="#"
-                                class="group relative flex items-center gap-2.5 rounded-lg px-4 py-2 font-medium text-gray-600 dark:text-gray-400 duration-300 ease-in-out hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-900">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <a href="#" class="group relative flex items-center gap-2.5 rounded-lg px-4 py-2 font-medium duration-300 ease-in-out menu-item-inactive">
+                            <svg class="w-5 h-5 menu-item-icon-inactive" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
                             </svg>
                             Charts
                         </a>
                     </li>
                     <li>
-                        <a
-                                href="#"
-                                class="group relative flex items-center gap-2.5 rounded-lg px-4 py-2 font-medium text-gray-600 dark:text-gray-400 duration-300 ease-in-out hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-900">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <a href="#" class="group relative flex items-center gap-2.5 rounded-lg px-4 py-2 font-medium duration-300 ease-in-out menu-item-inactive">
+                            <svg class="w-5 h-5 menu-item-icon-inactive" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5a1 1 0 011-1h4a1 1 0 011 1v7a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM14 5a1 1 0 011-1h4a1 1 0 011 1v7a1 1 0 01-1 1h-4a1 1 0 01-1-1V5zM4 15a1 1 0 011-1h4a1 1 0 011 1v3a1 1 0 01-1 1H5a1 1 0 01-1-1v-3zM14 15a1 1 0 011-1h4a1 1 0 011 1v3a1 1 0 01-1 1h-4a1 1 0 01-1-1v-3z"/>
                             </svg>
                             UI Elements
                         </a>
                     </li>
                     <li>
-                        <a
-                                href="#"
-                                class="group relative flex items-center gap-2.5 rounded-lg px-4 py-2 font-medium text-gray-600 dark:text-gray-400 duration-300 ease-in-out hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-900">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <a href="#" class="group relative flex items-center gap-2.5 rounded-lg px-4 py-2 font-medium duration-300 ease-in-out menu-item-inactive">
+                            <svg class="w-5 h-5 menu-item-icon-inactive" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
                             </svg>
                             Authentication

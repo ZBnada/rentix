@@ -9,6 +9,8 @@ export * from './assurance.routes';
 export * from './components/assurance-list/assurance-list.component';
 export * from './components/assurance-form/assurance-form.component';
 export * from './components/assurance-reglement-form/assurance-reglement-form.component';
+export * from './components/assurance-form-modal/assurance-form-modal.component';
+
 
 // Pages
 export * from './pages/assurance-index/assurance-index.component';
